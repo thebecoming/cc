@@ -8,7 +8,7 @@ local maxRadius = globals.maxRadius
 local maxDepth = globals.maxDepth
 local nextDepth = globals.nextDepth
 
-local isDigStairs = true
+local isDigStairs = false
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local curDepth

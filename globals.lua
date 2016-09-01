@@ -30,15 +30,15 @@ if regionCode == "w" then
 		isResumeMiningDepth = true
 	elseif turtleID == 3 then 
 		startLoc = {x=5717, z=2797, y=68, h="w"}
-		fillLoc = {x=5702, z=2824, y=64, h="s"}
+		fillLoc = {x=5686, z=2824, y=64, h="s"}
 	elseif turtleID == 4 then -- far side
 		isResourcePlacer = true
 		startLoc = {x=5715, z=2797, y=68, h="w"}
-		fillLoc = {x=5721, z=2845, y=63, h="w"}
+		fillLoc = {x=5702, z=2845, y=63, h="w"}
 	elseif turtleID == 5 then  -- near side
 		isResourcePlacer = true
 		startLoc = {x=5713, z=2797, y=68, h="w"}
-		fillLoc = {x=5722, z=2845, y=63, h="w"}
+		fillLoc = {x=5702, z=2823, y=63, h="w"}
 	elseif turtleID == 6 then 
 		startLoc = {x=5711, z=2797, y=68, h="w"}
 		fillLoc = {x=5600, z=2824, y=64, h="s"}
