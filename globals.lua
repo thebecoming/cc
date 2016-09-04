@@ -16,32 +16,43 @@ if tonumber(numSeg) ~= nil then
 	regionCode = string.sub(os.getComputerLabel(), 1, 1)
 end
 
+-- water_base
 if regionCode == "w" then
-	-- water_base
+
+	-- mine 1
 	if turtleID == 1 then 
 		startLoc = {x=5721, z=2797, y=68, h="w"}
-		fillLoc = {x=5743, z=2824, y=64, h="s"}
-		mineLoc = {x=5743, z=2824, y=63, h="s"}
+		mineLoc = {x=5703, z=2824, y=63, h="s"}
 		isResumeMiningDepth = true
+		
+	-- mine 2
 	elseif turtleID == 2 then 
 		startLoc = {x=5719, z=2797, y=68, h="w"}
-		fillLoc = {x=5721, z=2824, y=64, h="s"}
-		mineLoc = {x=5723, z=2824, y=63, h="s"}
+		mineLoc = {x=5683, z=2824, y=63, h="s"}
 		isResumeMiningDepth = true
+		
+	-- mine 3
 	elseif turtleID == 3 then 
 		startLoc = {x=5717, z=2797, y=68, h="w"}
-		fillLoc = {x=5686, z=2824, y=64, h="s"}
-	elseif turtleID == 4 then -- far side
+		mineLoc = {x=5663, z=2824, y=63, h="s"}
+		isResumeMiningDepth = true
+		
+	-- far side glass
+	elseif turtleID == 4 then 
 		isResourcePlacer = true
 		startLoc = {x=5715, z=2797, y=68, h="w"}
-		fillLoc = {x=5702, z=2845, y=63, h="w"}
-	elseif turtleID == 5 then  -- near side
+		fillLoc = {x=5663, z=2845, y=63, h="w"}
+		
+	-- near side glass
+	elseif turtleID == 5 then 
 		isResourcePlacer = true
 		startLoc = {x=5713, z=2797, y=68, h="w"}
-		fillLoc = {x=5702, z=2823, y=63, h="w"}
+		fillLoc = {x=5683, z=2823, y=63, h="w"}
+		
+	-- sand dropper
 	elseif turtleID == 6 then 
 		startLoc = {x=5711, z=2797, y=68, h="w"}
-		fillLoc = {x=5600, z=2824, y=64, h="s"}
+		fillLoc = {x=5644, z=2824, y=64, h="s"}
 	end
 	
 	destroyLoc = {x=5712, z=2803, y=68, h="w"}
@@ -68,7 +79,7 @@ if regionCode == "w" then
 	else
 		resourceName = "minecraft:sand"
 		length = 20
-		width = 10
+		width = 20
 	end
 	
 elseif regionCode == "d" then
