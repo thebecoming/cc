@@ -1,5 +1,5 @@
 inventorySize = 16
-flyCeiling = 75
+flyCeiling = 100
 port_log = 969
 port_turtleCmd = 967
 port_modemLocate = 967
@@ -85,11 +85,11 @@ if regionCode == "w" then
 elseif regionCode == "d" then
 	-- desert
 	if turtleID == 1 then 
-		startLoc = {x=-1557, z=7602, y=70, h="n"}
-		mineLoc = {x=-1562, z=7602, y=70, h="w"}
-		maxRadius = 8
+		startLoc = {x=207, z=1920, y=83, h="n"}
+		mineLoc = {x=193, z=1934, y=98, h="e"}
+		maxRadius = 10
 		nextDepth = 1
-		maxDepth = 0
+		maxDepth = 6
 		isResumeMiningDepth = true
 	elseif turtleID == 2 then 
 		startLoc = {x=-1557, z=7600, y=70, h="n"}
@@ -118,18 +118,18 @@ elseif regionCode == "d" then
 		startLoc = {x=-1557, z=7594, y=70, h="n"}
 	end
 	
-	destroyLoc = {x=-1555, z=7594, y=70, h="e"}
-	rarity2Loc = {x=-1555, z=7598, y=70, h="e"}
-	rarity3Loc = {x=-1555, z=7600, y=70, h="e"}
-	rarity4Loc = {x=-1555, z=7602, y=70, h="e"}
-	fuelLoc = {x=-1551, z=7598, y=70, h="e"}
+	destroyLoc = {x=202, z=1927, y=83, h="n"}
+	rarity2Loc = {x=205, z=1927, y=83, h="n"}
+	rarity3Loc = {x=207, z=1927, y=83, h="n"}
+	rarity4Loc = {x=209, z=1927, y=83, h="n"}
+	fuelLoc = {x=211, z=1927, y=83, h="n"}
 	
-	resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
-	resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
+	-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
+	-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
 	--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
 	--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
-	fillLoc = {x=-1559, z=7588, y=72, h="n"}
-	resourceName = "minecraft:sand"
+	-- fillLoc = {x=-1559, z=7588, y=72, h="n"}
+	-- resourceName = "minecraft:sand"
 	
 -- Z = desert 2
 elseif regionCode == "z" then

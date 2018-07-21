@@ -1,5 +1,5 @@
 -- ****************************
--- Written by Precious_Diamond
+-- Written by TheBecoming
 -- ****************************
 
 os.loadAPI("globals")
@@ -8,7 +8,7 @@ local redstoneSide = "left"
 local isDoorOpen = false
 
 local function InitProgram()	
-	print("DoorManager v1.0")
+	print("DoorManager v1.1")
 	WriteDoorStatus()		
 	while true do  
 		input = io.read()  
@@ -18,6 +18,10 @@ local function InitProgram()
 			WriteDoorStatus()
 			sleep(5)			
 			isDoorOpen = false
+			redstone.setOutput(redstoneSide, isDoorOpen)
+			WriteDoorStatus()
+		elseif input == "stayopen" then
+			isDoorOpen = true
 			redstone.setOutput(redstoneSide, isDoorOpen)
 			WriteDoorStatus()
 		elseif input == "close" then
@@ -37,9 +41,9 @@ end
 
 function WriteDoorStatus()
 	if isDoorOpen then
-    print("Door opened")
+    	print("Door opened")
 	else
-    print("Door closed")
+    	print("Door closed")
 	end
 end
 
