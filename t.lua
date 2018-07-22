@@ -60,7 +60,13 @@ function GoToPos(aDestLoc, aIsFly, aIsMovingHome)
 		end		
 		if not DigAndGoForward() then 
 			--util.Print("DigAndGoForward failed moving z")
-			return false 
+			-- Detect a turtle and pause			
+			local inspectSuccess, data = turtle.inspect()
+			if inspectSuccess && data.name == "computercraft:turtle" then
+				-- just pause until the other turtle passes
+			else
+				return false 
+			end
 		end
 	end
 	
