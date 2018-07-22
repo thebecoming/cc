@@ -60,13 +60,7 @@ function GoToPos(aDestLoc, aIsFly, aIsMovingHome)
 		end		
 		if not DigAndGoForward() then 
 			--util.Print("DigAndGoForward failed moving z")
-			-- Detect a turtle and pause			
-			local inspectSuccess, data = turtle.inspect()
-			if inspectSuccess && data.name == "computercraft:turtle" then
-				-- just pause until the other turtle passes
-			else
-				return false 
-			end
+			return false 
 		end
 	end
 	
@@ -259,7 +253,10 @@ function Dig()
 				end
 			end
 			return true -- do nothing
+		elseif data.name == "computercraft:turtle"
+			return true -- do nothing (wait for turtle to pass)
 		end
+		
 		local blockData = util.GetBlockData(data)
 		if not blockData then
 			util.Print("Block doesn't exist in data")
