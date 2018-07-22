@@ -253,10 +253,10 @@ function Dig()
 				end
 			end
 			return true -- do nothing
-		elseif data.name == "computercraft:turtle"
+		elseif data.name == "computercraft:turtle" then
 			return true -- do nothing (wait for turtle to pass)
 		end
-		
+
 		local blockData = util.GetBlockData(data)
 		if not blockData then
 			util.Print("Block doesn't exist in data")
