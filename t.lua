@@ -258,7 +258,11 @@ function Dig()
 		if not blockData then
 			util.Print("Block doesn't exist in data")
 			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
-			return false	
+			-- return false	
+			if not turtle.dig() then
+				util.Print("Unable to dig!")
+				return false
+			end
 		elseif not blockData.isDiggable then
 			undiggableBlockData = data
 			util.Print("Undiggable block found")

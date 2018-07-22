@@ -87,9 +87,9 @@ elseif regionCode == "d" then
 	if turtleID == 1 then 
 		startLoc = {x=207, z=1920, y=83, h="n"}
 		mineLoc = {x=193, z=1934, y=98, h="e"}
-		maxRadius = 10
-		nextDepth = 1
-		maxDepth = 6
+		maxRadius = 5
+		nextDepth = 6
+		maxDepth = 8
 		isResumeMiningDepth = true
 	elseif turtleID == 2 then 
 		startLoc = {x=-1557, z=7600, y=70, h="n"}

@@ -102,6 +102,9 @@ function InitProgram()
 	tmpData = {uid = "minecraft:flowing_water", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:rail", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:glass", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
+
+	tmpData = {uid = "minecraft:farmland", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:log", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	
 	-- NON BLOCK ITEMS
 	tmpData = {uid = "minecraft:gold", rarity=4}; blockData[tmpData.uid] = tmpData
