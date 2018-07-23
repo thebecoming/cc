@@ -491,11 +491,15 @@ function DropBlocksByRarity(aRarity)
 		local data = turtle.getItemDetail()
 		if data then
 			local blockData = util.GetBlockData(data)
-			if blockData and blockData.rarity == aRarity then			
-				if blockData.rarity > 2 then
-					util.Print("Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
+			if blockData and blockData.rarity == aRarity then	
+				if data.name == "minecraft:torch" then 
+					-- Turtles keep their torches
+				else
+					if blockData.rarity > 2 then
+						util.Print("Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
+					end
+					if not turtle.drop() then success = false end
 				end
-				if not turtle.drop() then success = false end
 			else
 				util.Print("blockData NOT found")
 				util.Print(data.name)

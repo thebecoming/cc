@@ -15,6 +15,8 @@ shell.run("delete sendTurtleMsg")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/sendTurtleMsg.lua sendTurtleMsg")
 shell.run("delete globals")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/globals.lua globals")
+shell.run("delete startup")
+shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/startPDA.lua startup")
 
 end
 
