@@ -654,20 +654,20 @@ function RegisterCommandListener(aCallback)
 					DispatchLocation()
 				
 				elseif string.lower(command) == "ping" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
 				
 				elseif string.lower(command) == "names" then		
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel())
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel())
 					
 				elseif string.lower(command) == "getfuel" then
 					local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, reply)
+					modem.transmit(globals.port_log, globals.port_turtleCmd, reply)
 
 					
 				-- MANUAL LOCATION COMMANDS
 				-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~					
 				elseif string.lower(command) == "up" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up()))
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "up10" then
@@ -675,11 +675,11 @@ function RegisterCommandListener(aCallback)
 					for n=1, 10 do
 						if Up() then moveCount=moveCount+1 end
 					end
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " up " .. tostring(moveCount) .. " spaces")
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " up " .. tostring(moveCount) .. " spaces")
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "down" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down()))
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "down10" then
@@ -687,11 +687,11 @@ function RegisterCommandListener(aCallback)
 					for n=1, 10 do
 						if Down() then moveCount=moveCount+1 end
 					end
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " down " .. tostring(moveCount) .. " spaces")
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " down " .. tostring(moveCount) .. " spaces")
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "forward" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
 					DispatchLocation()
 					
 				elseif string.lower(command) == "forward10" then
@@ -699,11 +699,11 @@ function RegisterCommandListener(aCallback)
 					for n=1, 10 do
 						if Forward() then moveCount=moveCount+1 end
 					end
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "back" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward()))
 					DispatchLocation()
 					
 				elseif string.lower(command) == "back10" then
@@ -711,15 +711,15 @@ function RegisterCommandListener(aCallback)
 					for n=1, 10 do
 						if Backward() then moveCount=moveCount+1 end
 					end
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " back " .. tostring(moveCount) .. " spaces")
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " back " .. tostring(moveCount) .. " spaces")
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "turnleft" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft()))
 					--DispatchLocation()
 					
 				elseif string.lower(command) == "turnright" then
-					modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight()))
+					modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight()))
 					--DispatchLocation()
 					
 				else

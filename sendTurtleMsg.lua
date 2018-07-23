@@ -14,7 +14,7 @@ function InitProgram()
 		return false
 	end	
 	modem.open(globals.port_log)
-	modem.open(globals.port_turtleCmd)
+	-- modem.open(globals.port_turtleCmd)
 	
 	-- Monitor
 	monitor = util.InitMonitor()
@@ -26,13 +26,13 @@ end
 function ListenForLogReceive()
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")		
-		if senderChannel == globals.port_turtleCmd or (senderChannel == globals.port_log and isListenLogPort) then 
+		-- if senderChannel == globals.port_turtleCmd or (senderChannel == globals.port_log and isListenLogPort) then 
 			if isShowDistance then
 				util.Print("d:" .. tostring(senderDistance) .. " " .. message)
 			else
 				util.Print(message)
 			end
-		end
+		-- end
 	end
 end
 

@@ -16,6 +16,9 @@ function InitProgram()
 	if not modem.isOpen(globals.port_log) then
 		modem.open(globals.port_log)
 	end
+	if not modem.isOpen(globals.port_turtleCmd) then
+		modem.open(globals.port_turtleCmd)
+	end
 	
 	-- Monitor
 	monitor = util.InitMonitor()
@@ -25,7 +28,7 @@ function InitProgram()
 
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
-		if senderChannel ~= globals.port_log then return false end
+		if senderChannel ~= globals.port_log and senderChannel ~= globals.port_turtleCmd then return false end
 		util.Print(message)
 	end
 end
