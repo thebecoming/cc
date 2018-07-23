@@ -53,10 +53,6 @@ function InitProgram()
 	EndProgram()
 end
 
-function ListenForCommands()
-	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
-end
-
 function BeginTurtleNavigation()
 	isStop = false
 	
@@ -264,7 +260,11 @@ function BeginMining()
 end
 
 
-function ListenForReturnMsg_Callback(command)
+function ListenForCommands()
+	t.RegisterCommandListener(CommandHandler)
+end
+
+function CommandHandler(command)
 	if string.lower(command) == "stop" then
 		stopReason = "incoming_stop"
 		isStop = true
@@ -272,7 +272,7 @@ function ListenForReturnMsg_Callback(command)
 	elseif string.lower(command) == "gohome" then
 		stopReason = "incoming_gohome"
 		isStop = true
-		
+
 	elseif string.lower(command) == "unload" then
 		stopReason = "incoming_unload"
 		isStop = true

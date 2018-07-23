@@ -46,7 +46,7 @@ function InitProgram()
 end
 
 function ListenForCommands()
-	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
+	t.RegisterCommandListener(CommandHandler)
 end
 
 function BeginTurtleNavigation()
@@ -226,7 +226,7 @@ function BeginFilling()
 end
 
 
-function ListenForReturnMsg_Callback(command)
+function CommandHandler(command)
 	if string.lower(command) == "stop" then
 		stopReason = "incoming_stop"
 		isStop = true

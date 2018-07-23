@@ -35,9 +35,6 @@ function InitProgram()
 		isValidInit = false 
 	end
 	
-	-- open the modem too so we can listen for pings so we can use the senderDistance in case GPS isn't working
-	--modem.open(globals.port_modemLocate)
-	
 	if not isValidInit then
 		util.Print("Unable to Initialize program")
 		util.Print("stopReason: " .. stopReason)
@@ -48,7 +45,6 @@ function InitProgram()
 end
 
 function StartDispatchLocLoop()
-	print("Broadcasting coordinates on channel " .. tostring(globals.port_log))
 	local n=1
 	local iterateCount = 1
 	while not isTerminateProgram do
@@ -76,14 +72,14 @@ function ListenForConsoleInput()
 end
 
 function ListenForCommands()
-	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
+	t.RegisterCommandListener(CommandHandler)
 end
 
-function ListenForReturnMsg_Callback(command)		
+function CommandHandler(command)		
 	if string.lower(command) == "gohome" then
 		stopReason = "incoming_gohome"
 		isStop = true
-		
+
 	elseif string.lower(command) == "stopbroadcast" then
 		isStopBroadcasting = true
 		
@@ -95,7 +91,14 @@ function ListenForReturnMsg_Callback(command)
 		local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
 		if not t.GoRefuel() then isStop = true; util.Print("can't return to get to refuel dest") end
 		if not t.GoToPos(returnLoc, true, false) then isStop = true; util.Print("can't return from refuel dest") end
+		
+	elseif string.lower(command) == "unload" then
+		-- make a copy to break the reference to startLoc
+		local returnLoc = {x=startLoc["x"],y=startLoc["y"],z=startLoc["z"],h=startLoc["h"]}
+		if not t.GoUnloadInventory() then util.Print("Unable to move during GoUnloadInventory()") end
+		if not t.GoToPos(returnLoc, true, false) then util.Print("Unable to return home from GoUnloadInventory() to startLoc") end
 	end
+	
 end
 
 InitProgram()

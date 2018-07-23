@@ -115,6 +115,8 @@ function InitProgram()
 	tmpData = {uid = "minecraft:quartz", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
+
+	tmpData = {uid = "chisel:marble2", rarity=1}; blockData[tmpData.uid] = tmpData
 end
 
 function GetBlockUID(data)
