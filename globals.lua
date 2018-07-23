@@ -2,7 +2,6 @@ inventorySize = 16
 flyCeiling = 100
 port_log = 969
 port_turtleCmd = 967
-port_modemLocate = 967
 rednetRepeaterID = 1717
 startLoc,destroyLoc,rarity2Loc,rarity3Loc,rarity4Loc = nil
 fuelLoc,sandLoc,fillLoc,resourceName,isResourcePlacer,maxResourceCount = nil

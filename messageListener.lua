@@ -21,6 +21,7 @@ function InitProgram()
 	monitor = util.InitMonitor()
 	
 	util.Print("Listening on port: " .. tostring(globals.port_log))
+	util.Print("Listening on port: " .. tostring(globals.port_turtleCmd))
 
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")

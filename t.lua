@@ -20,9 +20,6 @@ function InitTurtle(aModem, aHomeLoc, aCurLoc)
 	modem = aModem
 	startLoc = aHomeLoc
 	loc = aCurLoc
-	if not modem.isOpen(globals.port_modemLocate) then
-		modem.open(globals.port_modemLocate)
-	end
 	
 	if turtle.getFuelLevel() == 0 then
 		util.Print("OUT OF GAS !!!!!")
