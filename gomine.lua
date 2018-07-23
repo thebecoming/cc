@@ -92,13 +92,13 @@ function BeginTurtleNavigation()
 			-- Return home
 			isStop = false
 			stopReason = ""
-			util.Print("I am going home now..")
+			util.Print("Coming home.. Master")
 			if not t.GoToPos(globals.startLoc, true, true) then 
 				util.Print("Unable to return home!")
 				util.Print("stopReason: " .. stopReason)
 				return false
 			end		
-			util.Print("I have return home master")
+			util.Print("I have return home Master")
 			util.Print("stopReason: " .. stopReason)
 			
 			local undiggableBlockData = t.GetUndiggableBlockData()
