@@ -91,6 +91,7 @@ function BeginTurtleNavigation()
 		else
 			-- Return home
 			isStop = false
+			local lastStopReason = stopReason;
 			stopReason = ""
 			util.Print("Coming home.. Master")
 			if not t.GoToPos(globals.startLoc, true, true) then 
@@ -99,7 +100,7 @@ function BeginTurtleNavigation()
 				return false
 			end		
 			util.Print("I have return home Master")
-			util.Print("stopReason: " .. stopReason)
+			util.Print("stopReason: " .. lastStopReason)
 			
 			local undiggableBlockData = t.GetUndiggableBlockData()
 			if undiggableBlockData then

@@ -5,7 +5,7 @@ local modem, monitor, isShowDistance
 local isListenLogPort = false
 
 function InitProgram()
-	print("SendTurtleMsg v2.0")
+	print("SendTurtleMsg v2.1")
 	util.InitUtil(false)
 	
 	modem = util.InitModem()	
@@ -13,26 +13,26 @@ function InitProgram()
 		util.Print("No Modem Found!")
 		return false
 	end	
-	modem.open(globals.port_log)
-	-- modem.open(globals.port_turtleCmd)
+	if not modem.isOpen(globals.port_log) then modem.open(globals.port_log) end
+	if not modem.isOpen(globals.port_turtleCmd) then modem.open(globals.port_turtleCmd) end
 	
 	-- Monitor
 	monitor = util.InitMonitor()
 	
-	parallel.waitForAll(ListenForLogReceive, MessageDispatcher)
+	parallel.waitForAll(AwaitModemMsg, MessageDispatcher)
 	
 end
 
-function ListenForLogReceive()
+function AwaitModemMsg()
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")		
-		-- if senderChannel == globals.port_turtleCmd or (senderChannel == globals.port_log and isListenLogPort) then 
+		if senderChannel == globals.port_turtleCmd or (senderChannel == globals.port_log and isListenLogPort) then 
 			if isShowDistance then
 				util.Print("d:" .. tostring(senderDistance) .. " " .. message)
 			else
 				util.Print(message)
 			end
-		-- end
+		end
 	end
 end
 
@@ -60,8 +60,10 @@ function MessageDispatcher()
 			isShowDistance = not isShowDistance
 		elseif msg == "log on" then
 			isListenLogPort = true
+			util.Print("Logging port enabled")
 		elseif msg == "log off" then
 			isListenLogPort = false
+			util.Print("Logging port disabled")
 		else
 			modem.transmit(globals.port_turtleCmd, globals.port_turtleCmd, msg)
 			sleep(0.2)
@@ -71,7 +73,9 @@ function MessageDispatcher()
 end
 
 function ListCommands()
-	util.Print("Turtle Commands:")
+	util.Print("~~~~~~~~~~~~~~~~~~~~")
+	util.Print("Commands:")
+	util.Print("~~~~~~~~~~~~~~~~~~~~")
 	util.Print("stop")
 	util.Print("gohome")
 	util.Print("unload")
