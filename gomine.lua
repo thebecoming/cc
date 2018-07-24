@@ -46,7 +46,7 @@ function InitProgram()
 	
 	if not isValidInit then
 		util.Print("Unable to Initialize program")
-		util.Print("stopReason: " .. stopReason)
+		t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
 	else
 		parallel.waitForAll(ListenForCommands, BeginTurtleNavigation)
 	end
@@ -60,7 +60,7 @@ function BeginTurtleNavigation()
 		t.ResetInventorySlot()
 		
 		-- fly To destination
-		util.Print("going to mineLoc")
+		t.SendMessage(globals.port_log, "going to mineLoc")
 		if not t.GoToPos(mineLoc, true, false) then isStop = true end
 
 		-- Start mining
@@ -76,8 +76,8 @@ function BeginTurtleNavigation()
 		
 		-- don't return home for these situations
 		if stopReason == "incoming_stop" or stopReason == "out_of_fuel" then
-			util.Print("STOPPING IN PLACE!")
-			util.Print("stopReason:" .. stopReason)
+			t.SendMessage(globals.port_log, "STOPPING IN PLACE!")
+			t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
 			return false
 		elseif stopReason == "incoming_refuel" then
 			t.GoRefuel()
@@ -93,34 +93,19 @@ function BeginTurtleNavigation()
 			isStop = false
 			local lastStopReason = stopReason;
 			stopReason = ""
-			util.Print("Coming home.. Master")
+			t.SendMessage(globals.port_log, "Coming home...")
 			if not t.GoToPos(globals.startLoc, true, true) then 
-				util.Print("Unable to return home!")
-				util.Print("stopReason: " .. stopReason)
+				t.SendMessage(globals.port_log, "Unable to return home!")
+				t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
 				return false
 			end		
-			util.Print("I have return home Master")
-			util.Print("stopReason: " .. lastStopReason)
+			t.SendMessage(globals.port_log, "I am home")
+			t.SendMessage(globals.port_log, "stopReason: " .. lastStopReason)
 			
 			local undiggableBlockData = t.GetUndiggableBlockData()
 			if undiggableBlockData then
-				util.Print("Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))	
-			end
-			
-			local isValidCommand = false
-			local command = ""
-			while not isValidCommand do
-				util.Print("What now? (resume/quit)")
-				command = io.read()
-				isValidCommand = (string.lower(command) == "resume" or string.lower(command) == "quit")
-				if not isValidCommand then util.Print("Invalid command") end
-			end
-			
-			if string.lower(command) == "resume" then
-				-- do nothing..  continues program
-			elseif input == "quit" then
-				break -- Aborting program
-			end
+				t.SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
+			end			
 		end
 		
 		-- Setting up to resume
@@ -159,7 +144,7 @@ function BeginMining()
 				t.Down();
 			end
 			curDepth = mineLoc["y"] - currentLoc["y"]
-			util.Print("Depth:" .. tostring(curDepth))
+			t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
 			if isStop then return false end	
 		else
 			local depthIncrement = nextDepth - curDepth
@@ -167,7 +152,7 @@ function BeginMining()
 			for n=1,nextDepth - curDepth do
 				if not t.DigAndGoDown() then return false end	
 			curDepth = mineLoc["y"] - currentLoc["y"]
-				util.Print("Depth:" .. tostring(curDepth))
+				t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
 				if isStop then return false end	
 			end
 		end
@@ -248,7 +233,7 @@ function BeginMining()
 		
 		-- stopped at inner radius
 		if maxDepth > 0 and curDepth == maxDepth then
-			util.Print("Max curDepth: " .. tostring(maxDepth) .. " hit")
+			t.SendMessage(globals.port_log, "Max curDepth: " .. tostring(maxDepth) .. " hit")
 			return false
 		end
 		
@@ -257,7 +242,7 @@ function BeginMining()
 		if not t.GoToPos(cornerLoc, false, false) then return false end
 		nextDepth = curDepth+1
 	end
-	util.Print("Mining END")
+	t.SendMessage(globals.port_log, "Mining END")
 end
 
 
@@ -285,7 +270,7 @@ end
 
 
 function EndProgram()
-	util.Print("gomine program END")
+	t.SendMessage(globals.port_log, "gomine program END")
 end
 
 

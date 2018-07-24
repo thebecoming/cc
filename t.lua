@@ -25,7 +25,7 @@ function InitTurtle(aModem, aHomeLoc, aCurLoc)
 	end
 	
 	if turtle.getFuelLevel() == 0 then
-		util.Print("OUT OF GAS !!!!!")
+		SendMessage(globals.port_log, "OUT OF GAS !!!!!")
 		stopReason = "no_fuel"
 	end
 	
@@ -259,24 +259,24 @@ function Dig()
 
 		local blockData = util.GetBlockData(data)
 		if not blockData then
-			util.Print("Block doesn't exist in data")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Block doesn't exist in data")
+			SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 			-- return false	
 			if not turtle.dig() then
-				util.Print("Unable to dig!")
+				SendMessage(globals.port_log, "Unable to dig!")
 				return false
 			end
 		elseif not blockData.isDiggable then
 			undiggableBlockData = data
-			util.Print("Undiggable block found")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Undiggable block found")
+			SendMessage(globals.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
 			return false
 		elseif data.name == "minecraft:bedrock" then 
 			stopReason = "hit_bedrock"		
 			return false
 		else
 			if not turtle.dig() then
-				util.Print("Unable to dig!")
+				SendMessage(globals.port_log, "Unable to dig!")
 				return false
 			else
 				PrintDigResult(data, blockData)
@@ -298,20 +298,20 @@ function DigDown()
 		end
 		local blockData = util.GetBlockData(data)
 		if not blockData then
-			util.Print("Block doesn't exist in data")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Block doesn't exist in data")
+			SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 			return false
 		elseif not blockData.isDiggable then
 			undiggableBlockData = data
-			util.Print("Undiggable block found")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Undiggable block found")
+			SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 			return false
 		elseif data.name == "minecraft:bedrock" then 
 			stopReason = "hit_bedrock"		
 			return false
 		else
 			if not turtle.digDown() then
-				util.Print("Unable to digDown!")
+				SendMessage(globals.port_log, "Unable to digDown!")
 				return false
 			else
 				PrintDigResult(data, blockData)
@@ -333,20 +333,20 @@ function DigUp()
 		end
 		local blockData = util.GetBlockData(data)
 		if not blockData then
-			util.Print("Block doesn't exist in data")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Block doesn't exist in data")
+			SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 			return false
 		elseif not blockData.isDiggable then
 			undiggableBlockData = data
-			util.Print("Undiggable block found")
-			util.Print("Name:" .. data.name .. " meta:" .. data.metadata)	
+			SendMessage(globals.port_log, "Undiggable block found")
+			SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 			return false
 		elseif data.name == "minecraft:bedrock" then 
 			stopReason = "hit_bedrock"		
 			return false
 		else
 			if not turtle.digUp() then
-				util.Print("Unable to digUp!")
+				SendMessage(globals.port_log, "Unable to digUp!")
 				return false
 			else
 				PrintDigResult(data, blockData)
@@ -447,16 +447,16 @@ function Refuel(aIsMoveCheck)
 	  end
 		
 		if isRefuel then
-			util.Print("Refueling w/" .. d.name)
+			SendMessage(globals.port_log, "Refueling w/" .. d.name)
 			turtle.refuel()
 			fuelLevel = turtle.getFuelLevel()
-			util.Print("New Fuel level:" .. fuelLevel)
+			SendMessage(globals.port_log, "New Fuel level:" .. fuelLevel)
 		end
 	  slot = slot+1
   end
 	
 	if fuelLevel < 50 then
-		util.Print("LOW ON FUEL!")
+		SendMessage(globals.port_log, "LOW ON FUEL!")
 	end
 end
 
@@ -470,7 +470,7 @@ end
 
 function PrintDigResult(data, blockData)
 	if blockData.rarity == 4 then
-		util.Print("Found: " .. string.gsub(data.name, "minecraft:", "") .. "!!")
+		SendMessage(globals.port_log, "LOOT: " .. string.gsub(data.name, "minecraft:", ""))
 	end
 end
 
@@ -496,13 +496,13 @@ function DropBlocksByRarity(aRarity)
 					-- Turtles keep their torches
 				else
 					if blockData.rarity > 2 then
-						util.Print("Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
+						SendMessage(globals.port_log, "Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
 					end
 					if not turtle.drop() then success = false end
 				end
 			else
-				util.Print("blockData NOT found")
-				util.Print(data.name)
+				SendMessage(globals.port_log, "BlockData NOT found:")
+				SendMessage(globals.port_log, data.name)
 			end		
 		else
 			--util.Print("Empty slot")
@@ -529,9 +529,9 @@ end
 
 function GoRefuel()
 	if not globals.fuelLoc then 
-		util.Print(os.getComputerLabel() .. " No fuel loc found")
+		SendMessage(globals.port_log, "No fuel loc found!")
 	else
-		util.Print(os.getComputerLabel() .. " Going to Refuel..")
+		SendMessage(globals.port_log, "Going to Refuel...")
 		local isFuelContainerEmpty
 		if not GoToPos(globals.fuelLoc, true, false) then isStop = true end
 		if not isStop then 
@@ -544,7 +544,7 @@ function GoRefuel()
 				end
 			end
 			if not GoToPos(globals.fuelLoc, true, false) then 
-				util.Print(os.getComputerLabel() .. " Can't return home from fuel"); 
+				SendMessage(globals.port_log, "Can't return home from fuel")
 				isStop = true 
 			end
 		end
@@ -552,13 +552,13 @@ function GoRefuel()
 end
 
 function GoRefillFromContainer()
-	if not globals.resourceContLoc1 then util.Print("No resource location found!") end
+	if not globals.resourceContLoc1 then SendMessage(globals.port_log, "resourceContLoc1 not set") end
 	local resourceLocations = {globals.resourceContLoc1, globals.resourceContLoc2, globals.resourceContLoc3, globals.resourceContLoc4}
 	local tmpLoc, isInventoryFull, tblKey
 	local isFirstContainer = true
 	local slot = 0
 	local curResourceCount = 0
-	util.Print(os.getComputerLabel() .. " refilling")
+	SendMessage(globals.port_log, "refilling...")
 	
 	for tblKey in pairs(resourceLocations) do	
 		tmpLoc = resourceLocations[tblKey]
@@ -614,7 +614,7 @@ function GetIsHasResource()
 end
 
 function GoUnloadInventory()
-	util.Print(os.getComputerLabel() .. "Going to unload..")
+	SendMessage(globals.port_log, "Going to unload...")
 	if not GoToPos(globals.destroyLoc, true, false) then isStop = true end
 	if not isStop then 
 		if not DropBlocksByRarity(1) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
@@ -777,8 +777,8 @@ function GetCurrentLocation(startLoc)
 		-- make a copy to break the reference to startLoc
 		currentLoc = {x=startLoc["x"],y=startLoc["y"],z=startLoc["z"],h=startLoc["h"]}
 		if not GetIsOnHomeBlock() then
-			util.Print("WARNING: can't validate start loc")
-			util.Print("Make sure startLoc is correct!")
+			SendMessage(globals.port_log, "WARNING: can't validate start loc")
+			SendMessage(globals.port_log, "Make sure startLoc is correct!")
 			return false, currentLoc
 		else
 			return true, currentLoc
@@ -796,4 +796,9 @@ function DispatchLocation()
 		modem.transmit(globals.port_log, globals.port_turtleCmd, 
 			os.getComputerLabel() .. " L x:" .. tostring(loc["x"]) .. " z:" .. tostring(loc["z"]) .. " y:" .. tostring(loc["y"]) .. " h:" .. loc["h"])
 	end
+end
+
+function SendMessage(port, msg)
+	print(msg)
+	modem.transmit(port, globals.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
 end
