@@ -261,10 +261,10 @@ end
 
 
 function ListenForCommands()
-	t.RegisterCommandListener(CommandHandler)
+	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
 end
 
-function CommandHandler(command)
+function ListenForReturnMsg_Callback(command)
 	if string.lower(command) == "stop" then
 		stopReason = "incoming_stop"
 		isStop = true
