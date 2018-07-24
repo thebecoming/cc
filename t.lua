@@ -20,6 +20,9 @@ function InitTurtle(aModem, aHomeLoc, aCurLoc)
 	modem = aModem
 	startLoc = aHomeLoc
 	loc = aCurLoc
+	if not modem.isOpen(globals.port_modemLocate) then 
+		modem.open(globals.port_modemLocate)
+	end
 	
 	if turtle.getFuelLevel() == 0 then
 		util.Print("OUT OF GAS !!!!!")
@@ -630,7 +633,7 @@ function GoUnloadInventory()
 	end
 end
 
-function RegisterCommandListener(aCallback)
+function ListenForReturnMsg(aCallback)
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 		if senderChannel == globals.port_turtleCmd then	

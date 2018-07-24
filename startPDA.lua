@@ -1,1 +1,1 @@
-shell.run("snedTurtleMsg")
+shell.run("sendTurtleMsg")

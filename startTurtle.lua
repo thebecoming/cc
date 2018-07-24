@@ -72,10 +72,10 @@ function ListenForConsoleInput()
 end
 
 function ListenForCommands()
-	t.RegisterCommandListener(CommandHandler)
+	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
 end
 
-function CommandHandler(command)		
+function ListenForReturnMsg_Callback(command)		
 	if string.lower(command) == "gohome" then
 		stopReason = "incoming_gohome"
 		isStop = true
