@@ -108,6 +108,8 @@ function InitProgram()
 
 	tmpData = {uid = "chisel:marble2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "chisel:limestone2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "chisel:basalt2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	-- computercraft:turtle_expanded
 	
 	-- NON BLOCK ITEMS
 	tmpData = {uid = "minecraft:gold", rarity=4}; blockData[tmpData.uid] = tmpData

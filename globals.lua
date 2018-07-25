@@ -86,14 +86,14 @@ elseif regionCode == "d" then
 	-- desert
 	if turtleID == 1 then 
 		startLoc = {x=207, z=1920, y=83, h="n"}
-		mineLoc = {x=193, z=1934, y=98, h="e"}
+		mineLoc = {x=193, z=1934, y=107, h="e"}
 		maxRadius = 5 -- ex: 5 = 11 width (double radius +1)
 		nextDepth = 1
-		maxDepth = 255
+		maxDepth = 255 -- TODO: changing height messes up stair y axis?
 		isResumeMiningDepth = true
 	elseif turtleID == 2 then 
 		startLoc = {x=209, z=1920, y=83, h="n"}
-		mineLoc = {x=217, z=1934, y=98, h="s"}
+		mineLoc = {x=217, z=1934, y=106, h="s"}
 		maxRadius = 5
 		nextDepth = 1
 		maxDepth = 255
@@ -107,7 +107,7 @@ elseif regionCode == "d" then
 		isResumeMiningDepth = true
 	elseif turtleID == 4 then 
 		startLoc = {x=213, z=1920, y=83, h="n"}
-		mineLoc = {x=245, z=1934, y=88, h="s"}
+		mineLoc = {x=245, z=1934, y=97, h="s"}
 		maxRadius = 5
 		nextDepth = 1
 		maxDepth = 255
