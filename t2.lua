@@ -61,38 +61,35 @@ end
 		-- Return home
         SendMessage(globals.port_log, "Going home...")
         if aStopReason then SendMessage(globals.port_log, "Reason: " .. aStopReason) end
-		if not GoToPos(ii, homeLoc, true) then 
-			return false
-		end
+		if not GoToPos(ii, homeLoc, true) then  return false end
 		SendMessage(globals.port_log, "I am home")	
 		-- local undiggableBlockData = GetUndiggableBlockData()
 		-- if undiggableBlockData then
 		-- 	SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
 		-- end
+        return true
 	end
 
 	function GoRefuel(ii)
 		if not globals.fuelLoc then 
-			SendMessage(globals.port_log, "No fuel loc found!")
+            SendMessage(globals.port_log, "No fuel loc found!")
 		else
 			SendMessage(globals.port_log, "Going to Refuel...")
 			local isFuelContainerEmpty
 			local isStop = false
-			if not GoToPos(ii, globals.fuelLoc, true) then isStop = true end
-			if not isStop then 
-				local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
-				while missingFuel > 2000 and not isFuelContainerEmpty do
-					if not turtle.suck() then 
-						isFuelContainerEmpty = true 
-					else
-						Refuel(false)
-					end
-				end
-				if not GoToPos(ii, globals.fuelLoc, true) then 
-					SendMessage(globals.port_log, "Can't return home from fuel")
-				end
-			end
+            if not GoToPos(ii, globals.fuelLoc, true) then return false end
+            
+            local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
+            while missingFuel > 2000 and not isFuelContainerEmpty do
+                if not turtle.suck() then 
+                    isFuelContainerEmpty = true 
+                else
+                    Refuel(false)
+                end
+            end
+            if not GoToPos(ii, globals.fuelLoc, true) then return false end
 		end
+        return true
 	end
 
 	function GoRefillFromContainer(ii)
@@ -110,7 +107,7 @@ end
 				tmpLoc = resourceLocations[tblKey]
 				if tmpLoc and not isInventoryFull then
 					local isContainerEmpty = false		
-					GoToPos(ii, tmpLoc, isFirstContainer)
+					if not GoToPos(ii, tmpLoc, isFirstContainer) then return false end
 					isFirstContainer = false
 								
 					while slot < globals.inventorySize and not isContainerEmpty do
@@ -144,65 +141,79 @@ end
 				end
 			end
 		end
+        return true
 	end
 
 	function GoUnloadInventory(ii)
 		SendMessage(globals.port_log, "Going to unload...")
 		local isStop = false
-		if not GoToPos(ii, globals.destroyLoc, true) then isStop = true end
-		if not isStop then 
-			if not DropBlocksByRarity(ii, 1) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
-		end
-		if not GoToPos(ii, globals.rarity2Loc, false) then isStop = true end
-		if not isStop then 
-			if not DropBlocksByRarity(ii, 2) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
-		end
-		if not GoToPos(ii, globals.rarity3Loc, false) then isStop = true end
-		if not isStop then 
-			if not DropBlocksByRarity(ii, 3) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
-		end
-		if not GoToPos(ii, globals.rarity4Loc, false) then isStop = true end
-		if not isStop then 
-			if not DropBlocksByRarity(ii, 4) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
-		end
+		if not GoToPos(ii, globals.destroyLoc, true) then return false end
+        if not DropBlocksByRarity(ii, 1) then return false end
+		if not GoToPos(ii, globals.rarity2Loc, false) then return false end
+        if not DropBlocksByRarity(ii, 2) then return false end
+		if not GoToPos(ii, globals.rarity3Loc, false) then return false end
+        if not DropBlocksByRarity(ii, 3) then return false end
+		if not GoToPos(ii, globals.rarity4Loc, false) then return false end
+        if not DropBlocksByRarity(ii, 4) then return false end
+        return true
 	end
 
 	function GoToPos(ii, aDestLoc, aIsFly)
 		destLoc = aDestLoc
 		
-		if(aIsFly) then
+        local isAbortInstruction = false
+        if(aIsFly) then
 			while loc["y"] < globals.flyCeiling do
-				if not DigAndGoUp(ii) then return false end
-			end
+                if not DigAndGoUp(ii) then 
+                    isAbortInstruction = true 
+                    return false -- breaks for the while loop only
+                end
+            end
 		end
+        if isAbortInstruction then return false end
 		
 		-- move along z
 		--util.Print("Moving z: " .. tostring(loc["z"]) .. " to " .. tostring(destLoc["z"]))
 		while (loc["z"] ~= destLoc["z"]) do		
 			if loc["z"] < destLoc["z"] then
-				SetHeading(ii, "s")
+				if not SetHeading(ii, "s") then
+                    isAbortInstruction = true 
+                    return false -- breaks for the while loop only
+                end
 			else
-				SetHeading(ii, "n")
+				if not SetHeading(ii, "n") then
+                    isAbortInstruction = true 
+                    return false -- breaks for the while loop only
+                end
 			end		
 			if not DigAndGoForward(ii) then 
 				--util.Print("DigAndGoForward failed moving z")
 				return false 
 			end
 		end
+        if isAbortInstruction then return false end
 		
 		-- move along x
 		--util.Print("Moving X: " .. tostring(loc["x"]) .. " to " .. tostring(destLoc["x"]))
 		while (loc["x"] ~= destLoc["x"]) do		
 			if loc["x"] < destLoc["x"] then
-				SetHeading(ii, "e")
+				if not SetHeading(ii, "e") then
+                    isAbortInstruction = true 
+                    return false -- breaks for the while loop only
+                end
 			else
-				SetHeading(ii, "w")
+				if not SetHeading(ii, "w") then
+                    isAbortInstruction = true 
+                    return false -- breaks for the while loop only
+                end
 			end			
 			if not DigAndGoForward(ii) then 
 				--util.Print("DigAndGoForward failed moving x")
+                isAbortInstruction = true 
 				return false 
 			end
 		end
+        if isAbortInstruction then return false end
 		
 		-- move along y
 		--util.Print("Moving y: " .. tostring(loc["y"]) .. " to " .. tostring(destLoc["y"]))
@@ -211,18 +222,21 @@ end
 			if loc["y"] < destLoc["y"] then
 				if not DigAndGoUp(ii) then 
 					--util.Print("DigAndGoUp failed moving y")
+                    isAbortInstruction = true 
 					return false 
 				end
 			else
 				if not DigAndGoDown(ii) then 
 					--util.Print("DigAndGoDown failed moving y")
+                    isAbortInstruction = true 
 					return false 
 				end
 			end
 		end
+        if isAbortInstruction then return false end
 		
 		-- set heading
-		SetHeading(ii, destLoc["h"])
+		if not SetHeading(ii, destLoc["h"]) then return false end
 		
 		return true
 	end
@@ -812,24 +826,26 @@ end
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
                         modem.transmit(replyChannel, globals.port_turtleCmd, reply)
                         
-                    elseif string.lower(command) == "gohome" then
-                        local ii = StartNewInstruction()
-                        SendMessage(replyChannel, "Going home...")
-                        stopReason = "incoming_gohome"
-                        GoHome(ii, stopReason);
-                        
                     elseif string.lower(command) == "stop" then
                         local ii = StartNewInstruction()
                         SendMessage(replyChannel, "STOPPING IN PLACE!")
                         stopReason = "incoming_stop"
+                        
+                    elseif string.lower(command) == "gohome" then
+                        local ii = StartNewInstruction()
+                        SendMessage(replyChannel, "Going home...")
+                        stopReason = "incoming_gohome"
+                        -- GoHome(ii, stopReason);
+                        parallel.waitForAny(function() GoHome(ii, stopReason) end, function() end)
 
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
                         local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         local ii = StartNewInstruction()
-                        GoRefuel(ii)
-                        GoToPos(ii, returnLoc, true)
+                        -- GoRefuel(ii)
+                        -- GoToPos(ii, returnLoc, true)
+                        parallel.waitForAny(function() GoRefuel(ii); GoToPos(ii, returnLoc, true); end, function() end)
                         
                     elseif string.lower(command) == "unload" then
                         -- unload and go home
@@ -838,8 +854,9 @@ end
                         local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         local ii = StartNewInstruction()
-                        GoUnloadInventory(ii)
-                        GoToPos(ii, returnLoc, true)
+                        -- GoUnloadInventory(ii)
+                        -- GoToPos(ii, returnLoc, true)
+                        parallel.waitForAny(function() GoUnloadInventory(ii); GoToPos(ii, returnLoc, true); end, function() end)
 
                         
                     -- MANUAL LOCATION COMMANDS
