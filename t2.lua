@@ -42,7 +42,10 @@ function InitTurtle(aModem, aCurLoc)
 end
 
 function StartNewInstruction()
-	instructionIndex = instructionIndex + 1
+    local prev = instructionIndex
+    instructionIndex = instructionIndex + 1
+    -- TODO (Remove)
+    -- util.Print("NEW ii:" .. tostring(instructionIndex) .. ", prev:" .. tostring(prev))
 	return instructionIndex
 end
 
@@ -148,19 +151,19 @@ end
 		local isStop = false
 		if not GoToPos(ii, globals.destroyLoc, true) then isStop = true end
 		if not isStop then 
-			if not DropBlocksByRarity(1) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
+			if not DropBlocksByRarity(ii, 1) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
 		end
 		if not GoToPos(ii, globals.rarity2Loc, false) then isStop = true end
 		if not isStop then 
-			if not DropBlocksByRarity(2) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
+			if not DropBlocksByRarity(ii, 2) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
 		end
 		if not GoToPos(ii, globals.rarity3Loc, false) then isStop = true end
 		if not isStop then 
-			if not DropBlocksByRarity(3) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
+			if not DropBlocksByRarity(ii, 3) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
 		end
 		if not GoToPos(ii, globals.rarity4Loc, false) then isStop = true end
 		if not isStop then 
-			if not DropBlocksByRarity(4) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
+			if not DropBlocksByRarity(ii, 4) then isStop = true; stopReason = "Cannot unload inventory (full?)" end
 		end
 	end
 
@@ -499,7 +502,9 @@ end
 		return true
 	end 
 
-	function DigUp(ii)	
+    function DigUp(ii)	
+        -- TODO (Remove)
+        -- util.Print("ii:" .. tostring(ii) .. ", inst:" ..  tostring(instructionIndex))
 		if(ii ~= instructionIndex) then return false end
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
@@ -819,6 +824,7 @@ end
                         -- unload and go home
                         -- make a copy to break the reference to homeLoc
                         --local returnLoc = {x=homeLoc["x"],y=homeLoc["y"],z=homeLoc["z"],h=homeLoc["h"]}
+                        local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         local ii = StartNewInstruction()
                         GoUnloadInventory(ii)
