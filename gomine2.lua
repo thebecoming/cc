@@ -31,8 +31,10 @@ function InitProgram()
 		return false
 	end	
 	
-	local isCurLocValidated	
-	isCurLocValidated, currentLoc = t2.GetCurrentLocation(globals.startLoc)		
+    local isCurLocValidated
+    
+    t2.SetHomeLocation(globals.startLoc)
+	isCurLocValidated, currentLoc = t2.GetCurrentLocation()		
 	
 	-- Check if on home block
 	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= globals.startLoc.x or currentLoc.z ~= globals.startLoc.z or currentLoc.y ~= globals.startLoc.y) then
@@ -40,7 +42,7 @@ function InitProgram()
 		isValidInit = false
 	end	
 	
-	if not t2.InitTurtle(modem, globals.startLoc, currentLoc) then 
+	if not t2.InitTurtle(modem, currentLoc) then 
 		util.Print("Init fail on t2.lua")
 		isValidInit = false 
 	end
@@ -75,7 +77,12 @@ function BeginTurtleNavigation()
 			end
 			
 			-- don't return home for these situations
-			if stopReason == "inventory_full" or stopReason == "hit_bedrock" or stopReason == "incoming_unload" then 
+			if stopReason == "hit_bedrock" then 
+				t2.GoHome(ii, "hit_bedrock")
+			end
+			
+			-- don't return home for these situations
+			if stopReason == "inventory_full" or stopReason == "incoming_unload" then 
 				t2.GoUnloadInventory(ii)
 			end
 			
