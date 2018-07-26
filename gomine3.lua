@@ -1,4 +1,4 @@
-print("Gomine3 v0.10")
+print("Gomine3 v0.11")
 os.loadAPI("globals")
 os.loadAPI("util")
 os.loadAPI("t3")

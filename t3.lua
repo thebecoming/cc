@@ -64,9 +64,16 @@ function ProcessQueue()
                 end,
                 function() 
                     os.pullEvent("stopEvent")
+                    util.Print("ProcessQueue stopEvent")
                 end)
             else
-                tbl.func()
+                parallel.waitForAny(function() 
+                    tbl.func()
+                end,
+                function() 
+                    os.pullEvent("stopEvent")
+                    util.Print("ProcessQueue stopEvent")
+                end)
             end
         end
     end
@@ -74,6 +81,7 @@ end
 
 function AddCommand(cmdTable, isAbortCurrentCmd)
     if isAbortCurrentCmd then
+        util.Print("os.queueEvent stopEvent")
         os.queueEvent("stopEvent")
         queue = {}
         sleep(.1)
@@ -811,7 +819,7 @@ end
         modem.transmit(port, globals.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
     end
 
-    local function MessageHandler()
+    function MessageHandler()
         while true do
             local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
             if senderChannel == globals.port_turtleCmd then	
