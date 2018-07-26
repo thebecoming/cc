@@ -52,7 +52,7 @@ function StartTurtleRun()
 end
 
 
-local function ProcessQueue()
+function ProcessQueue()
     while true do
         sleep(.1)
         if #queue > 0 then
@@ -71,6 +71,15 @@ local function ProcessQueue()
             end
         end
     end
+end
+
+function AddCommand(cmdTable, isAbortCurrentCmd)
+    if isAbortCurrentCmd then
+        os.queueEvent("stopEvent")
+        queue = {}
+        sleep(.1)
+    end
+    table.insert(queue,cmdTable)
 end
 
 
