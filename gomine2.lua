@@ -1,3 +1,4 @@
+print("Gomine2 v0.1")
 os.loadAPI("globals")
 os.loadAPI("util")
 os.loadAPI("t2")
@@ -31,7 +32,7 @@ function InitProgram()
 	end	
 	
 	local isCurLocValidated	
-	isCurLocValidated, currentLoc = t.GetCurrentLocation(globals.startLoc)		
+	isCurLocValidated, currentLoc = t2.GetCurrentLocation(globals.startLoc)		
 	
 	-- Check if on home block
 	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= globals.startLoc.x or currentLoc.z ~= globals.startLoc.z or currentLoc.y ~= globals.startLoc.y) then
@@ -39,8 +40,8 @@ function InitProgram()
 		isValidInit = false
 	end	
 	
-	if not t.InitTurtle(modem, globals.startLoc, currentLoc) then 
-		util.Print("Init fail on t.lua")
+	if not t2.InitTurtle(modem, globals.startLoc, currentLoc) then 
+		util.Print("Init fail on t2.lua")
 		isValidInit = false 
 	end
 	
@@ -50,18 +51,18 @@ function InitProgram()
 		parallel.waitForAll(ListenForCommands, BeginTurtleNavigation)
 	end
 
-	t.SendMessage(globals.port_log, "gomine program END")
+	t2.SendMessage(globals.port_log, "gomine program END")
 end
 
 function BeginTurtleNavigation()	
 	while true do
 		if isMining then 
-			local ii = t.StartNewInstruction()
-			t.ResetInventorySlot()
+			local ii = t2.StartNewInstruction()
+			t2.ResetInventorySlot()
 			
 			-- fly To destination
-			t.SendMessage(globals.port_log, "going to mineLoc")
-			if not t.GoToPos(ii, mineLoc, true) then isMining = false end
+			t2.SendMessage(globals.port_log, "going to mineLoc")
+			if not t2.GoToPos(ii, mineLoc, true) then isMining = false end
 
 			-- Start mining
 			if isMining then
@@ -70,12 +71,12 @@ function BeginTurtleNavigation()
 			
 			-- these are local stopReasons so use these first
 			if stopReason ~= "incoming_unload" then
-				stopReason = t.GetStopReason()
+				stopReason = t2.GetStopReason()
 			end
 			
 			-- don't return home for these situations
 			if stopReason == "inventory_full" or stopReason == "hit_bedrock" or stopReason == "incoming_unload" then 
-				t.GoUnloadInventory(ii)
+				t2.GoUnloadInventory(ii)
 			end
 			
 
@@ -83,21 +84,21 @@ function BeginTurtleNavigation()
 				-- Program will continue running and it will return to mining
 			else
 				-- -- Return home
-				-- t.SendMessage(globals.port_log, "Coming home...")
-				-- if not t.GoToPos(globals.startLoc, true, true) then 
-				-- 	t.SendMessage(globals.port_log, "Unable to return home!")
-				-- 	t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
+				-- t2.SendMessage(globals.port_log, "Coming home...")
+				-- if not t2.GoToPos(globals.startLoc, true, true) then 
+				-- 	t2.SendMessage(globals.port_log, "Unable to return home!")
+				-- 	t2.SendMessage(globals.port_log, "stopReason:" .. stopReason)
 				-- 	return false
 				-- end		
-				-- t.SendMessage(globals.port_log, "I am home")
-				-- t.SendMessage(globals.port_log, "stopReason: " .. stopReason)				
-				-- local undiggableBlockData = t.GetUndiggableBlockData()
+				-- t2.SendMessage(globals.port_log, "I am home")
+				-- t2.SendMessage(globals.port_log, "stopReason: " .. stopReason)				
+				-- local undiggableBlockData = t2.GetUndiggableBlockData()
 				-- if undiggableBlockData then
-				-- 	t.SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
+				-- 	t2.SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
 				-- end
 
 
-				--t.GoHome(stopReason)
+				--t2.GoHome(stopReason)
 				
 				-- Stop the loop from executing until another command sets isStop=true
 				isMining = false
@@ -121,28 +122,28 @@ function BeginMining(ii)
 	-- 2 = 7*4=28
 	local outerStepCount = (3 + (maxRadius * 2)) * 4
 	
-	t.SetHeading(ii, mineLoc["h"])
+	t2.SetHeading(ii, mineLoc["h"])
 	while true do
 		-- loops once for each y unit
 		if isStop then return false end		
-		curDepth = mineLoc["y"] - t.GetLocation()["y"]
+		curDepth = mineLoc["y"] - t2.GetLocation()["y"]
 		
 		-- go down to correct curDepth		
 		if globals.isResumeMiningDepth and isFirstDecent then
 			isFirstDecent = false
 			while not turtle.detectDown() do
-				t.Down(ii)
+				t2.Down(ii)
 			end
 			curDepth = mineLoc["y"] - currentLoc["y"]
-			t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
+			t2.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
 			if isStop then return false end	
 		else
 			local depthIncrement = nextDepth - curDepth
 			--util.Print("newD:" .. tostring(curDepth) .. " nxt:" .. tostring(nextDepth) .. " inc:" .. tostring(nextDepth - curDepth))
 			for n=1,nextDepth - curDepth do
-				if not t.DigAndGoDown(ii) then return false end	
+				if not t2.DigAndGoDown(ii) then return false end	
 			curDepth = mineLoc["y"] - currentLoc["y"]
-				t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
+				t2.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
 				if isStop then return false end	
 			end
 		end
@@ -171,30 +172,30 @@ function BeginMining(ii)
 							--make the cut
 							if isAtSideStart then
 								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
-								if not t.TurnLeft(ii) then return false end
-								if not t.DigAndGoForward(ii) then return false end
-								if not t.TurnLeft(ii) then return false end
-								if not t.DigAndGoForward(ii) then return false end
-								if not t.TurnLeft(ii) then return false end
-								if not t.DigAndGoForward(ii) then return false end
-								if not t.TurnLeft(ii) then return false end
-								if not t.DigAndGoForward(ii) then return false end
+								if not t2.TurnLeft(ii) then return false end
+								if not t2.DigAndGoForward(ii) then return false end
+								if not t2.TurnLeft(ii) then return false end
+								if not t2.DigAndGoForward(ii) then return false end
+								if not t2.TurnLeft(ii) then return false end
+								if not t2.DigAndGoForward(ii) then return false end
+								if not t2.TurnLeft(ii) then return false end
+								if not t2.DigAndGoForward(ii) then return false end
 								
 								-- add some style (torches)
 								if curSideStep == stairCutPos3 then
 									local data = turtle.getItemDetail(1)
 									if data and data.name == "minecraft:torch" then
-										if not t.TurnLeft(ii) then return false end
+										if not t2.TurnLeft(ii) then return false end
 										turtle.select(1)
 										if not turtle.detect() then turtle.place() end
-										if not t.TurnRight(ii) then return false end
+										if not t2.TurnRight(ii) then return false end
 									end
 								end
 							else
 								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
-								if not t.TurnLeft(ii) then return false end
-								if not t.Dig(ii) then return false end
-								if not t.TurnRight(ii) then return false end
+								if not t2.TurnLeft(ii) then return false end
+								if not t2.Dig(ii) then return false end
+								if not t2.TurnRight(ii) then return false end
 							end
 					else
 						--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
@@ -203,10 +204,10 @@ function BeginMining(ii)
 				
 				
 				-- go forward normally
-				if not t.DigAndGoForward(ii) then return false end
+				if not t2.DigAndGoForward(ii) then return false end
 				
 				if curSideStep%sideStepCount == 0 then
-					if not t.TurnRight(ii) then return false end
+					if not t2.TurnRight(ii) then return false end
 				end
 			end				
 			
@@ -214,30 +215,30 @@ function BeginMining(ii)
 			if curRadius >= 0 then
 				-- move to the next inner start position
 				if isStop then return false end
-				if not t.Forward(ii) then return false end
-				if not t.TurnRight(ii) then return false end
-				if not t.DigAndGoForward(ii) then return false end
-				if not t.TurnLeft(ii) then return false end
+				if not t2.Forward(ii) then return false end
+				if not t2.TurnRight(ii) then return false end
+				if not t2.DigAndGoForward(ii) then return false end
+				if not t2.TurnLeft(ii) then return false end
 			end
 		end
 		
 		-- stopped at inner radius
 		if maxDepth > 0 and curDepth == maxDepth then
-			t.SendMessage(globals.port_log, "Max curDepth: " .. tostring(maxDepth) .. " hit")
+			t2.SendMessage(globals.port_log, "Max curDepth: " .. tostring(maxDepth) .. " hit")
 			return false
 		end
 		
-		local curLoc = t.GetLocation()
+		local curLoc = t2.GetLocation()
 		local cornerLoc = {x=mineLoc["x"],y=curLoc["y"],z=mineLoc["z"],h=mineLoc["h"]}
-		if not t.GoToPos(ii, cornerLoc, false) then return false end
+		if not t2.GoToPos(ii, cornerLoc, false) then return false end
 		nextDepth = curDepth+1
 	end
-	t.SendMessage(globals.port_log, "Mining END")
+	t2.SendMessage(globals.port_log, "Mining END")
 end
 
 
 function ListenForCommands()
-	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
+	t2.ListenForReturnMsg(ListenForReturnMsg_Callback)
 end
 
 function ListenForReturnMsg_Callback(command)
