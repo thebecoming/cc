@@ -103,6 +103,7 @@ function BeginTurtleNavigation()
 				isMining = false
 			end		
 		end
+		os.sleep()
 	end
 end
 
