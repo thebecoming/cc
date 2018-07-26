@@ -43,7 +43,7 @@ function InitProgram()
     end	
 
     if isValidInit then 
-        if not t3.InitTurtle(modem, currentLoc, ListenForReturnMsg_Callback) then 
+        if not t3.InitTurtle(modem, currentLoc, IncomingMessageHandler) then 
             isValidInit = false
         end
     end
@@ -70,19 +70,19 @@ function TestBack(steps)
     end
 end
 
-function BeginTurtleNavigation()	
+function RunGoMine()	
+    isMining = true
 	while true do
 		if isMining then 
-			local ii = t3.StartNewInstruction()
 			t3.ResetInventorySlot()
 			
 			-- fly To destination
 			t3.SendMessage(globals.port_log, "going to mineLoc")
-			if not t3.GoToPos(ii, mineLoc, true) then isMining = false end
+			if not t3.GoToPos(mineLoc, true) then isMining = false end
 
 			-- Start mining
 			if isMining then
-				BeginMining(ii)
+				BeginMining()
 			end
 			
 			-- these are local stopReasons so use these first
@@ -92,12 +92,12 @@ function BeginTurtleNavigation()
 			
 			-- don't return home for these situations
 			if stopReason == "hit_bedrock" then 
-				t3.GoHome(ii, "hit_bedrock")
+				t3.GoHome("hit_bedrock")
 			end
 			
 			-- don't return home for these situations
 			if stopReason == "inventory_full" or stopReason == "incoming_unload" then 
-				t3.GoUnloadInventory(ii)
+				t3.GoUnloadInventory()
 			end
 			
 
@@ -129,7 +129,7 @@ function BeginTurtleNavigation()
 	end
 end
 
-function BeginMining(ii)
+function BeginMining()
 		--1,2,3 (1)
 		--2,3,4 (2)
 		--3,4,5 (3)
@@ -143,7 +143,7 @@ function BeginMining(ii)
 	-- 2 = 7*4=28
 	local outerStepCount = (3 + (maxRadius * 2)) * 4
 	
-	t3.SetHeading(ii, mineLoc["h"])
+	t3.SetHeading(mineLoc["h"])
 	while true do
 		-- loops once for each y unit
 		if isStop then return false end		
@@ -153,7 +153,7 @@ function BeginMining(ii)
 		if globals.isResumeMiningDepth and isFirstDecent then
 			isFirstDecent = false
 			while not turtle.detectDown() do
-				t3.Down(ii)
+				t3.Down()
 			end
 			curDepth = mineLoc["y"] - currentLoc["y"]
 			t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
@@ -162,7 +162,7 @@ function BeginMining(ii)
 			local depthIncrement = nextDepth - curDepth
 			--util.Print("newD:" .. tostring(curDepth) .. " nxt:" .. tostring(nextDepth) .. " inc:" .. tostring(nextDepth - curDepth))
 			for n=1,nextDepth - curDepth do
-				if not t3.DigAndGoDown(ii) then return false end	
+				if not t3.DigAndGoDown() then return false end	
 			curDepth = mineLoc["y"] - currentLoc["y"]
 				t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
 				if isStop then return false end	
@@ -193,30 +193,30 @@ function BeginMining(ii)
 							--make the cut
 							if isAtSideStart then
 								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
-								if not t3.TurnLeft(ii) then return false end
-								if not t3.DigAndGoForward(ii) then return false end
-								if not t3.TurnLeft(ii) then return false end
-								if not t3.DigAndGoForward(ii) then return false end
-								if not t3.TurnLeft(ii) then return false end
-								if not t3.DigAndGoForward(ii) then return false end
-								if not t3.TurnLeft(ii) then return false end
-								if not t3.DigAndGoForward(ii) then return false end
+								if not t3.TurnLeft() then return false end
+								if not t3.DigAndGoForward() then return false end
+								if not t3.TurnLeft() then return false end
+								if not t3.DigAndGoForward() then return false end
+								if not t3.TurnLeft() then return false end
+								if not t3.DigAndGoForward() then return false end
+								if not t3.TurnLeft() then return false end
+								if not t3.DigAndGoForward() then return false end
 								
 								-- add some style (torches)
 								if curSideStep == stairCutPos3 then
 									local data = turtle.getItemDetail(1)
 									if data and data.name == "minecraft:torch" then
-										if not t3.TurnLeft(ii) then return false end
+										if not t3.TurnLeft() then return false end
 										turtle.select(1)
 										if not turtle.detect() then turtle.place() end
-										if not t3.TurnRight(ii) then return false end
+										if not t3.TurnRight() then return false end
 									end
 								end
 							else
 								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
-								if not t3.TurnLeft(ii) then return false end
-								if not t3.Dig(ii) then return false end
-								if not t3.TurnRight(ii) then return false end
+								if not t3.TurnLeft() then return false end
+								if not t3.Dig() then return false end
+								if not t3.TurnRight() then return false end
 							end
 					else
 						--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
@@ -225,10 +225,10 @@ function BeginMining(ii)
 				
 				
 				-- go forward normally
-				if not t3.DigAndGoForward(ii) then return false end
+				if not t3.DigAndGoForward() then return false end
 				
 				if curSideStep%sideStepCount == 0 then
-					if not t3.TurnRight(ii) then return false end
+					if not t3.TurnRight() then return false end
 				end
 			end				
 			
@@ -236,10 +236,10 @@ function BeginMining(ii)
 			if curRadius >= 0 then
 				-- move to the next inner start position
 				if isStop then return false end
-				if not t3.Forward(ii) then return false end
-				if not t3.TurnRight(ii) then return false end
-				if not t3.DigAndGoForward(ii) then return false end
-				if not t3.TurnLeft(ii) then return false end
+				if not t3.Forward() then return false end
+				if not t3.TurnRight() then return false end
+				if not t3.DigAndGoForward() then return false end
+				if not t3.TurnLeft() then return false end
 			end
 		end
 		
@@ -251,25 +251,31 @@ function BeginMining(ii)
 		
 		local curLoc = t3.GetLocation()
 		local cornerLoc = {x=mineLoc["x"],y=curLoc["y"],z=mineLoc["z"],h=mineLoc["h"]}
-		if not t3.GoToPos(ii, cornerLoc, false) then return false end
+		if not t3.GoToPos(cornerLoc, false) then return false end
 		nextDepth = curDepth+1
 	end
 	t3.SendMessage(globals.port_log, "Mining END")
 end
 
-function ListenForReturnMsg_Callback(command)
+function IncomingMessageHandler(command)
 	if string.lower(command) == "test" then
         t3.AddCommand({func=TestForward, args={10}})
         os.sleep(2)
         t3.AddCommand({func=TestBack, args={10}}, true)
+
+    elseif string.lower(command) == "test2" then
+        t3.AddCommand({func=TestForward, args={10}})
+        os.sleep(2)
+        t3.AddCommand({func=TestBack, args={10}})
     
     elseif string.lower(command) == "gomine" then
 		stopReason = ""
-		isMining = true
+        t3.AddCommand({func=RunGoMine}, true)        
 
-	elseif string.lower(command) == "unload" then
+	elseif string.lower(command) == "unloadtest" then
 		stopReason = "incoming_unload"
 		isMining = false
+        t3.AddCommand({func=function() t3.GoUnloadInventory() end}, true)  
 	end
 end
 
