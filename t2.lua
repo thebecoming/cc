@@ -249,6 +249,7 @@ end
 			end
 			if not ProcessMovementChange() then return false end
 		end
+        os.sleep()
 		return result
 	end
 
@@ -272,6 +273,7 @@ end
 		else 
 			util.Print("turtle.back() failed")
 		end
+        os.sleep()
 		return result
 	end
 
@@ -285,6 +287,7 @@ end
 		else 
 			util.Print("turtle.up() failed")
 		end
+        os.sleep()
 		return result
 	end
 
@@ -298,6 +301,7 @@ end
 		else 
 			util.Print("turtle.down() failed")
 		end
+        os.sleep()
 		return result
 	end
 
@@ -319,6 +323,7 @@ end
 		else 
 			util.Print("turtle.turnLeft() failed")
 		end
+        os.sleep()
 		return result
 	end
 
@@ -340,6 +345,7 @@ end
 		else 
 			util.Print("turtle.turnRight() failed")
 		end
+        os.sleep()
 		return result
 	end
 
@@ -354,8 +360,8 @@ end
 		
 		if not success then
 			util.Print("Heading set fail: " .. aHeading)
-		end
-		
+		end		
+        os.sleep()
 		return success
     end
     
@@ -385,6 +391,7 @@ end
 				--util.Print("Empty slot")
 			end
 		end
+        os.sleep()
 		return success
 	end
 
@@ -402,6 +409,7 @@ end
 				slot = slot + 1
 			end	
 		end
+        os.sleep()
 		return isPlaced
 	end
 -- 
@@ -462,7 +470,8 @@ end
 					PrintDigResult(data, blockData)
 				end
 			end
-		end
+        end
+        os.sleep()
 		return true
 	end
 
@@ -499,11 +508,12 @@ end
 				end
 			end
 		end
+        os.sleep()
 		return true
 	end 
 
     function DigUp(ii)	
-        -- TODO (Remove)
+        -- TODO (Remove)TODO (Remove)
         -- util.Print("ii:" .. tostring(ii) .. ", inst:" ..  tostring(instructionIndex))
 		if(ii ~= instructionIndex) then return false end
 		local inspectSuccess, data = turtle.inspectUp()
@@ -537,6 +547,7 @@ end
 				end
 			end
 		end
+        os.sleep()
 		return true
 	end
 
