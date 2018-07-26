@@ -259,9 +259,9 @@ end
 
 function ListenForReturnMsg_Callback(command)
 	if string.lower(command) == "test" then
-        t3.AddCommand({func=TestForward, args=10})
+        t3.AddCommand({func=TestForward, args={10}})
         os.sleep(2)
-        t3.AddCommand({func=TestBack, args=10}, true)
+        t3.AddCommand({func=TestBack, args={10}}, true)
     
     elseif string.lower(command) == "gomine" then
 		stopReason = ""

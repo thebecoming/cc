@@ -61,7 +61,7 @@ function ProcessQueue()
             local args = tbl.args
             if args then
                 parallel.waitForAny(function() 
-                    tbl.func(table.unpack(Args))
+                    tbl.func(table.unpack(args))
                 end,
                 function() 
                     os.pullEvent("stopEvent")
