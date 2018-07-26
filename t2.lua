@@ -56,10 +56,9 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- NAVIGATION PATHS
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
-	function GoHome(aStopReason)
+	function GoHome(ii, aStopReason)
 		-- Return home
 		isBaseNaviating = true
-		local ii = StartNewInstruction()
 		SendMessage(globals.port_log, "Going home...")
 		if not GoToPos(ii, globals.startLoc, true) then 
 			SendMessage(globals.port_log, "Unable to return home!")
@@ -75,12 +74,11 @@ end
 		-- end
 	end
 
-	function GoRefuel()
+	function GoRefuel(ii)
 		if not globals.fuelLoc then 
 			SendMessage(globals.port_log, "No fuel loc found!")
 		else
 			isBaseNaviating = true
-			local ii = StartNewInstruction()
 			SendMessage(globals.port_log, "Going to Refuel...")
 			local isFuelContainerEmpty
 			local isStop = false
@@ -102,11 +100,10 @@ end
 		end
 	end
 
-	function GoRefillFromContainer()
+	function GoRefillFromContainer(ii)
 		if not globals.resourceContLoc1 then 
 			SendMessage(globals.port_log, "resourceContLoc1 not set") 
 		else
-			local ii = StartNewInstruction()
 			isBaseNaviating = true
 			local resourceLocations = {globals.resourceContLoc1, globals.resourceContLoc2, globals.resourceContLoc3, globals.resourceContLoc4}
 			local tmpLoc, isInventoryFull, tblKey
@@ -156,9 +153,8 @@ end
 		end
 	end
 
-	function GoUnloadInventory()
+	function GoUnloadInventory(ii)
 		SendMessage(globals.port_log, "Going to unload...")
-		local ii = StartNewInstruction()
 		isBaseNaviating = true
 		local isStop = false
 		if not GoToPos(ii, globals.destroyLoc, true) then isStop = true end
@@ -803,11 +799,13 @@ end
 						modem.transmit(replyChannel, globals.port_turtleCmd, reply)
 						
 					elseif string.lower(command) == "gohome" then
+						local ii = StartNewInstruction()
 						SendMessage(replyChannel, "Going home...")
 						stopReason = "incoming_gohome"
-						GoHome(stopReason);
+						GoHome(ii, stopReason);
 						
 					elseif string.lower(command) == "stop" then
+						local ii = StartNewInstruction()
 						SendMessage(replyChannel, "STOPPING IN PLACE!")
 						stopReason = "incoming_stop"
 
@@ -815,25 +813,27 @@ end
 						-- make a copy to break the reference to startLoc
 						local currentLoc = GetCurrentLocation(nil)
 						local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
-						if not GoRefuel() then SendMessage(globals.port_log, "can't return to get to refuel dest") end
-						ii = StartNewInstruction()
+						local ii = StartNewInstruction()
+						if not GoRefuel(ii) then SendMessage(globals.port_log, "can't return to get to refuel dest") end
 						if not GoToPos(ii, returnLoc, true) then SendMessage(globals.port_log, "can't return from refuel dest") end
 						
 					elseif string.lower(command) == "unload" then
 						-- make a copy to break the reference to startLoc
 						local returnLoc = {x=startLoc["x"],y=startLoc["y"],z=startLoc["z"],h=startLoc["h"]}
-						ii = StartNewInstruction()
-						if not GoUnloadInventory() then SendMessage(globals.port_log, "Unable to move during GoUnloadInventory()") end
+						local ii = StartNewInstruction()
+						if not GoUnloadInventory(ii) then SendMessage(globals.port_log, "Unable to move during GoUnloadInventory()") end
 						if not GoToPos(ii, returnLoc, true) then SendMessage(globals.port_log, "Unable to return home from GoUnloadInventory() to startLoc") end
 
 						
 					-- MANUAL LOCATION COMMANDS
 					-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~					
 					elseif string.lower(command) == "up" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up(ii)))
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "up10" then
+						local ii = StartNewInstruction()
 						local moveCount = 0
 						for n=1, 10 do
 							if Up(ii) then moveCount=moveCount+1 end
@@ -842,10 +842,12 @@ end
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "down" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down(ii)))
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "down10" then
+						local ii = StartNewInstruction()
 						local moveCount = 0
 						for n=1, 10 do
 							if Down(ii) then moveCount=moveCount+1 end
@@ -854,10 +856,12 @@ end
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "forward" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward(ii)))
 						DispatchLocation()
 						
 					elseif string.lower(command) == "forward10" then
+						local ii = StartNewInstruction()
 						local moveCount = 0
 						for n=1, 10 do
 							if Forward(ii) then moveCount=moveCount+1 end
@@ -866,10 +870,12 @@ end
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "back" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward(ii)))
 						DispatchLocation()
 						
 					elseif string.lower(command) == "back10" then
+						local ii = StartNewInstruction()
 						local moveCount = 0
 						for n=1, 10 do
 							if Backward(ii) then moveCount=moveCount+1 end
@@ -878,10 +884,12 @@ end
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "turnleft" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft(ii)))
 						--DispatchLocation()
 						
 					elseif string.lower(command) == "turnright" then
+						local ii = StartNewInstruction()
 						modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight(ii)))
 						--DispatchLocation()
 						

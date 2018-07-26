@@ -12,6 +12,8 @@ shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/util.lua
 shell.run("delete globals")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/globals.lua globals")
 
+shell.run("delete t")
+shell.run("delete gomine")
 shell.run("delete t2")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/t2.lua t2")
 shell.run("delete gomine2")
