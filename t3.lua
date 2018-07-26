@@ -21,9 +21,13 @@ local homeLoc, loc, destLoc
 local firstOpenInvSlot
 local instructionIndex = 0
 
-function InitTurtle(aModem, aCurLoc)
+local queue = {}
+local cmdHandler;
+
+function InitTurtle(aModem, aCurLoc, aCommandHandler)
 	modem = aModem
-	loc = aCurLoc
+    loc = aCurLoc
+    cmdHandler = aCommandHandler;
 	if not modem.isOpen(globals.port_modemLocate) then 
 		modem.open(globals.port_modemLocate)
 	end
@@ -31,15 +35,45 @@ function InitTurtle(aModem, aCurLoc)
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then
 		SendMessage(globals.port_log, "Out of fuel!")
+        return false
 	end
 	
 	firstOpenInvSlot = GetFirstOpenInvSlot()
-	if firstOpenInvSlot == 0 then
-		SendMessage(globals.port_log, "Inventory is full!")
+    if firstOpenInvSlot == 0 then
+        SendMessage(globals.port_log, "Inventory is full!")
+        return false
 	end
 
 	return true
 end
+
+function StartTurtleRun()
+    parallel.waitForAny(ProcessQueue, ListenForReturnMsg)
+end
+
+
+local function ProcessQueue()
+    while true do
+        sleep(.1)
+        if #queue > 0 then
+            local tbl = table.remove(queue,1)
+            local func = tbl.func
+            local args = tbl.args
+            if args then
+                parallel.waitForAny(function() 
+                    tbl.func(table.unpack(Args))
+                end,
+                function() 
+                    os.pullEvent("stopEvent")
+                end)
+            else
+                tbl.func()
+            end
+        end
+    end
+end
+
+
 
 function StartNewInstruction()
     local prev = instructionIndex
@@ -245,8 +279,7 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- Lowest level process for each instruction, (checks instruction index)
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function Forward(ii)
-		if(ii ~= instructionIndex) then return false end
+	function Forward()
 		CheckFuelOnMove()
 		local result = turtle.forward()
 		if result then
@@ -267,8 +300,7 @@ end
 		return result
 	end
 
-	function Backward(ii)
-		if(ii ~= instructionIndex) then return false end
+	function Backward()
 		CheckFuelOnMove()	
 		local result = turtle.back()
 		if result then
@@ -793,7 +825,7 @@ end
         modem.transmit(port, globals.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
     end
 
-    function ListenForReturnMsg(aCallback)
+    function ListenForReturnMsg()
         while true do
             local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
             if senderChannel == globals.port_turtleCmd then	
@@ -927,8 +959,8 @@ end
                         modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight(ii)))
                         --DispatchLocation()
                         
-                    else
-                        aCallback(command, "")
+                    elseif cmdHandler then
+                        cmdHandler(command, "")
                     end
                 end
             end
