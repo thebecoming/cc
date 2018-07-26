@@ -247,7 +247,7 @@ end
 	function Forward(ii)
 		if(ii ~= instructionIndex) then return false end
 		CheckFuelOnMove()
-		local result = turtle.Forward()
+		local result = turtle.forward()
 		if result then
 			if loc["h"] == "n" then
 				loc["z"] = loc["z"] - 1
@@ -291,12 +291,12 @@ end
 	function Up(ii)
 		if(ii ~= instructionIndex) then return false end
 		CheckFuelOnMove()	
-		local result = turtle.Up()
+		local result = turtle.up()
 		if result then
 			loc["y"] = loc["y"] + 1
 			if not ProcessMovementChange() then return false end
 		else 
-			util.Print("turtle.Up() failed")
+			util.Print("turtle.up() failed")
 		end
 		return result
 	end
@@ -304,19 +304,19 @@ end
 	function Down(ii)
 		if(ii ~= instructionIndex) then return false end
 		CheckFuelOnMove()	
-		local result = turtle.Down()
+		local result = turtle.down()
 		if result then
 			loc["y"] = loc["y"] - 1
 			if not ProcessMovementChange() then return false end
 		else 
-			util.Print("turtle.Down() failed")
+			util.Print("turtle.down() failed")
 		end
 		return result
 	end
 
 	function TurnLeft(ii)
 		if(ii ~= instructionIndex) then return false end
-		local result = turtle.TurnLeft()
+		local result = turtle.turnLeft()
 		if result then
 			if loc["h"] == "n" then
 				loc["h"] = "w"
@@ -330,14 +330,14 @@ end
 				util.Print("ERROR! loc['h'] is wrong")
 			end
 		else 
-			util.Print("turtle.TurnLeft() failed")
+			util.Print("turtle.turnLeft() failed")
 		end
 		return result
 	end
 
 	function TurnRight(ii)
 		if(ii ~= instructionIndex) then return false end
-		local result = turtle.TurnRight()
+		local result = turtle.turnRight()
 		if result then
 			if loc["h"] == "n" then
 				loc["h"] = "e"
@@ -351,7 +351,7 @@ end
 				util.Print("ERROR! loc['h'] is wrong")
 			end
 		else 
-			util.Print("turtle.TurnRight() failed")
+			util.Print("turtle.turnRight() failed")
 		end
 		return result
 	end
@@ -408,7 +408,7 @@ end
 				SendMessage(globals.port_log, "Block doesn't exist in data")
 				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				-- return false	
-				if not turtle.Dig() then
+				if not turtle.dig() then
 					SendMessage(globals.port_log, "Unable to dig!")
 					return false
 				end
@@ -421,7 +421,7 @@ end
 				stopReason = "hit_bedrock"		
 				return false
 			else
-				if not turtle.Dig() then
+				if not turtle.dig() then
 					SendMessage(globals.port_log, "Unable to dig!")
 					return false
 				else
@@ -456,7 +456,7 @@ end
 				stopReason = "hit_bedrock"		
 				return false
 			else
-				if not turtle.DigDown() then
+				if not turtle.digDown() then
 					SendMessage(globals.port_log, "Unable to digDown!")
 					return false
 				else
@@ -735,8 +735,8 @@ end
 					end
 					isGpsSuccess = true
 				end
-				turtle.Forward()
-			elseif turtle.Forward() then
+				turtle.forward()
+			elseif turtle.forward() then
 				local x2,y2,z2 = gps.locate(1)
 				if x2 then
 					if x2 > x then
