@@ -95,7 +95,7 @@ function InitProgram()
 	tmpData = {uid = "minecraft:dark_oak_fence", isDiggable=true, rarity=1, isDungeon=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:acacia_fence", isDiggable=true, rarity=1, isDungeon=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:frosted_ice", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:torch", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:torch", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:stone_stairs", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:sandstone_stairs", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	
@@ -120,7 +120,6 @@ function InitProgram()
 	tmpData = {uid = "minecraft:quartz", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:torch", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
 end
 

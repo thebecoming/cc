@@ -14,7 +14,7 @@ local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local curDepth
 
-local isRequireHomeBlock = true
+local isRequireHomeBlock = false
 local torchSlot = 1
 local modem
 local isMining = false
@@ -85,43 +85,14 @@ function RunGoMine()
 				BeginMining()
 			end
 			
-			-- these are local stopReasons so use these first
-			if stopReason ~= "incoming_unload" then
-				stopReason = t3.GetStopReason()
-			end
-			
-			-- don't return home for these situations
-			if stopReason == "hit_bedrock" then 
-				t3.GoHome("hit_bedrock")
-			end
-			
-			-- don't return home for these situations
-			if stopReason == "inventory_full" or stopReason == "incoming_unload" then 
+			stopReason = t3.GetStopReason()            
+            if stopReason == "hit_bedrock" then 
+                t3.GoHome("hit_bedrock")                
+			elseif stopReason == "inventory_full" then 
+                -- don't return home for these situations
 				t3.GoUnloadInventory()
-			end
-			
-
-			if stopReason == "inventory_full" or stopReason == "incoming_unload" then
-				-- Program will continue running and it will return to mining
-			else
-				-- -- Return home
-				-- t3.SendMessage(globals.port_log, "Coming home...")
-				-- if not t3.GoToPos(globals.startLoc, true, true) then 
-				-- 	t3.SendMessage(globals.port_log, "Unable to return home!")
-				-- 	t3.SendMessage(globals.port_log, "stopReason:" .. stopReason)
-				-- 	return false
-				-- end		
-				-- t3.SendMessage(globals.port_log, "I am home")
-				-- t3.SendMessage(globals.port_log, "stopReason: " .. stopReason)				
-				-- local undiggableBlockData = t3.GetUndiggableBlockData()
-				-- if undiggableBlockData then
-				-- 	t3.SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
-				-- end
-
-
-				--t3.GoHome(stopReason)
-				
-				-- Stop the loop from executing until another command sets isStop=true
+			else				
+				-- End the program
 				isMining = false
 			end		
 		end
@@ -270,12 +241,7 @@ function IncomingMessageHandler(command)
     
     elseif string.lower(command) == "gomine" then
 		stopReason = ""
-        t3.AddCommand({func=RunGoMine}, true)        
-
-	elseif string.lower(command) == "unloadtest" then
-		stopReason = "incoming_unload"
-		isMining = false
-        t3.AddCommand({func=function() t3.GoUnloadInventory() end}, true)  
+        t3.AddCommand({func=RunGoMine}, true)
 	end
 end
 

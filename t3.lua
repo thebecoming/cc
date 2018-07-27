@@ -755,7 +755,7 @@ end
         if loc then
             -- break the reference before handing over
             local newloc = {x=loc["x"],y=loc["y"],z=loc["z"],h=loc["h"]}
-            return newloc
+            return true, newloc
         end
 
 		local isGpsSuccess
@@ -872,7 +872,7 @@ end
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
                         SendMessage(replyChannel, "refuel Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
+                        local isCurLocValidated, currentLoc = GetCurrentLocation()	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         AddCommand({func=function() 
                                 GoRefuel(); 
@@ -885,7 +885,7 @@ end
                         -- unload and go home
                         -- make a copy to break the reference to homeLoc
                         SendMessage(replyChannel, "unload Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
+                        local isCurLocValidated, currentLoc = GetCurrentLocation()	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         AddCommand({func=function() 
                                 GoUnloadInventory(); 
