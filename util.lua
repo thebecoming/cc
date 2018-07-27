@@ -1,5 +1,3 @@
-os.loadAPI("globals")
-
 local modem
 local monitor = nil
 	
@@ -14,9 +12,18 @@ local blockData = {}
 local monScreenWidth = 0
 local monScreenHeight = 0
 local screenLineDataTbl = {}
-isBroadcastPrints = true
+local port_log
+local port_turtleCmd
+local isBroadcastPrints = true
 
-function InitProgram()
+function InitUtil(aIsBroadcastPrints, port_log, port_turtleCmd)
+	isBroadcastPrints = aIsBroadcastPrints
+	port_log = aPort_log
+	port_turtleCmd = aPort_turtleCmd
+	InitBlockData()
+end
+
+function InitBlockData()
 	local tmpData
 	tmpData = {uid = "minecraft:stone", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:grass", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
@@ -200,14 +207,10 @@ function IsBlockNameDiggable(data)
 	return blockData[uid] and blockData[GetBlockUID(data)].isDiggable
 end
 
-function InitUtil(aIsBroadcastPrints)
-	isBroadcastPrints = aIsBroadcastPrints
-end
-
 function Print(msg)
 	print(msg)
 	if modem and isBroadcastPrints then
-		modem.transmit(globals.port_log, globals.port_turtleCmd, os.getComputerLabel() .. ":" .. msg)
+		modem.transmit(port_log, port_turtleCmd, os.getComputerLabel() .. ":" .. msg)
 	end
 	if monitor then
 		PrintToMonitor(msg)
@@ -220,7 +223,26 @@ function PrintTable(obj)
 	end
 end
 
-function AddVectorToLoc(direction, aLoc)
+function GetNewHeading(aCurHeading, aTurnDirection)
+	if aTurnDirection == "r" then
+		if aCurHeading == "n" then return "e"
+		elseif aCurHeading == "e" then return "s"
+		elseif aCurHeading == "s" then return "w"
+		elseif aCurHeading == "w" then return "n"
+		else error("GetNewHeading died")
+		end
+	elseif aTurnDirection == "l" then
+		if aCurHeading == "n" then return "w"
+		elseif aCurHeading == "e" then return "n"
+		elseif aCurHeading == "s" then return "e"
+		elseif aCurHeading == "w" then return "s"
+		else error("GetNewHeading died")
+		end	
+	else error("GetNewHeading died")
+	end
+end
+
+function AddVectorToLoc(aLoc, direction, steps)
 	-- break the reference before handing over
 	local newloc = {x=aLoc["x"],y=aLoc["y"],z=aLoc["z"],h=aLoc["h"]}
 
@@ -229,30 +251,32 @@ function AddVectorToLoc(direction, aLoc)
 		or (direction == "b" and newloc["h"] == "n")
 		or (direction == "r" and newloc["h"] == "e"))
 	then 
-		newloc["z"] = newloc["x"] + 1
+		newloc["z"] = newloc["x"] + steps
 
 	elseif ((direction == "f" and newloc["h"] == "n")
 		or (direction == "l" and newloc["h"] == "e")
 		or (direction == "b" and newloc["h"] == "s")
 		or (direction == "r" and newloc["h"] == "w"))
 	then 
-		newloc["z"] = newloc["x"] - 1
+		newloc["z"] = newloc["x"] - steps
 
 	elseif ((direction == "f" and newloc["h"] == "e")
 		or (direction == "l" and newloc["h"] == "s")
 		or (direction == "b" and newloc["h"] == "w")
 		or (direction == "r" and newloc["h"] == "n"))
 	then 
-		newloc["x"] = newloc["x"] + 1
+		newloc["x"] = newloc["x"] + steps
 
 	elseif ((direction == "f" and newloc["h"] == "w")
 		or (direction == "l" and newloc["h"] == "n")
 		or (direction == "b" and newloc["h"] == "e")
 		or (direction == "r" and newloc["h"] == "s"))
 	then 
-		newloc["x"] = newloc["x"] - 1
+		newloc["x"] = newloc["x"] - steps
 
+	else 
+		error("AddVectorToLoc died!")
 	end 
-end
 
-InitProgram()
+	return newloc;
+end

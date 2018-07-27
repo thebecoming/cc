@@ -3,43 +3,31 @@
 -- so it may continue on to the next task.
 -- if the parent class is handling some navigation, it will have to check the stop value on t and 
 -- have this same behavior`
-os.loadAPI("globals")
-os.loadAPI("util")
-
--- globals
+-- os.loadAPI("globals")
+-- os.loadAPI("util")
+local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
---inventory_full
---incoming_stop
---incoming_gohome
---init_not_on_home
---hit_bedrock
---out_of_fuel
-
-local modem
-local homeLoc, loc, destLoc, heading
+local homeLoc, loc, destLoc
 local firstOpenInvSlot
-
 local queue = {}
 local msgHandler
 
-function InitTurtle(aModem, aCurLoc, aMessageHander)
+function InitTurtle(aModem, aUtil, aCfg, aCurLoc, aMessageHander)
 	modem = aModem
+    util = aUtil
     loc = aCurLoc
     msgHandler = aMessageHander;
-	if not modem.isOpen(globals.port_modemLocate) then 
-		modem.open(globals.port_modemLocate)
-	end
 	
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then
-		SendMessage(globals.port_log, "Out of fuel!")
+		SendMessage(cfg.port_log, "Out of fuel!")
         return false
 	end
 	
 	firstOpenInvSlot = GetFirstOpenInvSlot()
     if firstOpenInvSlot == 0 then
-        SendMessage(globals.port_log, "Inventory is full!")
+        SendMessage(cfg.port_log, "Inventory is full!")
         return false
 	end
 
@@ -98,24 +86,24 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 	function GoHome(aStopReason)
 		-- Return home
-        SendMessage(globals.port_log, "Going home...")
-        if aStopReason then SendMessage(globals.port_log, "Reason: " .. aStopReason) end
+        SendMessage(cfg.port_log, "Going home...")
+        if aStopReason then SendMessage(cfg.port_log, "Reason: " .. aStopReason) end
 		if not GoToPos(homeLoc, true) then  return false end
-		SendMessage(globals.port_log, "I am home")	
+		SendMessage(cfg.port_log, "I am home")	
 		-- local undiggableBlockData = GetUndiggableBlockData()
 		-- if undiggableBlockData then
-		-- 	SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
+		-- 	SendMessage(cfg.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
 		-- end
         return true
 	end
 
 	function GoRefuel()
-		if not globals.fuelLoc then 
-            SendMessage(globals.port_log, "No fuel loc found!")
+		if not cfg.fuelLoc then 
+            SendMessage(cfg.port_log, "No fuel loc found!")
 		else
-			SendMessage(globals.port_log, "Going to Refuel...")
+			SendMessage(cfg.port_log, "Going to Refuel...")
 			local isFuelContainerEmpty
-            if not GoToPos(globals.fuelLoc, true) then return false end
+            if not GoToPos(cfg.fuelLoc, true) then return false end
             
             local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
             while missingFuel > 2000 and not isFuelContainerEmpty do
@@ -125,21 +113,21 @@ end
                     Refuel(false)
                 end
             end
-            if not GoToPos(globals.fuelLoc, true) then return false end
+            if not GoToPos(cfg.fuelLoc, true) then return false end
 		end
         return true
 	end
 
 	function GoRefillFromContainer()
-		if not globals.resourceContLoc1 then 
-			SendMessage(globals.port_log, "resourceContLoc1 not set") 
+		if not resourceContLoc1 then 
+			SendMessage(cfg.port_log, "resourceContLoc1 not set") 
 		else
-			local resourceLocations = {globals.resourceContLoc1, globals.resourceContLoc2, globals.resourceContLoc3, globals.resourceContLoc4}
+			local resourceLocations = {resourceContLoc1, resourceContLoc2, resourceContLoc3, resourceContLoc4}
 			local tmpLoc, isInventoryFull, tblKey
 			local isFirstContainer = true
 			local slot = 0
 			local curResourceCount = 0
-			SendMessage(globals.port_log, "refilling...")
+			SendMessage(cfg.port_log, "refilling...")
 			
 			for tblKey in pairs(resourceLocations) do	
 				tmpLoc = resourceLocations[tblKey]
@@ -148,29 +136,29 @@ end
 					if not GoToPos(tmpLoc, isFirstContainer) then return false end
 					isFirstContainer = false
 								
-					while slot < globals.inventorySize and not isContainerEmpty do
+					while slot < cfg.inventorySize and not isContainerEmpty do
 						slot = slot + 1
 						turtle.select(slot)
 						local fillAmount = 0
 						local data = turtle.getItemDetail()
 						if not data then
 							fillAmount = 64
-						elseif data.name == globals.resourceName then
+						elseif data.name == cfg.resourceName then
 							fillAmount = 64 - turtle.getItemCount()
 						end
-						if globals.maxResourceCount and fillAmount > (globals.maxResourceCount - curResourceCount) then
-							fillAmount = globals.maxResourceCount - curResourceCount;
+						if cfg.maxResourceCount and fillAmount > (cfg.maxResourceCount - curResourceCount) then
+							fillAmount = cfg.maxResourceCount - curResourceCount;
 						end
 						if fillAmount > 0 then
 							if not turtle.suck(fillAmount) then 
 								isContainerEmpty = true 
 							else
 								curResourceCount = curResourceCount + fillAmount
-								if globals.maxResourceCount and curResourceCount >= globals.maxResourceCount then
+								if cfg.maxResourceCount and curResourceCount >= cfg.maxResourceCount then
 									isInventoryFull = true
 								end
 							end
-						elseif slot == globals.inventorySize then
+						elseif slot == cfg.inventorySize then
 							isInventoryFull = true
 						end
 					end
@@ -183,14 +171,14 @@ end
 	end
 
 	function GoUnloadInventory()
-		SendMessage(globals.port_log, "Going to unload...")
-		if not GoToPos(globals.destroyLoc, true) then return false end
+		SendMessage(cfg.port_log, "Going to unload...")
+		if not GoToPos(cfg.destroyLoc, true) then return false end
         if not DropBlocksByRarity(1) then return false end
-		if not GoToPos(globals.rarity2Loc, false) then return false end
+		if not GoToPos(cfg.rarity2Loc, false) then return false end
         if not DropBlocksByRarity(2) then return false end
-		if not GoToPos(globals.rarity3Loc, false) then return false end
+		if not GoToPos(cfg.rarity3Loc, false) then return false end
         if not DropBlocksByRarity(3) then return false end
-		if not GoToPos(globals.rarity4Loc, false) then return false end
+		if not GoToPos(cfg.rarity4Loc, false) then return false end
         if not DropBlocksByRarity(4) then return false end
         return true
 	end
@@ -200,7 +188,7 @@ end
 		
         local isAbortInstruction = false
         if(aIsFly) then
-			while loc["y"] < globals.flyCeiling do
+			while loc["y"] < cfg.flyCeiling do
                 if not DigAndGoUp() then 
                     isAbortInstruction = true 
                     return false -- breaks for the while loop only
@@ -412,7 +400,7 @@ end
 	function DropBlocksByRarity(aRarity)
 		local slot = 1	
 		local success = true
-		for slot=1, globals.inventorySize do
+		for slot=1, cfg.inventorySize do
 			turtle.select(slot)
 			local data = turtle.getItemDetail()
 			if data then
@@ -422,13 +410,13 @@ end
 						-- Turtles keep their torches
 					else
 						if blockData.rarity > 2 then
-							SendMessage(globals.port_log, "Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
+							SendMessage(cfg.port_log, "Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
 						end
 						if not turtle.drop() then success = false end
 					end
 				else
-					SendMessage(globals.port_log, "BlockData NOT found:")
-					SendMessage(globals.port_log, data.name)
+					SendMessage(cfg.port_log, "BlockData NOT found:")
+					SendMessage(cfg.port_log, data.name)
 				end		
 			else
 				--util.Print("Empty slot")
@@ -441,10 +429,10 @@ end
 	function PlaceResourceDown()
 		local isPlaced
 		local slot = 1
-		while slot <= globals.inventorySize and not isPlaced do
+		while slot <= cfg.inventorySize and not isPlaced do
 			turtle.select(slot)	
 			local data = turtle.getItemDetail()
-			if data and data.name == globals.resourceName then
+			if data and data.name == cfg.resourceName then
 				turtle.placeDown()
 				isPlaced = true
 			else
@@ -463,14 +451,14 @@ end
 		local n
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
-			if GetIsInventoryFull() and not globals.isResourcePlacer then
+			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
 				return false	
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				-- if flowing lava found, pick it up and try to refuel
 				if data.metadata == 0 and data.state and data.state.level == 0 then
-					for n=1, globals.inventorySize do
+					for n=1, cfg.inventorySize do
 						local detail = turtle.getItemDetail(n)
 						if detail and detail.name == "minecraft:bucket" then
 							turtle.select(n)
@@ -488,24 +476,24 @@ end
 
 			local blockData = util.GetBlockData(data)
 			if not blockData then
-				SendMessage(globals.port_log, "Block doesn't exist in data")
-				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Block doesn't exist in data")
+				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				-- return false	
 				if not turtle.dig() then
-					SendMessage(globals.port_log, "Unable to dig!")
+					SendMessage(cfg.port_log, "Unable to dig!")
 					return false
 				end
 			elseif not blockData.isDiggable then
 				undiggableBlockData = data
-				SendMessage(globals.port_log, "Undiggable block found")
-				SendMessage(globals.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Undiggable block found")
+				SendMessage(cfg.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
 			elseif data.name == "minecraft:bedrock" then 
 				stopReason = "hit_bedrock"		
 				return false
 			else
 				if not turtle.dig() then
-					SendMessage(globals.port_log, "Unable to dig!")
+					SendMessage(cfg.port_log, "Unable to dig!")
 					return false
 				else
 					PrintDigResult(data, blockData)
@@ -519,7 +507,7 @@ end
 	function DigDown()	
 		local inspectSuccess, data = turtle.inspectDown()
 		if inspectSuccess then
-			if GetIsInventoryFull() and not globals.isResourcePlacer then
+			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
 				return false	
 			end
@@ -528,20 +516,20 @@ end
 			end
 			local blockData = util.GetBlockData(data)
 			if not blockData then
-				SendMessage(globals.port_log, "Block doesn't exist in data")
-				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Block doesn't exist in data")
+				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
 			elseif not blockData.isDiggable then
 				undiggableBlockData = data
-				SendMessage(globals.port_log, "Undiggable block found")
-				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Undiggable block found")
+				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
 			elseif data.name == "minecraft:bedrock" then 
 				stopReason = "hit_bedrock"		
 				return false
 			else
 				if not turtle.digDown() then
-					SendMessage(globals.port_log, "Unable to digDown!")
+					SendMessage(cfg.port_log, "Unable to digDown!")
 					return false
 				else
 					PrintDigResult(data, blockData)
@@ -555,7 +543,7 @@ end
     function DigUp()	
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
-			if GetIsInventoryFull() and not globals.isResourcePlacer then
+			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
 				return false	
 			end
@@ -564,20 +552,20 @@ end
 			end
 			local blockData = util.GetBlockData(data)
 			if not blockData then
-				SendMessage(globals.port_log, "Block doesn't exist in data")
-				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Block doesn't exist in data")
+				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
 			elseif not blockData.isDiggable then
 				undiggableBlockData = data
-				SendMessage(globals.port_log, "Undiggable block found")
-				SendMessage(globals.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
+				SendMessage(cfg.port_log, "Undiggable block found")
+				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
 			elseif data.name == "minecraft:bedrock" then 
 				stopReason = "hit_bedrock"		
 				return false
 			else
 				if not turtle.digUp() then
-					SendMessage(globals.port_log, "Unable to digUp!")
+					SendMessage(cfg.port_log, "Unable to digUp!")
 					return false
 				else
 					PrintDigResult(data, blockData)
@@ -637,7 +625,7 @@ end
 		if aIsMoveCheck and fuelLevel > 500 then return end
 			
 		local slot = 1	
-		while slot <= globals.inventorySize do
+		while slot <= cfg.inventorySize do
 			local selFuelAmount = 0
 			turtle.select(slot)
 			local d = turtle.getItemDetail()
@@ -662,16 +650,16 @@ end
 			end
 			
 			if isRefuel then
-				SendMessage(globals.port_log, "Refueling w/" .. d.name)
+				SendMessage(cfg.port_log, "Refueling w/" .. d.name)
 				turtle.refuel()
 				fuelLevel = turtle.getFuelLevel()
-				SendMessage(globals.port_log, "New Fuel level:" .. fuelLevel)
+				SendMessage(cfg.port_log, "New Fuel level:" .. fuelLevel)
 			end
 			slot = slot+1
 		end
 		
 		if fuelLevel < 50 then
-			SendMessage(globals.port_log, "LOW ON FUEL!")
+			SendMessage(cfg.port_log, "LOW ON FUEL!")
 		end
 	end
 
@@ -685,7 +673,7 @@ end
 
 	function PrintDigResult(data, blockData)
 		if blockData.rarity == 4 then
-			SendMessage(globals.port_log, "LOOT: " .. string.gsub(data.name, "minecraft:", ""))
+			SendMessage(cfg.port_log, "LOOT: " .. string.gsub(data.name, "minecraft:", ""))
 		end
 	end
 
@@ -696,10 +684,10 @@ end
 	function DispatchLocation()
 		local x,y,z = gps.locate(5)
 		if x then 
-			modem.transmit(globals.port_log, globals.port_turtleCmd, 
+			modem.transmit(cfg.port_log, cfg.port_turtleCmd, 
 				os.getComputerLabel() .. " G x:" .. tostring(x) .. " z:" .. tostring(z) .. " y:" .. tostring(y))
 		else
-			modem.transmit(globals.port_log, globals.port_turtleCmd, 
+			modem.transmit(cfg.port_log, cfg.port_turtleCmd, 
 				os.getComputerLabel() .. " L x:" .. tostring(loc["x"]) .. " z:" .. tostring(loc["z"]) .. " y:" .. tostring(loc["y"]) .. " h:" .. loc["h"])
 		end
 	end
@@ -722,7 +710,7 @@ end
 
 	function GetFirstOpenInvSlot()
 		local n
-		for n=1,globals.inventorySize do
+		for n=1,cfg.inventorySize do
 			if turtle.getItemCount(n) == 0 then
 				return n
 			end
@@ -737,11 +725,11 @@ end
 	function GetIsHasResource()
 		local slot = 0
 		local isResourceFound
-		while slot < globals.inventorySize and not isResourceFound do
+		while slot < cfg.inventorySize and not isResourceFound do
 			slot = slot + 1
 			turtle.select(slot)
 			local data = turtle.getItemDetail()
-			if data and data.name == globals.resourceName then
+			if data and data.name == cfg.resourceName then
 				isResourceFound = true
 			end
 		end
@@ -801,8 +789,8 @@ end
 				local currentLoc = {x=homeLoc["x"],y=homeLoc["y"],z=homeLoc["z"],h=homeLoc["h"]}
 				return true, currentLoc
 			else
-				SendMessage(globals.port_log, "WARNING: can't validate start loc")
-				SendMessage(globals.port_log, "Make sure homeLoc is correct!")
+				SendMessage(cfg.port_log, "WARNING: can't validate start loc")
+				SendMessage(cfg.port_log, "Make sure homeLoc is correct!")
 				return false, nil
 			end
 		end
@@ -819,13 +807,13 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
     function SendMessage(port, msg)
         print(msg)
-        modem.transmit(port, globals.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
+        modem.transmit(port, cfg.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
     end
 
     function MessageHandler()
         while true do
             local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
-            if senderChannel == globals.port_turtleCmd then	
+            if senderChannel == cfg.port_turtleCmd then	
                 local isProcessMessage = false
                 local command
                 
@@ -846,14 +834,14 @@ end
                         DispatchLocation()
                     
                     elseif string.lower(command) == "ping" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
                     
                     elseif string.lower(command) == "names" then		
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel())
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel())
                         
                     elseif string.lower(command) == "getfuel" then
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
-                        modem.transmit(replyChannel, globals.port_turtleCmd, reply)
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
                         
                     elseif string.lower(command) == "stop" then
                         SendMessage(replyChannel, "stop Received")
@@ -895,7 +883,7 @@ end
                     -- MANUAL LOCATION COMMANDS
                     -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~					
                     elseif string.lower(command) == "up" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up()))
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "up10" then
@@ -903,11 +891,11 @@ end
                         for n=1, 10 do
                             if Up() then moveCount=moveCount+1 end
                         end
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " up " .. tostring(moveCount) .. " spaces")
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " up " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "down" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down()))
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "down10" then
@@ -915,11 +903,11 @@ end
                         for n=1, 10 do
                             if Down() then moveCount=moveCount+1 end
                         end
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " down " .. tostring(moveCount) .. " spaces")
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " down " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "forward" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
                         DispatchLocation()
                         
                     elseif string.lower(command) == "forward10" then
@@ -927,11 +915,11 @@ end
                         for n=1, 10 do
                             if Forward() then moveCount=moveCount+1 end
                         end
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "back" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward()))
                         DispatchLocation()
                         
                     elseif string.lower(command) == "back10" then
@@ -939,15 +927,15 @@ end
                         for n=1, 10 do
                             if Backward() then moveCount=moveCount+1 end
                         end
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " back " .. tostring(moveCount) .. " spaces")
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " back " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "turnleft" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft()))
                         --DispatchLocation()
                         
                     elseif string.lower(command) == "turnright" then
-                        modem.transmit(replyChannel, globals.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight()))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight()))
                         --DispatchLocation()
                         
                     elseif msgHandler then

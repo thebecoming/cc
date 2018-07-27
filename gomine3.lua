@@ -1,18 +1,11 @@
 print("Gomine3 v0.11")
-os.loadAPI("globals")
 os.loadAPI("util")
 os.loadAPI("t3")
-
--- globals
-local mineLoc = globals.mineLoc
-local maxRadius = globals.maxRadius
-local maxDepth = globals.maxDepth
-local nextDepth = globals.nextDepth
 
 local isDigStairs = true
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
-local curDepth
+local curdepth
 
 local isRequireHomeBlock = false
 local torchSlot = 1
@@ -20,10 +13,46 @@ local modem
 local isMining = false
 local isFirstDecent
 
+
+local cfg = {
+    inventorySize = 16,
+    flyCeiling = 71,
+    port_log = 969,
+    port_turtleCmd = 967,
+    turtleID = nil,
+    regionCode = nil,
+
+    startLoc = nil,
+    mineLoc = nil,
+
+    destroyLoc = nil,
+    rarity2Loc = nil,
+    rarity3Loc = nil,
+    rarity4Loc = nil,
+    fuelLoc = nil,
+
+    resourceName = nil,
+    isResourcePlacer = nil,
+    maxResourceCount = nil,
+    sandLoc = nil,
+    fillLoc = nil,
+
+    length = nil,
+    width = nil,
+    depth = nil,
+    maxRadius = nil,
+    nextdepth = nil,
+    maxdepth = nil,
+    isResumeMiningdepth = nil,
+}
+
 function InitProgram()
-	util.Print("Init Mining program")	
-	local isValidInit = true	
-	
+	print("Init Mining program")	
+    local isValidInit = true	
+    
+    util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)	
+    SetTurtleConfig(cfg)
+
 	-- Init peripherals
 	modem = util.InitModem()	
 	if not modem then
@@ -33,11 +62,11 @@ function InitProgram()
 	
     local isCurLocValidated
     
-    t3.SetHomeLocation(globals.startLoc)
+    t3.SetHomeLocation(cfg.startLoc)
 	isCurLocValidated, currentLoc = t3.GetCurrentLocation()		
 	
 	-- Check if on home block
-	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= globals.startLoc.x or currentLoc.z ~= globals.startLoc.z or currentLoc.y ~= globals.startLoc.y) then
+	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= cfg.startLoc.x or currentLoc.z ~= cfg.startLoc.z or currentLoc.y ~= cfg.startLoc.y) then
 		util.Print("Not one home block")
 		isValidInit = false
     end	
@@ -55,7 +84,233 @@ function InitProgram()
         t3.StartTurtleRun();
 	end
 
-	t3.SendMessage(globals.port_log, "gomine program END")
+	t3.SendMessage(cfg.port_log, "gomine program END")
+end
+
+
+
+function SetTurtleConfig(cfg)
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    if tonumber(numSeg) ~= nil then
+        cfg.turtleID = tonumber(numSeg)
+        cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
+    end
+
+	-- water_base
+	if cfg.regionCode == "a" then	
+		local locBaseCenter = {x=178, z=1900, y=70, h="w"}
+		local baseCenterOffset = 3
+		-- cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+		-- cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+		-- cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+		-- cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+		-- cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		cfg.maxRadius = 2
+		cfg.nextdepth = 1
+		cfg.maxdepth = 2
+
+		-- mine 1
+		if cfg.turtleID == 1 then 		
+			local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
+			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			cfg.mineLoc = newloc
+			-- print("ml x:" .. newloc.x .. " y:" .. newloc.y .. " z:" .. newloc.z)
+			cfg.isResumeMiningdepth = true
+			
+		-- mine 2
+		elseif cfg.turtleID == 2 then 
+			local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
+			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			cfg.mineLoc = newloc
+			cfg.isResumeMiningdepth = true
+			
+		-- mine 3
+		elseif cfg.turtleID == 3 then 
+			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
+			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			cfg.mineLoc = newloc
+			cfg.isResumeMiningdepth = true
+			
+		-- far side glass
+		elseif cfg.turtleID == 4 then 
+			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
+			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			cfg.mineLoc = newloc
+			cfg.isResumeMiningdepth = true
+
+		end
+			
+		-- near side glass
+		-- elseif cfg.turtleID == 5 then 
+		-- 	cfg.isResourcePlacer = true
+		-- 	cfg.startLoc = {x=5713, z=2797, y=68, h="w"}
+		-- 	cfg.fillLoc = {x=5683, z=2823, y=63, h="w"}
+			
+		-- -- sand dropper
+		-- elseif cfg.turtleID == 6 then 
+		-- 	cfg.startLoc = {x=5711, z=2797, y=68, h="w"}
+		-- 	cfg.fillLoc = {x=5644, z=2824, y=64, h="s"}
+		-- end
+		
+		-- resourceContLoc1 = {x=5719, z=2806, y=67, h="n"}
+		-- resourceContLoc2 = {x=5718, z=2806, y=67, h="n"}
+		-- resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+		-- resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- cfg.maxResourceCount = 448
+			
+		-- if cfg.isResourcePlacer then
+		-- 	cfg.resourceName = "minecraft:glass"
+		-- 	resourceContLoc1 = {x=5715, z=2806, y=67, h="n"}
+		-- 	if cfg.turtleID == 4 or cfg.turtleID == 5 then 
+		-- 		cfg.length = 20
+		-- 	end
+		-- 	cfg.width = 2
+		-- else
+		-- 	cfg.resourceName = "minecraft:sand"
+		-- 	cfg.length = 20
+		-- 	cfg.width = 20
+		-- end
+		
+	elseif cfg.regionCode == "d" then
+		-- desert
+		if cfg.turtleID == 1 then 
+			cfg.startLoc = {x=207, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=193, z=1934, y=107, h="e"}
+			cfg.maxRadius = 5 -- ex: 5 = 11 cfg.width (double radius +1)
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255 -- TODO: changing height messes up stair y axis?
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 2 then 
+			cfg.startLoc = {x=209, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=217, z=1934, y=106, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 3 then 
+			cfg.startLoc = {x=211, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=231, z=1934, y=91, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 4 then 
+			cfg.startLoc = {x=213, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=245, z=1934, y=97, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		-- 	cfg.startLoc = {x=-1557, z=7596, y=70, h="n"}
+		-- 	cfg.mineLoc = {x=-1558, z=7606, y=69, h="e"}
+		-- 	cfg.maxRadius = 8
+		-- 	cfg.nextdepth = 1
+		-- 	cfg.maxdepth = 0
+		-- 	cfg.isResumeMiningdepth = true
+		-- 	cfg.length = 62
+		-- 	cfg.width = 3
+		-- 	cfg.depth = 2
+		elseif cfg.turtleID == 5 then 
+			cfg.startLoc = {x=-1557, z=7594, y=70, h="n"}
+		end
+		
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		
+		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
+		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
+		--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+		--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="n"}
+		-- cfg.resourceName = "minecraft:sand"
+		
+	-- Z = desert 2
+	elseif cfg.regionCode == "z" then
+		-- desert
+		if cfg.turtleID == 1 then 
+			cfg.startLoc = {x=-1517, z=7428, y=69, h="n"}
+			cfg.mineLoc = {x=-1524, z=7473, y=66, h="w"}
+		elseif cfg.turtleID == 2 then 
+			cfg.startLoc = {x=-1517, z=7426, y=69, h="n"}
+			cfg.mineLoc = {x=-1524, z=7453, y=66, h="w"}
+		elseif cfg.turtleID == 3 then 
+			cfg.startLoc = {x=-1517, z=7424, y=69, h="n"}
+			cfg.mineLoc = {x=-1524, z=7433, y=66, h="w"}
+		elseif cfg.turtleID == 4 then 
+			cfg.startLoc = {x=-1517, z=7422, y=69, h="n"}
+			cfg.mineLoc = {x=-1524, z=7413, y=68, h="w"}
+		elseif cfg.turtleID == 5 then 
+			cfg.startLoc = {x=-1517, z=7420, y=69, h="n"}
+			cfg.mineLoc = {x=-1524, z=7393, y=68, h="w"}
+			
+		elseif cfg.turtleID == 6 then 
+			cfg.startLoc = {x=-1517, z=7418, y=69, h="n"}
+			cfg.mineLoc = {x=-1523, z=7473, y=66, h="e"}
+		elseif cfg.turtleID == 7 then 
+			cfg.startLoc = {x=-1517, z=7416, y=69, h="n"}
+			cfg.mineLoc = {x=-1523, z=7423, y=63, h="e"}
+		elseif cfg.turtleID == 8 then 
+			cfg.startLoc = {x=-1517, z=7414, y=69, h="n"}
+			cfg.mineLoc = {x=-1523, z=7433, y=66, h="e"}
+		elseif cfg.turtleID == 9 then 
+			cfg.startLoc = {x=-1517, z=7412, y=69, h="n"}
+			cfg.mineLoc = {x=-1523, z=7413, y=68, h="e"}
+		end
+		
+		cfg.length = 59
+		cfg.width = 20
+		cfg.depth = 1
+		
+		cfg.destroyLoc = {x=-1520, z=7428, y=69, h="s"}
+		cfg.rarity2Loc = {x=-1520, z=7426, y=69, h="w"}
+		cfg.rarity3Loc = {x=-1520, z=7424, y=69, h="w"}
+		cfg.rarity4Loc = {x=-1520, z=7422, y=69, h="w"}
+		cfg.fuelLoc = {x=-1520, z=7419, y=69, h="w"}
+		
+		
+	elseif cfg.regionCode == "s" then
+		-- shafts
+		if cfg.turtleID == 1 then 
+			cfg.startLoc = {x=6283, z=3539, y=70, h="n"}
+		elseif cfg.turtleID == 2 then 
+			cfg.startLoc = {x=6283, z=3537, y=70, h="n"}
+		elseif cfg.turtleID == 3 then 
+			cfg.startLoc = {x=6283, z=3535, y=70, h="n"}
+		elseif cfg.turtleID == 4 then 
+			cfg.startLoc = {x=6283, z=3533, y=70, h="n"}
+		elseif cfg.turtleID == 5 then 
+			cfg.startLoc = {x=6283, z=3531, y=70, h="n"}
+		end
+
+		cfg.destroyLoc = {x=6286, z=3534, y=70, h="e"}
+		cfg.rarity2Loc = {x=6286, z=3536, y=70, h="e"}
+		cfg.rarity3Loc = {x=6286, z=3538, y=70, h="e"}
+		cfg.rarity4Loc = {x=6286, z=3540, y=70, h="e"}
+
+	-- south main hole
+	-- ~~~~~~~~~~~~~~
+	-- cfg.mineLoc = {x=6285, z=3559, y=58, h="s"}
+	-- cfg.maxdepth = 58
+	-- maxcfg.width = 6
+	-- maxHeight = 100
+
+	-- digout
+	-- ~~~~~~~~~~~~~~
+	-- cfg.mineLoc = {x=6295, z=3527, y=7, h="e"}
+	-- cfg.maxdepth = 18
+	-- maxcfg.width = 2
+	-- maxHeight = 2
+	end
 end
 
 function TestForward(steps)
@@ -77,8 +332,8 @@ function RunGoMine()
 			t3.ResetInventorySlot()
 			
 			-- fly To destination
-			t3.SendMessage(globals.port_log, "going to mineLoc")
-			if not t3.GoToPos(mineLoc, true) then isMining = false end
+			t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
+			if not t3.GoToPos(cfg.mineLoc, true) then isMining = false end
 
 			-- Start mining
 			if isMining then
@@ -112,38 +367,38 @@ function BeginMining()
 	-- 0 = 3*4=12
 	-- 1 = 5*4=20
 	-- 2 = 7*4=28
-	local outerStepCount = (3 + (maxRadius * 2)) * 4
+	local outerStepCount = (3 + (cfg.maxRadius * 2)) * 4
 	
-	t3.SetHeading(mineLoc["h"])
+	t3.SetHeading(cfg.mineLoc.h)
 	while true do
 		-- loops once for each y unit
-		curDepth = mineLoc["y"] - t3.GetLocation()["y"]
+		curdepth = cfg.mineLoc.y - t3.GetLocation().y
 		
-		-- go down to correct curDepth		
-		if globals.isResumeMiningDepth and isFirstDecent then
+		-- go down to correct curdepth		
+		if cfg.isResumeMiningdepth and isFirstDecent then
 			isFirstDecent = false
 			while not turtle.detectDown() do
 				t3.Down()
 			end
-			curDepth = mineLoc["y"] - currentLoc["y"]
-			t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
+			curdepth = cfg.mineLoc.y - currentLoc.y
+			t3.SendMessage(cfg.port_log, "depth:" .. tostring(curdepth))
 		else
-			local depthIncrement = nextDepth - curDepth
-			--util.Print("newD:" .. tostring(curDepth) .. " nxt:" .. tostring(nextDepth) .. " inc:" .. tostring(nextDepth - curDepth))
-			for n=1,nextDepth - curDepth do
+			local depthIncrement = cfg.nextdepth - curdepth
+			--util.Print("newD:" .. tostring(curdepth) .. " nxt:" .. tostring(cfg.nextdepth) .. " inc:" .. tostring(cfg.nextdepth - curdepth))
+			for n=1,cfg.nextdepth - curdepth do
 				if not t3.DigAndGoDown() then return false end	
-			curDepth = mineLoc["y"] - currentLoc["y"]
-				t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
+			curdepth = cfg.mineLoc.y - currentLoc.y
+				t3.SendMessage(cfg.port_log, "depth:" .. tostring(curdepth))
 			end
 		end
 		
-		curRadius = maxRadius
+		curRadius = cfg.maxRadius
 		
 		-- calculate position to start cutting stairs
-		local stairCutPos1 = (curDepth % outerStepCount)
-		local stairCutPos2 = ((curDepth+1) % outerStepCount)
-		local stairCutPos3 = ((curDepth+2) % outerStepCount)
-		local stairCutPos4 = ((curDepth+3) % outerStepCount)
+		local stairCutPos1 = (curdepth % outerStepCount)
+		local stairCutPos2 = ((curdepth+1) % outerStepCount)
+		local stairCutPos3 = ((curdepth+2) % outerStepCount)
+		local stairCutPos4 = ((curdepth+3) % outerStepCount)
 		
 		while curRadius >= 0 do
 			--util.Print("Current Radius:" .. tostring(curRadius))			
@@ -154,12 +409,12 @@ function BeginMining()
 				local isAtSideStart = curSideStep % sideStepCount == 1
 				
 				-- cut stairs notch
-				if isDigStairs and curRadius == maxRadius then
+				if isDigStairs and curRadius == cfg.maxRadius then
 					--local stairCurSideStep = curSideStep+1
 					if curSideStep == stairCutPos1 or curSideStep == stairCutPos2 or curSideStep == stairCutPos3 or curSideStep == stairCutPos4 then
 							--make the cut
 							if isAtSideStart then
-								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
 								if not t3.TurnLeft() then return false end
 								if not t3.DigAndGoForward() then return false end
 								if not t3.TurnLeft() then return false end
@@ -180,13 +435,13 @@ function BeginMining()
 									end
 								end
 							else
-								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
 								if not t3.TurnLeft() then return false end
 								if not t3.Dig() then return false end
 								if not t3.TurnRight() then return false end
 							end
 					else
-						--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
+						--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
 					end
 				end
 				
@@ -211,17 +466,17 @@ function BeginMining()
 		end
 		
 		-- stopped at inner radius
-		if maxDepth > 0 and curDepth == maxDepth then
-			t3.SendMessage(globals.port_log, "Max curDepth: " .. tostring(maxDepth) .. " hit")
+		if cfg.maxdepth > 0 and curdepth == cfg.maxdepth then
+			t3.SendMessage(cfg.port_log, "Max curdepth: " .. tostring(cfg.maxdepth) .. " hit")
 			return false
 		end
 		
 		local curLoc = t3.GetLocation()
-		local cornerLoc = {x=mineLoc["x"],y=curLoc["y"],z=mineLoc["z"],h=mineLoc["h"]}
+		local cornerLoc = {x=cfg.mineLoc.x,y=curLoc.y,z=cfg.mineLoc.z,h=cfg.mineLoc.h}
 		if not t3.GoToPos(cornerLoc, false) then return false end
-		nextDepth = curDepth+1
+		cfg.nextdepth = curdepth+1
 	end
-	t3.SendMessage(globals.port_log, "Mining END")
+	t3.SendMessage(cfg.port_log, "Mining END")
 end
 
 function IncomingMessageHandler(command)
