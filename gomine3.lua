@@ -108,7 +108,8 @@ function SetTurtleConfig(cfg)
 		-- cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
 		-- cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
         cfg.isResumeMiningdepth = true
-		cfg.maxRadius = 2
+		cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
+		-- cfg.maxRadius = 3 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
 		cfg.nextdepth = 1
 		cfg.maxdepth = 2
 
