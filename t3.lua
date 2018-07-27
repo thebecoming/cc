@@ -1,10 +1,11 @@
--- TODO: Need to return home when no more events left to process
+-- TODO: 
+-- Need to return home when no more events left to process
+-- Carry a lava bucket and have turtle dig a hold of lava under it and drop junk when full
 -- The stop should only stop the current instruction, and as something senses the failure, reset the stop
 -- so it may continue on to the next task.
 -- if the parent class is handling some navigation, it will have to check the stop value on t and
 -- have this same behavior`
--- os.loadAPI("globals")
--- os.loadAPI("util")
+
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -13,16 +14,19 @@ local firstOpenInvSlot
 local queue = {}
 local msgHandler
 
-function InitTurtle(aModem, aUtil, aCfg, aCurLoc, aMessageHander)
+function InitReferences(aModem, aUtil, aCfg)
 	modem = aModem
-    util = aUtil
-    loc = aCurLoc
-    msgHandler = aMessageHander
+	util = aUtil
     cfg = aCfg
 
 	if not modem.isOpen(aCfg.port_turtleCmd) then
 		modem.open(aCfg.port_turtleCmd)
 	end
+end
+
+function InitTurtle(aCurLoc, aMessageHander)
+    loc = aCurLoc
+    msgHandler = aMessageHander
 
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then

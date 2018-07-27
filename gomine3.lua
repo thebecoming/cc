@@ -51,30 +51,34 @@ function InitProgram()
     local isValidInit = true
 
     util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
-    SetTurtleConfig(cfg)
+	SetTurtleConfig(cfg)		
 
 	-- Init peripherals
 	modem = util.InitModem()
 	if not modem then
 		util.Print("No Modem Found!")
-		return false
+		isValidInit = false
 	end
 
-	if cfg.startLoc then
-		t3.SetHomeLocation(cfg.startLoc)
-		currentLoc = t3.GetCurrentLocation()		
-		if not currentLoc then isValidInit = false end
-	else
-		currentLoc = t3.GetCurrentLocation()
-		if not currentLoc then
-			isValidInit = false
+	if isValidInit then
+		t3.InitReferences(modem, util, cfg)
+
+		if cfg.startLoc then
+			t3.SetHomeLocation(cfg.startLoc)
+			currentLoc = t3.GetCurrentLocation()		
+			if not currentLoc then isValidInit = false end
 		else
-			t3.SetHomeLocation(currentLoc)
+			currentLoc = t3.GetCurrentLocation()
+			if not currentLoc then
+				isValidInit = false
+			else
+				t3.SetHomeLocation(currentLoc)
+			end
 		end
 	end
 
     if isValidInit then
-        if not t3.InitTurtle(modem, util, cfg, currentLoc, IncomingMessageHandler) then
+        if not t3.InitTurtle(modem, currentLoc, IncomingMessageHandler) then
             isValidInit = false
         end
     end
@@ -103,16 +107,19 @@ function SetTurtleConfig(cfg)
 	-- water_base
 	if cfg.regionCode == "a" then
 		local locBaseCenter = {x=178, z=1900, y=70, h="w"} -- the space above the center block
-		local baseCenterOffset = 3
+		local baseCenterOffset = 4
 		
 		-- plus sign above center block
-        cfg.destroyLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        cfg.destroyLoc = {x=locBaseCenter.x-1, y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
         cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
         cfg.rarity3Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
 		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
-        cfg.fuelLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        cfg.rarity4Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity4Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "l")
+        cfg.fuelLoc = {x=locBaseCenter.x-1,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
 
 		cfg.flyCeiling = locBaseCenter.y + 3
