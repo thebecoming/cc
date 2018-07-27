@@ -1,4 +1,4 @@
-print("Gomine3 v0.14")
+print("Gomine3 v0.15")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -107,26 +107,22 @@ function SetTurtleConfig(cfg)
 		-- cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
 		-- cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
 		-- cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+        cfg.isResumeMiningdepth = true
 		cfg.maxRadius = 2
 		cfg.nextdepth = 1
 		cfg.maxdepth = 2
 
 		-- mine 1
+        local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		if cfg.turtleID == 1 then
-			local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
 			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
-			cfg.mineLoc = newloc
-			cfg.isResumeMiningdepth = true
 
 		-- mine 2
 		elseif cfg.turtleID == 2 then
-			local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 			newloc.h = util.GetNewHeading(newloc.h, "r")
 			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
 			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
-			cfg.mineLoc = newloc
-			cfg.isResumeMiningdepth = true
 
 		-- mine 3
 		elseif cfg.turtleID == 3 then
@@ -134,19 +130,15 @@ function SetTurtleConfig(cfg)
 			newloc.h = util.GetNewHeading(newloc.h, "r")
 			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
 			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
-			cfg.mineLoc = newloc
-			cfg.isResumeMiningdepth = true
 
 		-- far side glass
 		elseif cfg.turtleID == 4 then
-			newloc.h = util.GetNewHeading(newloc.h, "r")
-			newloc.h = util.GetNewHeading(newloc.h, "r")
+			newloc.h = util.GetNewHeading(newloc.h, "l")
 			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
 			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
-			cfg.mineLoc = newloc
-			cfg.isResumeMiningdepth = true
 
 		end
+        cfg.mineLoc = newloc
 
 		-- near side glass
 		-- elseif cfg.turtleID == 5 then
