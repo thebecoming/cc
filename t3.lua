@@ -17,11 +17,11 @@ local stopReason = ""
 --out_of_fuel
 
 local modem
-local homeLoc, loc, destLoc
+local homeLoc, loc, destLoc, heading
 local firstOpenInvSlot
 
 local queue = {}
-local msgHandler;
+local msgHandler
 
 function InitTurtle(aModem, aCurLoc, aMessageHander)
 	modem = aModem
@@ -64,7 +64,7 @@ function ProcessQueue()
                 end,
                 function() 
                     os.pullEvent("stopEvent")
-                    util.Print("ProcessQueue stopEvent")
+                    -- util.Print("ProcessQueue stopEvent")
                 end)
             else
                 parallel.waitForAny(function() 
@@ -72,7 +72,7 @@ function ProcessQueue()
                 end,
                 function() 
                     os.pullEvent("stopEvent")
-                    util.Print("ProcessQueue stopEvent")
+                    -- util.Print("ProcessQueue stopEvent")
                 end)
             end
         end
@@ -81,9 +81,9 @@ end
 
 function AddCommand(cmdTable, isAbortCurrentCmd)
     if isAbortCurrentCmd then
-        util.Print("os.queueEvent stopEvent")
-        os.queueEvent("stopEvent")
+        -- util.Print("os.queueEvent stopEvent")
         queue = {}
+        os.queueEvent("stopEvent")
         sleep(.1)
     end
     table.insert(queue,cmdTable)
@@ -697,7 +697,7 @@ end
 	end
 
 	function DispatchLocation()
-		local x,y,z = gps.locate(2)
+		local x,y,z = gps.locate(5)
 		if x then 
 			modem.transmit(globals.port_log, globals.port_turtleCmd, 
 				os.getComputerLabel() .. " G x:" .. tostring(x) .. " z:" .. tostring(z) .. " y:" .. tostring(y))
@@ -751,14 +751,20 @@ end
 		return isResourceFound
 	end
 
-	function GetCurrentLocation()
+    function GetCurrentLocation()
+        if loc then
+            -- break the reference before handing over
+            local newloc = {x=loc["x"],y=loc["y"],z=loc["z"],h=loc["h"]}
+            return newloc
+        end
+
 		local isGpsSuccess
-		local x,y,z = gps.locate(1)
+		local x,y,z = gps.locate(5)
 		local h = ""
 		if x then 
 			-- GPS does not give heading so we need to find that
 			if turtle.back() then
-				local x2,y2,z2 = gps.locate(1)
+				local x2,y2,z2 = gps.locate(5)
 				if x2 then
 					if x2 > x then
 						h = "w"
@@ -773,7 +779,7 @@ end
 				end
 				turtle.forward()
 			elseif turtle.forward() then
-				local x2,y2,z2 = gps.locate(1)
+				local x2,y2,z2 = gps.locate(5)
 				if x2 then
 					if x2 > x then
 						h = "e"
@@ -853,35 +859,40 @@ end
                         modem.transmit(replyChannel, globals.port_turtleCmd, reply)
                         
                     elseif string.lower(command) == "stop" then
-                        SendMessage(replyChannel, "STOPPING IN PLACE!")
-                        stopReason = "incoming_stop"
+                        SendMessage(replyChannel, "stop Received")
+                        queue = {}
+                        os.queueEvent("stopEvent")
                         
                     elseif string.lower(command) == "gohome" then
-                        SendMessage(replyChannel, "Going home...")
-                        stopReason = "incoming_gohome"
-                        -- GoHome(stopReason);
-                        parallel.waitForAny(function() GoHome(stopReason) end, function() end)
+                        SendMessage(replyChannel, "gohome Received")
+                        AddCommand({func=function() 
+                            GoHome("incoming_gohome"); 
+                        end}, true)
 
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
+                        SendMessage(replyChannel, "refuel Received")
                         local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
-                        -- GoRefuel()
-                        -- GoToPos(returnLoc, true)
                         AddCommand({func=function() 
                                 GoRefuel(); 
-                                GoToPos(returnLoc, true); 
                             end}, true)
+                        AddCommand({func=function() 
+                                GoToPos(returnLoc, true); 
+                            end}, false)
                         
                     elseif string.lower(command) == "unload" then
                         -- unload and go home
                         -- make a copy to break the reference to homeLoc
+                        SendMessage(replyChannel, "unload Received")
                         local isCurLocValidated, currentLoc = GetCurrentLocation(nil)	
                         local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
                         AddCommand({func=function() 
                                 GoUnloadInventory(); 
-                                GoToPos(returnLoc, true); 
                             end}, true)
+                        AddCommand({func=function() 
+                                GoToPos(returnLoc, true); 
+                            end}, false)
 
                         
                     -- MANUAL LOCATION COMMANDS
