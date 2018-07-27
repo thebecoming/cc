@@ -251,14 +251,14 @@ function AddVectorToLoc(aLoc, direction, steps)
 		or (direction == "b" and newloc["h"] == "n")
 		or (direction == "r" and newloc["h"] == "e"))
 	then 
-		newloc["z"] = newloc["x"] + steps
+		newloc["z"] = newloc["z"] + steps
 
 	elseif ((direction == "f" and newloc["h"] == "n")
 		or (direction == "l" and newloc["h"] == "e")
 		or (direction == "b" and newloc["h"] == "s")
 		or (direction == "r" and newloc["h"] == "w"))
 	then 
-		newloc["z"] = newloc["x"] - steps
+		newloc["z"] = newloc["z"] - steps
 
 	elseif ((direction == "f" and newloc["h"] == "e")
 		or (direction == "l" and newloc["h"] == "s")

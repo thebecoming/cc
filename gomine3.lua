@@ -1,4 +1,4 @@
-print("Gomine3 v0.13")
+print("Gomine3 v0.14")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -113,7 +113,6 @@ function SetTurtleConfig(cfg)
 
 		-- mine 1
 		if cfg.turtleID == 1 then
-			-- print("locBaseCenter x:" .. locBaseCenter.x .. " y:" .. locBaseCenter.y .. " z:" .. locBaseCenter.z)
 			local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
 			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
