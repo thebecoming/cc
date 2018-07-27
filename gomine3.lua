@@ -78,7 +78,7 @@ function InitProgram()
 	end
 
     if isValidInit then
-        if not t3.InitTurtle(modem, currentLoc, IncomingMessageHandler) then
+        if not t3.InitTurtle(currentLoc, IncomingMessageHandler) then
             isValidInit = false
         end
     end
