@@ -1,4 +1,4 @@
-print("Gomine3 v0.11")
+print("Gomine3 v0.12")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -72,7 +72,7 @@ function InitProgram()
     end	
 
     if isValidInit then 
-        if not t3.InitTurtle(modem, currentLoc, IncomingMessageHandler) then 
+        if not t3.InitTurtle(modem, util, cfg, currentLoc, IncomingMessageHandler) then 
             isValidInit = false
         end
     end

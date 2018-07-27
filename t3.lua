@@ -17,7 +17,12 @@ function InitTurtle(aModem, aUtil, aCfg, aCurLoc, aMessageHander)
 	modem = aModem
     util = aUtil
     loc = aCurLoc
-    msgHandler = aMessageHander;
+    msgHandler = aMessageHander
+    cfg = aCfg
+    
+	if not modem.isOpen(aCfg.port_turtleCmd) then 
+		modem.open(aCfg.port_turtleCmd)
+	end
 	
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then
