@@ -1,4 +1,4 @@
-print("Gomine3 v0.15")
+print("Gomine3 v0.16")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -100,18 +100,23 @@ function SetTurtleConfig(cfg)
 
 	-- water_base
 	if cfg.regionCode == "a" then
-		local locBaseCenter = {x=178, z=1900, y=70, h="w"}
+		local locBaseCenter = {x=178, z=1900, y=70, h="w"} -- the space above the center block
 		local baseCenterOffset = 3
-		-- cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-		-- cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-		-- cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-		-- cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-		-- cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		
+        cfg.destroyLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
+        cfg.rarity3Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+        cfg.fuelLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
+
         cfg.isResumeMiningdepth = true
-		cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
-		-- cfg.maxRadius = 3 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
+		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
+		cfg.maxRadius = 3 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
 		cfg.nextdepth = 1
-		cfg.maxdepth = 2
+		cfg.maxdepth = 100
 
 		-- mine 1
         local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}

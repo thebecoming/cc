@@ -1,7 +1,7 @@
--- TODO: need to handle the stop implementation better..
+-- TODO: Need to return home when no more events left to process
 -- The stop should only stop the current instruction, and as something senses the failure, reset the stop
 -- so it may continue on to the next task.
--- if the parent class is handling some navigation, it will have to check the stop value on t and 
+-- if the parent class is handling some navigation, it will have to check the stop value on t and
 -- have this same behavior`
 -- os.loadAPI("globals")
 -- os.loadAPI("util")
@@ -19,17 +19,17 @@ function InitTurtle(aModem, aUtil, aCfg, aCurLoc, aMessageHander)
     loc = aCurLoc
     msgHandler = aMessageHander
     cfg = aCfg
-    
-	if not modem.isOpen(aCfg.port_turtleCmd) then 
+
+	if not modem.isOpen(aCfg.port_turtleCmd) then
 		modem.open(aCfg.port_turtleCmd)
 	end
-	
+
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then
 		SendMessage(cfg.port_log, "Out of fuel!")
         return false
 	end
-	
+
 	firstOpenInvSlot = GetFirstOpenInvSlot()
     if firstOpenInvSlot == 0 then
         SendMessage(cfg.port_log, "Inventory is full!")
@@ -51,18 +51,18 @@ function ProcessQueue()
             local func = tbl.func
             local args = tbl.args
             if args then
-                parallel.waitForAny(function() 
+                parallel.waitForAny(function()
                     tbl.func(table.unpack(args))
                 end,
-                function() 
+                function()
                     os.pullEvent("stopEvent")
                     -- util.Print("ProcessQueue stopEvent")
                 end)
             else
-                parallel.waitForAny(function() 
+                parallel.waitForAny(function()
                     tbl.func()
                 end,
-                function() 
+                function()
                     os.pullEvent("stopEvent")
                     -- util.Print("ProcessQueue stopEvent")
                 end)
@@ -82,7 +82,7 @@ function AddCommand(cmdTable, isAbortCurrentCmd)
 end
 
 function GetIsOnHomeBlock()
-    local success, data = turtle.inspectDown() 
+    local success, data = turtle.inspectDown()
     return success and (data.name == "minecraft:wool" or data.name == "minecraft:planks" or data.name == "minecraft:lapis_block" or data.name == "minecraft:redstone_block")
 end
 
@@ -94,7 +94,7 @@ end
         SendMessage(cfg.port_log, "Going home...")
         if aStopReason then SendMessage(cfg.port_log, "Reason: " .. aStopReason) end
 		if not GoToPos(homeLoc, true) then  return false end
-		SendMessage(cfg.port_log, "I am home")	
+		SendMessage(cfg.port_log, "I am home")
 		-- local undiggableBlockData = GetUndiggableBlockData()
 		-- if undiggableBlockData then
 		-- 	SendMessage(cfg.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
@@ -103,17 +103,17 @@ end
 	end
 
 	function GoRefuel()
-		if not cfg.fuelLoc then 
+		if not cfg.fuelLoc then
             SendMessage(cfg.port_log, "No fuel loc found!")
 		else
 			SendMessage(cfg.port_log, "Going to Refuel...")
 			local isFuelContainerEmpty
             if not GoToPos(cfg.fuelLoc, true) then return false end
-            
+
             local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
             while missingFuel > 2000 and not isFuelContainerEmpty do
-                if not turtle.suck() then 
-                    isFuelContainerEmpty = true 
+                if not turtle.suck() then
+                    isFuelContainerEmpty = true
                 else
                     Refuel(false)
                 end
@@ -124,8 +124,8 @@ end
 	end
 
 	function GoRefillFromContainer()
-		if not resourceContLoc1 then 
-			SendMessage(cfg.port_log, "resourceContLoc1 not set") 
+		if not resourceContLoc1 then
+			SendMessage(cfg.port_log, "resourceContLoc1 not set")
 		else
 			local resourceLocations = {resourceContLoc1, resourceContLoc2, resourceContLoc3, resourceContLoc4}
 			local tmpLoc, isInventoryFull, tblKey
@@ -133,14 +133,14 @@ end
 			local slot = 0
 			local curResourceCount = 0
 			SendMessage(cfg.port_log, "refilling...")
-			
-			for tblKey in pairs(resourceLocations) do	
+
+			for tblKey in pairs(resourceLocations) do
 				tmpLoc = resourceLocations[tblKey]
 				if tmpLoc and not isInventoryFull then
-					local isContainerEmpty = false		
+					local isContainerEmpty = false
 					if not GoToPos(tmpLoc, isFirstContainer) then return false end
 					isFirstContainer = false
-								
+
 					while slot < cfg.inventorySize and not isContainerEmpty do
 						slot = slot + 1
 						turtle.select(slot)
@@ -155,8 +155,8 @@ end
 							fillAmount = cfg.maxResourceCount - curResourceCount;
 						end
 						if fillAmount > 0 then
-							if not turtle.suck(fillAmount) then 
-								isContainerEmpty = true 
+							if not turtle.suck(fillAmount) then
+								isContainerEmpty = true
 							else
 								curResourceCount = curResourceCount + fillAmount
 								if cfg.maxResourceCount and curResourceCount >= cfg.maxResourceCount then
@@ -168,7 +168,7 @@ end
 						end
 					end
 					if not isContainerEmpty then isInventoryFull = true end
-					
+
 				end
 			end
 		end
@@ -190,87 +190,89 @@ end
 
 	function GoToPos(aDestLoc, aIsFly)
 		destLoc = aDestLoc
-		
-        local isAbortInstruction = false
-        if(aIsFly) then
-			while loc["y"] < cfg.flyCeiling do
-                if not DigAndGoUp() then 
-                    isAbortInstruction = true 
-                    return false -- breaks for the while loop only
-                end
-            end
+
+		local isAbortInstruction = false
+		if destLoc.x ~= loc.x or destLoc.y ~= loc.y then
+			if aIsFly then
+				while loc.y < cfg.flyCeiling do
+					if not DigAndGoUp() then
+						isAbortInstruction = true
+						return false -- breaks for the while loop only
+					end
+				end
+			end
+			if isAbortInstruction then return false end
+
 		end
-        if isAbortInstruction then return false end
-		
+
 		-- move along z
-		--util.Print("Moving z: " .. tostring(loc["z"]) .. " to " .. tostring(destLoc["z"]))
-		while (loc["z"] ~= destLoc["z"]) do		
-			if loc["z"] < destLoc["z"] then
+		--util.Print("Moving z: " .. tostring(loc.z) .. " to " .. tostring(destLoc.z))
+		while (loc.z ~= destLoc.z) do
+			if loc.z < destLoc.z then
 				if not SetHeading("s") then
-                    isAbortInstruction = true 
-                    return false -- breaks for the while loop only
-                end
+					isAbortInstruction = true
+					return false -- breaks for the while loop only
+				end
 			else
 				if not SetHeading("n") then
-                    isAbortInstruction = true 
-                    return false -- breaks for the while loop only
-                end
-			end		
-			if not DigAndGoForward() then 
+					isAbortInstruction = true
+					return false -- breaks for the while loop only
+				end
+			end
+			if not DigAndGoForward() then
 				--util.Print("DigAndGoForward failed moving z")
-				return false 
+				return false
 			end
 		end
-        if isAbortInstruction then return false end
-		
+		if isAbortInstruction then return false end
+
 		-- move along x
-		--util.Print("Moving X: " .. tostring(loc["x"]) .. " to " .. tostring(destLoc["x"]))
-		while (loc["x"] ~= destLoc["x"]) do		
-			if loc["x"] < destLoc["x"] then
+		--util.Print("Moving X: " .. tostring(loc.x) .. " to " .. tostring(destLoc.x))
+		while (loc.x ~= destLoc.x) do
+			if loc.x < destLoc.x then
 				if not SetHeading("e") then
-                    isAbortInstruction = true 
-                    return false -- breaks for the while loop only
-                end
+					isAbortInstruction = true
+					return false -- breaks for the while loop only
+				end
 			else
 				if not SetHeading("w") then
-                    isAbortInstruction = true 
-                    return false -- breaks for the while loop only
-                end
-			end			
-			if not DigAndGoForward() then 
+					isAbortInstruction = true
+					return false -- breaks for the while loop only
+				end
+			end
+			if not DigAndGoForward() then
 				--util.Print("DigAndGoForward failed moving x")
-                isAbortInstruction = true 
-				return false 
+				isAbortInstruction = true
+				return false
 			end
 		end
-        if isAbortInstruction then return false end
-		
+		if isAbortInstruction then return false end
+
 		-- move along y
-		--util.Print("Moving y: " .. tostring(loc["y"]) .. " to " .. tostring(destLoc["y"]))
-		while (loc["y"] ~= destLoc["y"]) do					
-			-- TODO break things to move forward
-			if loc["y"] < destLoc["y"] then
-				if not DigAndGoUp() then 
+		--util.Print("Moving y: " .. tostring(loc.y) .. " to " .. tostring(destLoc.y))
+		while (loc.y ~= destLoc.y) do
+			if loc.y < destLoc.y then
+				if not DigAndGoUp() then
 					--util.Print("DigAndGoUp failed moving y")
-                    isAbortInstruction = true 
-					return false 
+					isAbortInstruction = true
+					return false
 				end
 			else
-				if not DigAndGoDown() then 
+				if not DigAndGoDown() then
 					--util.Print("DigAndGoDown failed moving y")
-                    isAbortInstruction = true 
-					return false 
+					isAbortInstruction = true
+					return false
 				end
 			end
 		end
-        if isAbortInstruction then return false end
-		
+		if isAbortInstruction then return false end
+
 		-- set heading
-		if not SetHeading(destLoc["h"]) then return false end
-		
+		if not SetHeading(destLoc.h) then return false end
+
 		return true
 	end
--- 
+--
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- Lowest level process for each instruction, (checks instruction index)
@@ -279,14 +281,14 @@ end
 		CheckFuelOnMove()
 		local result = turtle.forward()
 		if result then
-			if loc["h"] == "n" then
-				loc["z"] = loc["z"] - 1
-			elseif loc["h"] == "e" then
-				loc["x"] = loc["x"] + 1
-			elseif loc["h"] == "s" then
-				loc["z"] = loc["z"] + 1
-			elseif loc["h"] == "w" then
-				loc["x"] = loc["x"] - 1
+			if loc.h == "n" then
+				loc.z = loc.z - 1
+			elseif loc.h == "e" then
+				loc.x = loc.x + 1
+			elseif loc.h == "s" then
+				loc.z = loc.z + 1
+			elseif loc.h == "w" then
+				loc.x = loc.x - 1
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
@@ -297,22 +299,22 @@ end
 	end
 
 	function Backward()
-		CheckFuelOnMove()	
+		CheckFuelOnMove()
 		local result = turtle.back()
 		if result then
-			if loc["h"] == "n" then
-				loc["z"] = loc["z"] + 1
-			elseif loc["h"] == "e" then
-				loc["x"] = loc["x"] - 1
-			elseif loc["h"] == "s" then
-				loc["z"] = loc["z"] - 1
-			elseif loc["h"] == "w" then
-				loc["x"] = loc["x"] + 1
+			if loc.h == "n" then
+				loc.z = loc.z + 1
+			elseif loc.h == "e" then
+				loc.x = loc.x - 1
+			elseif loc.h == "s" then
+				loc.z = loc.z - 1
+			elseif loc.h == "w" then
+				loc.x = loc.x + 1
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
 			if not ProcessMovementChange() then return false end
-		else 
+		else
 			util.Print("turtle.back() failed")
 		end
         os.sleep()
@@ -320,12 +322,12 @@ end
 	end
 
 	function Up()
-		CheckFuelOnMove()	
+		CheckFuelOnMove()
 		local result = turtle.up()
 		if result then
-			loc["y"] = loc["y"] + 1
+			loc.y = loc.y + 1
 			if not ProcessMovementChange() then return false end
-		else 
+		else
 			util.Print("turtle.up() failed")
 		end
         os.sleep()
@@ -333,12 +335,12 @@ end
 	end
 
 	function Down()
-		CheckFuelOnMove()	
+		CheckFuelOnMove()
 		local result = turtle.down()
 		if result then
-			loc["y"] = loc["y"] - 1
+			loc.y = loc.y - 1
 			if not ProcessMovementChange() then return false end
-		else 
+		else
 			util.Print("turtle.down() failed")
 		end
         os.sleep()
@@ -348,18 +350,18 @@ end
 	function TurnLeft()
 		local result = turtle.turnLeft()
 		if result then
-			if loc["h"] == "n" then
-				loc["h"] = "w"
-			elseif loc["h"] == "e" then
-				loc["h"] = "n"
-			elseif loc["h"] == "s" then
-				loc["h"] = "e"
-			elseif loc["h"] == "w" then
-				loc["h"] = "s"
+			if loc.h == "n" then
+				loc.h = "w"
+			elseif loc.h == "e" then
+				loc.h = "n"
+			elseif loc.h == "s" then
+				loc.h = "e"
+			elseif loc.h == "w" then
+				loc.h = "s"
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
-		else 
+		else
 			util.Print("turtle.turnLeft() failed")
 		end
         os.sleep()
@@ -369,18 +371,18 @@ end
 	function TurnRight()
 		local result = turtle.turnRight()
 		if result then
-			if loc["h"] == "n" then
-				loc["h"] = "e"
-			elseif loc["h"] == "e" then
-				loc["h"] = "s"
-			elseif loc["h"] == "s" then
-				loc["h"] = "w"
-			elseif loc["h"] == "w" then
-				loc["h"] = "n"
+			if loc.h == "n" then
+				loc.h = "e"
+			elseif loc.h == "e" then
+				loc.h = "s"
+			elseif loc.h == "s" then
+				loc.h = "w"
+			elseif loc.h == "w" then
+				loc.h = "n"
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
-		else 
+		else
 			util.Print("turtle.turnRight() failed")
 		end
         os.sleep()
@@ -388,30 +390,30 @@ end
 	end
 
 	function SetHeading(aHeading)
-		if aHeading == loc["h"] then return true end
+		if aHeading == loc.h then return true end
 		local success = true
-		while(loc["h"] ~= aHeading and success) do
+		while(loc.h ~= aHeading and success) do
 			-- Note: Derek Zoolander cannot turn left!
 			success = TurnRight()
 		end
-		
+
 		if not success then
 			util.Print("Heading set fail: " .. aHeading)
-		end		
+		end
         os.sleep()
 		return success
     end
-    
+
 	function DropBlocksByRarity(aRarity)
-		local slot = 1	
+		local slot = 1
 		local success = true
 		for slot=1, cfg.inventorySize do
 			turtle.select(slot)
 			local data = turtle.getItemDetail()
 			if data then
 				local blockData = util.GetBlockData(data)
-				if blockData and blockData.rarity == aRarity then	
-					if data.name == "minecraft:torch" then 
+				if blockData and blockData.rarity == aRarity then
+					if data.name == "minecraft:torch" then
 						-- Turtles keep their torches
 					else
 						if blockData.rarity > 2 then
@@ -422,7 +424,7 @@ end
 				else
 					SendMessage(cfg.port_log, "BlockData NOT found:")
 					SendMessage(cfg.port_log, data.name)
-				end		
+				end
 			else
 				--util.Print("Empty slot")
 			end
@@ -435,30 +437,30 @@ end
 		local isPlaced
 		local slot = 1
 		while slot <= cfg.inventorySize and not isPlaced do
-			turtle.select(slot)	
+			turtle.select(slot)
 			local data = turtle.getItemDetail()
 			if data and data.name == cfg.resourceName then
 				turtle.placeDown()
 				isPlaced = true
 			else
 				slot = slot + 1
-			end	
+			end
 		end
         os.sleep()
 		return isPlaced
 	end
--- 
+--
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- DIG
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
-	function Dig()	
+	function Dig()
 		local n
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
-				return false	
+				return false
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				-- if flowing lava found, pick it up and try to refuel
@@ -471,7 +473,7 @@ end
 							if turtle.getFuelLevel() < (turtle.getFuelLimit() - 20000) then
 								turtle.refuel()
 							end
-						end 
+						end
 					end
 				end
 				return true -- do nothing
@@ -483,7 +485,7 @@ end
 			if not blockData then
 				SendMessage(cfg.port_log, "Block doesn't exist in data")
 				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
-				-- return false	
+				-- return false
 				if not turtle.dig() then
 					SendMessage(cfg.port_log, "Unable to dig!")
 					return false
@@ -493,8 +495,8 @@ end
 				SendMessage(cfg.port_log, "Undiggable block found")
 				SendMessage(cfg.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
-			elseif data.name == "minecraft:bedrock" then 
-				stopReason = "hit_bedrock"		
+			elseif data.name == "minecraft:bedrock" then
+				stopReason = "hit_bedrock"
 				return false
 			else
 				if not turtle.dig() then
@@ -509,12 +511,12 @@ end
 		return true
 	end
 
-	function DigDown()	
+	function DigDown()
 		local inspectSuccess, data = turtle.inspectDown()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
-				return false	
+				return false
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				return true -- do nothing
@@ -529,8 +531,8 @@ end
 				SendMessage(cfg.port_log, "Undiggable block found")
 				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
-			elseif data.name == "minecraft:bedrock" then 
-				stopReason = "hit_bedrock"		
+			elseif data.name == "minecraft:bedrock" then
+				stopReason = "hit_bedrock"
 				return false
 			else
 				if not turtle.digDown() then
@@ -543,14 +545,14 @@ end
 		end
         os.sleep()
 		return true
-	end 
+	end
 
-    function DigUp()	
+    function DigUp()
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				stopReason = "inventory_full"
-				return false	
+				return false
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				return true -- do nothing
@@ -565,8 +567,8 @@ end
 				SendMessage(cfg.port_log, "Undiggable block found")
 				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
 				return false
-			elseif data.name == "minecraft:bedrock" then 
-				stopReason = "hit_bedrock"		
+			elseif data.name == "minecraft:bedrock" then
+				stopReason = "hit_bedrock"
 				return false
 			else
 				if not turtle.digUp() then
@@ -581,30 +583,30 @@ end
 		return true
 	end
 
-	function DigAndGoForward()	
+	function DigAndGoForward()
 		-- handle sand/gravel
             local success = false
 		local n
 		for n=1,20 do
 			if not Dig() then return false end
-			if Forward() then 
+			if Forward() then
 				success = true
-				break 
+				break
 			end
 		end
 		return success
 	end
 
-	function DigAndGoDown()	
+	function DigAndGoDown()
 		if not DigDown() then return false end
 		return Down()
-	end 
+	end
 
-	function DigAndGoUp()	
+	function DigAndGoUp()
 		if not DigUp() then return false end
 		return Up()
 	end
--- 
+--
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- PRIVATE METHODS
@@ -628,8 +630,8 @@ end
 	function Refuel(aIsMoveCheck)
 		local fuelLevel = turtle.getFuelLevel()
 		if aIsMoveCheck and fuelLevel > 500 then return end
-			
-		local slot = 1	
+
+		local slot = 1
 		while slot <= cfg.inventorySize do
 			local selFuelAmount = 0
 			turtle.select(slot)
@@ -642,18 +644,18 @@ end
 					--todo
 					selFuelAmount = 5120
 			end
-			
+
 			local isRefuel = false
 			if selFuelAmount > 0 then
 				if aIsMoveCheck then
 					if selFuelAmount <= (turtle.getFuelLimit() - fuelLevel) then
-						isRefuel = true			
+						isRefuel = true
 					end
 				elseif turtle.getFuelLimit() ~= fuelLevel then
 					isRefuel = true
 				end
 			end
-			
+
 			if isRefuel then
 				SendMessage(cfg.port_log, "Refueling w/" .. d.name)
 				turtle.refuel()
@@ -662,7 +664,7 @@ end
 			end
 			slot = slot+1
 		end
-		
+
 		if fuelLevel < 50 then
 			SendMessage(cfg.port_log, "LOW ON FUEL!")
 		end
@@ -688,16 +690,16 @@ end
 
 	function DispatchLocation()
 		local x,y,z = gps.locate(5)
-		if x then 
-			modem.transmit(cfg.port_log, cfg.port_turtleCmd, 
+		if x then
+			modem.transmit(cfg.port_log, cfg.port_turtleCmd,
 				os.getComputerLabel() .. " G x:" .. tostring(x) .. " z:" .. tostring(z) .. " y:" .. tostring(y))
 		else
-			modem.transmit(cfg.port_log, cfg.port_turtleCmd, 
-				os.getComputerLabel() .. " L x:" .. tostring(loc["x"]) .. " z:" .. tostring(loc["z"]) .. " y:" .. tostring(loc["y"]) .. " h:" .. loc["h"])
+			modem.transmit(cfg.port_log, cfg.port_turtleCmd,
+				os.getComputerLabel() .. " L x:" .. tostring(loc.x) .. " z:" .. tostring(loc.z) .. " y:" .. tostring(loc.y) .. " h:" .. loc.h)
 		end
 	end
--- 
-    
+--
+
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- ACCESSORS AND CALLBACKS
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -744,14 +746,14 @@ end
     function GetCurrentLocation()
         if loc then
             -- break the reference before handing over
-            local newloc = {x=loc["x"],y=loc["y"],z=loc["z"],h=loc["h"]}
+            local newloc = {x=loc.x,y=loc.y,z=loc.z,h=loc.h}
             return true, newloc
         end
 
 		local isGpsSuccess
 		local x,y,z = gps.locate(5)
 		local h = ""
-		if x then 
+		if x then
 			-- GPS does not give heading so we need to find that
 			if turtle.back() then
 				local x2,y2,z2 = gps.locate(5)
@@ -784,14 +786,14 @@ end
 				end
 			end
 		end
-		
+
 		if isGpsSuccess then
 			return true, {x=x,y=y,z=z,h=h}
 		else
 			-- make a copy to break the reference to homeLoc
             if GetIsOnHomeBlock() then
                 -- Use the homeblock when there is no GPS tower
-				local currentLoc = {x=homeLoc["x"],y=homeLoc["y"],z=homeLoc["z"],h=homeLoc["h"]}
+				local currentLoc = {x=homeLoc.x,y=homeLoc.y,z=homeLoc.z,h=homeLoc.h}
 				return true, currentLoc
 			else
 				SendMessage(cfg.port_log, "WARNING: can't validate start loc")
@@ -799,13 +801,13 @@ end
 				return false, nil
 			end
 		end
-		
+
     end
-    
+
     function SetHomeLocation(aHomeLoc)
         homeLoc = aHomeLoc
     end
--- 
+--
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- COMMUNICATION
@@ -818,10 +820,10 @@ end
     function MessageHandler()
         while true do
             local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
-            if senderChannel == cfg.port_turtleCmd then	
+            if senderChannel == cfg.port_turtleCmd then
                 local isProcessMessage = false
                 local command
-                
+
                 -- message comes in with "labelName command" schema
                 local idIndex = string.find(message, " ")
                 if idIndex then
@@ -833,64 +835,64 @@ end
                     isProcessMessage = true
                     command = message
                 end
-                
-                if isProcessMessage then				
+
+                if isProcessMessage then
                     if string.lower(command) == "locate" then
                         DispatchLocation()
-                    
+
                     elseif string.lower(command) == "ping" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
-                    
-                    elseif string.lower(command) == "names" then		
+
+                    elseif string.lower(command) == "names" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel())
-                        
+
                     elseif string.lower(command) == "getfuel" then
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
                         modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
-                        
+
                     elseif string.lower(command) == "stop" then
                         SendMessage(replyChannel, "stop Received")
                         queue = {}
                         os.queueEvent("stopEvent")
-                        
+
                     elseif string.lower(command) == "gohome" then
                         SendMessage(replyChannel, "gohome Received")
-                        AddCommand({func=function() 
-                            GoHome("incoming_gohome"); 
+                        AddCommand({func=function()
+                            GoHome("incoming_gohome");
                         end}, true)
 
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
                         SendMessage(replyChannel, "refuel Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation()	
-                        local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
-                        AddCommand({func=function() 
-                                GoRefuel(); 
+                        local isCurLocValidated, currentLoc = GetCurrentLocation()
+                        local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
+                        AddCommand({func=function()
+                                GoRefuel();
                             end}, true)
-                        AddCommand({func=function() 
-                                GoToPos(returnLoc, true); 
+                        AddCommand({func=function()
+                                GoToPos(returnLoc, true);
                             end}, false)
-                        
+
                     elseif string.lower(command) == "unload" then
                         -- unload and go home
                         -- make a copy to break the reference to homeLoc
                         SendMessage(replyChannel, "unload Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation()	
-                        local returnLoc = {x=currentLoc["x"],y=currentLoc["y"],z=currentLoc["z"],h=currentLoc["h"]}
-                        AddCommand({func=function() 
-                                GoUnloadInventory(); 
+                        local isCurLocValidated, currentLoc = GetCurrentLocation()
+                        local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
+                        AddCommand({func=function()
+                                GoUnloadInventory();
                             end}, true)
-                        AddCommand({func=function() 
-                                GoToPos(returnLoc, true); 
+                        AddCommand({func=function()
+                                GoToPos(returnLoc, true);
                             end}, false)
 
-                        
+
                     -- MANUAL LOCATION COMMANDS
-                    -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~					
+                    -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     elseif string.lower(command) == "up" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " up: " .. tostring(Up()))
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "up10" then
                         local moveCount = 0
                         for n=1, 10 do
@@ -898,11 +900,11 @@ end
                         end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " up " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "down" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " down: " .. tostring(Down()))
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "down10" then
                         local moveCount = 0
                         for n=1, 10 do
@@ -910,11 +912,11 @@ end
                         end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " down " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "forward" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
                         DispatchLocation()
-                        
+
                     elseif string.lower(command) == "forward10" then
                         local moveCount = 0
                         for n=1, 10 do
@@ -922,11 +924,11 @@ end
                         end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "back" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " back: " .. tostring(Backward()))
                         DispatchLocation()
-                        
+
                     elseif string.lower(command) == "back10" then
                         local moveCount = 0
                         for n=1, 10 do
@@ -934,15 +936,15 @@ end
                         end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " back " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "turnleft" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " turnLeft: " .. tostring(TurnLeft()))
                         --DispatchLocation()
-                        
+
                     elseif string.lower(command) == "turnright" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " turnRight: " .. tostring(TurnRight()))
                         --DispatchLocation()
-                        
+
                     elseif msgHandler then
                         msgHandler(command, "")
                     end
