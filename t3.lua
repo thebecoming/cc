@@ -791,7 +791,7 @@ end
 			return true, {x=x,y=y,z=z,h=h}
 		else
 			-- make a copy to break the reference to homeLoc
-            if GetIsOnHomeBlock() then
+            if GetIsOnHomeBlock() and homeLoc then
                 -- Use the homeblock when there is no GPS tower
 				local currentLoc = {x=homeLoc.x,y=homeLoc.y,z=homeLoc.z,h=homeLoc.h}
 				return true, currentLoc

@@ -1,4 +1,4 @@
-print("Gomine3 v0.16")
+print("Gomine3 v0.17")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -16,7 +16,7 @@ local isFirstDecent
 
 local cfg = {
     inventorySize = 16,
-    flyCeiling = 71,
+    flyCeiling = nil,
     port_log = 969,
     port_turtleCmd = 967,
     turtleID = nil,
@@ -61,9 +61,13 @@ function InitProgram()
 	end
 
     local isCurLocValidated
-
-    t3.SetHomeLocation(cfg.startLoc)
-	isCurLocValidated, currentLoc = t3.GetCurrentLocation()
+	if cfg.startLoc then 
+		t3.SetHomeLocation(cfg.startLoc) 
+		isCurLocValidated, currentLoc = t3.GetCurrentLocation()
+	else
+		isCurLocValidated, currentLoc = t3.GetCurrentLocation()
+		t3.SetHomeLocation(currentLoc) 
+	end
 
 	-- Check if on home block
 	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= cfg.startLoc.x or currentLoc.z ~= cfg.startLoc.z or currentLoc.y ~= cfg.startLoc.y) then
@@ -103,6 +107,7 @@ function SetTurtleConfig(cfg)
 		local locBaseCenter = {x=178, z=1900, y=70, h="w"} -- the space above the center block
 		local baseCenterOffset = 3
 		
+		-- plus sign above center block
         cfg.destroyLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
         cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
@@ -112,11 +117,12 @@ function SetTurtleConfig(cfg)
         cfg.fuelLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
 
-        cfg.isResumeMiningdepth = true
+		cfg.flyCeiling = locBaseCenter.y + 3,
 		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
 		cfg.maxRadius = 3 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
 		cfg.nextdepth = 1
 		cfg.maxdepth = 100
+        cfg.isResumeMiningdepth = true
 
 		-- mine 1
         local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
