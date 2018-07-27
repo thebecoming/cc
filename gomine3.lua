@@ -117,7 +117,6 @@ function BeginMining()
 	t3.SetHeading(mineLoc["h"])
 	while true do
 		-- loops once for each y unit
-		if isStop then return false end		
 		curDepth = mineLoc["y"] - t3.GetLocation()["y"]
 		
 		-- go down to correct curDepth		
@@ -128,7 +127,6 @@ function BeginMining()
 			end
 			curDepth = mineLoc["y"] - currentLoc["y"]
 			t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
-			if isStop then return false end	
 		else
 			local depthIncrement = nextDepth - curDepth
 			--util.Print("newD:" .. tostring(curDepth) .. " nxt:" .. tostring(nextDepth) .. " inc:" .. tostring(nextDepth - curDepth))
@@ -136,7 +134,6 @@ function BeginMining()
 				if not t3.DigAndGoDown() then return false end	
 			curDepth = mineLoc["y"] - currentLoc["y"]
 				t3.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
-				if isStop then return false end	
 			end
 		end
 		
@@ -153,8 +150,7 @@ function BeginMining()
 			local sideStepCount = ((curRadius)*2)+1
 			local stairSideStepCount = ((curRadius+1)*2)+1			
 			
-			for curSideStep=1,sideStepCount*4 do
-				if isStop then return false end				
+			for curSideStep=1,sideStepCount*4 do	
 				local isAtSideStart = curSideStep % sideStepCount == 1
 				
 				-- cut stairs notch

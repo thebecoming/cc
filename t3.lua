@@ -50,7 +50,6 @@ function StartTurtleRun()
     parallel.waitForAny(ProcessQueue, MessageHandler)
 end
 
-
 function ProcessQueue()
     while true do
         sleep(.1)
@@ -116,7 +115,6 @@ end
 		else
 			SendMessage(globals.port_log, "Going to Refuel...")
 			local isFuelContainerEmpty
-			local isStop = false
             if not GoToPos(globals.fuelLoc, true) then return false end
             
             local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
@@ -186,7 +184,6 @@ end
 
 	function GoUnloadInventory()
 		SendMessage(globals.port_log, "Going to unload...")
-		local isStop = false
 		if not GoToPos(globals.destroyLoc, true) then return false end
         if not DropBlocksByRarity(1) then return false end
 		if not GoToPos(globals.rarity2Loc, false) then return false end
