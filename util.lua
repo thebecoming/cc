@@ -131,6 +131,7 @@ function GetBlockUID(data)
 		-- return data.name .. "|m" .. tostring(data.damage)
 	-- end
 end
+
 function GetBlockData(data)
 	return blockData[GetBlockUID(data)]
 end
@@ -162,7 +163,6 @@ function InitMonitor()
 	end
 	return nil
 end
-
 
 function PrintToMonitor(msg)
 	while #screenLineDataTbl > 500 do -- cap the table at 500 entries
@@ -218,6 +218,41 @@ function PrintTable(obj)
 	for key, value in pairs(obj) do
 		print("key:" .. key)
 	end
+end
+
+function AddVectorToLoc(direction, aLoc)
+	-- break the reference before handing over
+	local newloc = {x=aLoc["x"],y=aLoc["y"],z=aLoc["z"],h=aLoc["h"]}
+
+	if ((direction == "f" and newloc["h"] == "s")
+		or (direction == "l" and newloc["h"] == "w")
+		or (direction == "b" and newloc["h"] == "n")
+		or (direction == "r" and newloc["h"] == "e"))
+	then 
+		newloc["z"] = newloc["x"] + 1
+
+	elseif ((direction == "f" and newloc["h"] == "n")
+		or (direction == "l" and newloc["h"] == "e")
+		or (direction == "b" and newloc["h"] == "s")
+		or (direction == "r" and newloc["h"] == "w"))
+	then 
+		newloc["z"] = newloc["x"] - 1
+
+	elseif ((direction == "f" and newloc["h"] == "e")
+		or (direction == "l" and newloc["h"] == "s")
+		or (direction == "b" and newloc["h"] == "w")
+		or (direction == "r" and newloc["h"] == "n"))
+	then 
+		newloc["x"] = newloc["x"] + 1
+
+	elseif ((direction == "f" and newloc["h"] == "w")
+		or (direction == "l" and newloc["h"] == "n")
+		or (direction == "b" and newloc["h"] == "e")
+		or (direction == "r" and newloc["h"] == "s"))
+	then 
+		newloc["x"] = newloc["x"] - 1
+
+	end 
 end
 
 InitProgram()

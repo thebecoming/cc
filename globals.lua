@@ -1,86 +1,100 @@
 inventorySize = 16
-flyCeiling = 100
+flyCeiling = 71
 port_log = 969
 port_turtleCmd = 967
 port_modemLocate = 967
-rednetRepeaterID = 1717
 startLoc,destroyLoc,rarity2Loc,rarity3Loc,rarity4Loc = nil
 fuelLoc,sandLoc,fillLoc,resourceName,isResourcePlacer,maxResourceCount = nil
 length,width,depth,maxRadius,nextDepth,maxDepth,isResumeMiningDepth = nil
 
-local turtleID = 0 
-local regionCode = ""
+local turtleID
+local regionCode
 local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
 if tonumber(numSeg) ~= nil then
 	turtleID = tonumber(numSeg)
 	regionCode = string.sub(os.getComputerLabel(), 1, 1)
 end
 
+
+
 -- water_base
-if regionCode == "w" then
+if regionCode == "a" then	
+	local locBaseCenter = {x=178, z=1900, y=70, h="w"}
+	local baseCenterOffset = 3
+	-- destroyLoc = {x=202, z=1927, y=83, h="n"}
+	-- rarity2Loc = {x=205, z=1927, y=83, h="n"}
+	-- rarity3Loc = {x=207, z=1927, y=83, h="n"}
+	-- rarity4Loc = {x=209, z=1927, y=83, h="n"}
+	-- fuelLoc = {x=211, z=1927, y=83, h="n"}
+	maxRadius = 2
+	nextDepth = 1
+	maxDepth = 2
 
 	-- mine 1
-	if turtleID == 1 then 
-		startLoc = {x=5721, z=2797, y=68, h="w"}
-		mineLoc = {x=5703, z=2824, y=63, h="s"}
+	if turtleID == 1 then 		
+		local newloc = {x=locBaseCenter["x"],y=locBaseCenter["y"],z=locBaseCenter["z"],h=locBaseCenter["h"]}
+		startLoc = AddVectorToLoc(newloc, "f", baseCenterOffset)
+		startLoc = AddVectorToLoc(newloc, "r", baseCenterOffset)
+		mineLoc = newloc
 		isResumeMiningDepth = true
 		
 	-- mine 2
 	elseif turtleID == 2 then 
-		startLoc = {x=5719, z=2797, y=68, h="w"}
-		mineLoc = {x=5683, z=2824, y=63, h="s"}
+		local newloc = {x=locBaseCenter["x"],y=locBaseCenter["y"],z=locBaseCenter["z"],h=locBaseCenter["h"]}
+		newloc["h"] = GetNewHeading(newloc["h"], "r")
+		startLoc = AddVectorToLoc(newloc, "f", baseCenterOffset)
+		startLoc = AddVectorToLoc(newloc, "r", baseCenterOffset)
+		mineLoc = newloc
 		isResumeMiningDepth = true
 		
 	-- mine 3
 	elseif turtleID == 3 then 
-		startLoc = {x=5717, z=2797, y=68, h="w"}
-		mineLoc = {x=5663, z=2824, y=63, h="s"}
+		newloc["h"] = GetNewHeading(newloc["h"], "r")
+		newloc["h"] = GetNewHeading(newloc["h"], "r")
+		startLoc = AddVectorToLoc(newloc, "f", baseCenterOffset)
+		startLoc = AddVectorToLoc(newloc, "r", baseCenterOffset)
+		mineLoc = newloc
 		isResumeMiningDepth = true
 		
 	-- far side glass
 	elseif turtleID == 4 then 
-		isResourcePlacer = true
-		startLoc = {x=5715, z=2797, y=68, h="w"}
-		fillLoc = {x=5663, z=2845, y=63, h="w"}
+		newloc["h"] = GetNewHeading(newloc["h"], "r")
+		newloc["h"] = GetNewHeading(newloc["h"], "r")
+		startLoc = AddVectorToLoc(newloc, "f", baseCenterOffset)
+		startLoc = AddVectorToLoc(newloc, "r", baseCenterOffset)
+		mineLoc = newloc
+		isResumeMiningDepth = true
 		
 	-- near side glass
-	elseif turtleID == 5 then 
-		isResourcePlacer = true
-		startLoc = {x=5713, z=2797, y=68, h="w"}
-		fillLoc = {x=5683, z=2823, y=63, h="w"}
+	-- elseif turtleID == 5 then 
+	-- 	isResourcePlacer = true
+	-- 	startLoc = {x=5713, z=2797, y=68, h="w"}
+	-- 	fillLoc = {x=5683, z=2823, y=63, h="w"}
 		
-	-- sand dropper
-	elseif turtleID == 6 then 
-		startLoc = {x=5711, z=2797, y=68, h="w"}
-		fillLoc = {x=5644, z=2824, y=64, h="s"}
-	end
+	-- -- sand dropper
+	-- elseif turtleID == 6 then 
+	-- 	startLoc = {x=5711, z=2797, y=68, h="w"}
+	-- 	fillLoc = {x=5644, z=2824, y=64, h="s"}
+	-- end
 	
-	destroyLoc = {x=5712, z=2803, y=68, h="w"}
-	rarity2Loc = {x=5714, z=2803, y=68, h="n"}
-	rarity3Loc = {x=5717, z=2803, y=68, h="n"}
-	rarity4Loc = {x=5719, z=2803, y=68, h="n"}
-	fuelLoc = {x=5720, z=2800, y=69, h="w"}
-	resourceContLoc1 = {x=5719, z=2806, y=67, h="n"}
-	resourceContLoc2 = {x=5718, z=2806, y=67, h="n"}
-	resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
-	resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
-	maxResourceCount = 448
-	maxRadius = 9
-	nextDepth = 1
-	maxDepth = 0
+	-- resourceContLoc1 = {x=5719, z=2806, y=67, h="n"}
+	-- resourceContLoc2 = {x=5718, z=2806, y=67, h="n"}
+	-- resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+	-- resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+	-- maxResourceCount = 448
 		
-	if isResourcePlacer then
-		resourceName = "minecraft:glass"
-		resourceContLoc1 = {x=5715, z=2806, y=67, h="n"}
-		if turtleID == 4 or turtleID == 5 then 
-			length = 20
-		end
-		width = 2
-	else
-		resourceName = "minecraft:sand"
-		length = 20
-		width = 20
-	end
+	-- if isResourcePlacer then
+	-- 	resourceName = "minecraft:glass"
+	-- 	resourceContLoc1 = {x=5715, z=2806, y=67, h="n"}
+	-- 	if turtleID == 4 or turtleID == 5 then 
+	-- 		length = 20
+	-- 	end
+	-- 	width = 2
+	-- else
+	-- 	resourceName = "minecraft:sand"
+	-- 	length = 20
+	-- 	width = 20
+	-- end
 	
 elseif regionCode == "d" then
 	-- desert
@@ -214,4 +228,62 @@ elseif regionCode == "s" then
 -- maxDepth = 18
 -- maxWidth = 2
 -- maxHeight = 2
+end
+
+local function GetNewHeading(aCurHeading, aTurnDirection)
+	if aTurnDirection == "r" then
+		if aCurHeading == "n" then return "e"
+		elseif aCurHeading == "e" then return "s"
+		elseif aCurHeading == "s" then return "w"
+		elseif aCurHeading == "w" then return "n"
+		else error("GetNewHeading died")
+		end
+	elseif aTurnDirection == "l" then
+		if aCurHeading == "n" then return "w"
+		elseif aCurHeading == "e" then return "n"
+		elseif aCurHeading == "s" then return "e"
+		elseif aCurHeading == "w" then return "s"
+		else error("GetNewHeading died")
+		end	
+	else error("GetNewHeading died")
+	end
+end
+
+local function AddVectorToLoc(aLoc, direction, steps)
+	-- break the reference before handing over
+	local newloc = {x=aLoc["x"],y=aLoc["y"],z=aLoc["z"],h=aLoc["h"]}
+
+	if ((direction == "f" and newloc["h"] == "s")
+		or (direction == "l" and newloc["h"] == "w")
+		or (direction == "b" and newloc["h"] == "n")
+		or (direction == "r" and newloc["h"] == "e"))
+	then 
+		newloc["z"] = newloc["x"] + steps
+
+	elseif ((direction == "f" and newloc["h"] == "n")
+		or (direction == "l" and newloc["h"] == "e")
+		or (direction == "b" and newloc["h"] == "s")
+		or (direction == "r" and newloc["h"] == "w"))
+	then 
+		newloc["z"] = newloc["x"] - steps
+
+	elseif ((direction == "f" and newloc["h"] == "e")
+		or (direction == "l" and newloc["h"] == "s")
+		or (direction == "b" and newloc["h"] == "w")
+		or (direction == "r" and newloc["h"] == "n"))
+	then 
+		newloc["x"] = newloc["x"] + steps
+
+	elseif ((direction == "f" and newloc["h"] == "w")
+		or (direction == "l" and newloc["h"] == "n")
+		or (direction == "b" and newloc["h"] == "e")
+		or (direction == "r" and newloc["h"] == "s"))
+	then 
+		newloc["x"] = newloc["x"] - steps
+
+	else 
+		error("AddVectorToLoc died!")
+	end 
+
+	return newloc;
 end
