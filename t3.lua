@@ -788,20 +788,14 @@ end
 		end
 
 		if isGpsSuccess then
-			return true, {x=x,y=y,z=z,h=h}
-		else
-			-- make a copy to break the reference to homeLoc
-            if GetIsOnHomeBlock() and homeLoc then
-                -- Use the homeblock when there is no GPS tower
-				local currentLoc = {x=homeLoc.x,y=homeLoc.y,z=homeLoc.z,h=homeLoc.h}
-				return true, currentLoc
-			else
-				SendMessage(cfg.port_log, "WARNING: can't validate start loc")
-				SendMessage(cfg.port_log, "Make sure homeLoc is correct!")
-				return false, nil
-			end
+			return {x=x,y=y,z=z,h=h}
+		elseif homeLoc and GetIsOnHomeBlock()  then
+			-- Use the homeblock when there is no GPS tower
+			return {x=homeLoc.x,y=homeLoc.y,z=homeLoc.z,h=homeLoc.h}
 		end
 
+		util.Print("Unable to get CurrentLocation!")
+		return nil
     end
 
     function SetHomeLocation(aHomeLoc)
@@ -864,7 +858,7 @@ end
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
                         SendMessage(replyChannel, "refuel Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation()
+                        local currentLoc = GetCurrentLocation()
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
                                 GoRefuel();
@@ -877,7 +871,7 @@ end
                         -- unload and go home
                         -- make a copy to break the reference to homeLoc
                         SendMessage(replyChannel, "unload Received")
-                        local isCurLocValidated, currentLoc = GetCurrentLocation()
+                        local currentLoc = GetCurrentLocation()
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
                                 GoUnloadInventory();

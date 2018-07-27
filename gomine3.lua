@@ -60,20 +60,18 @@ function InitProgram()
 		return false
 	end
 
-    local isCurLocValidated
-	if cfg.startLoc then 
-		t3.SetHomeLocation(cfg.startLoc) 
-		isCurLocValidated, currentLoc = t3.GetCurrentLocation()
+	if cfg.startLoc then
+		t3.SetHomeLocation(cfg.startLoc)
+		currentLoc = t3.GetCurrentLocation()		
+		if not currentLoc then isValidInit = false end
 	else
-		isCurLocValidated, currentLoc = t3.GetCurrentLocation()
-		t3.SetHomeLocation(currentLoc) 
+		currentLoc = t3.GetCurrentLocation()
+		if not currentLoc then
+			isValidInit = false
+		else
+			t3.SetHomeLocation(currentLoc)
+		end
 	end
-
-	-- Check if on home block
-	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= cfg.startLoc.x or currentLoc.z ~= cfg.startLoc.z or currentLoc.y ~= cfg.startLoc.y) then
-		util.Print("Not one home block")
-		isValidInit = false
-    end
 
     if isValidInit then
         if not t3.InitTurtle(modem, util, cfg, currentLoc, IncomingMessageHandler) then
