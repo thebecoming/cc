@@ -13,6 +13,7 @@ local homeLoc, loc, destLoc
 local firstOpenInvSlot
 local queue = {}
 local msgHandler
+local fuelRefillThreshold = 900
 
 function InitReferences(aModem, aUtil, aCfg)
 	modem = aModem
@@ -126,12 +127,11 @@ end
 
             -- Dump all lava buckets except 1 (for auto-refueling)
             local hasEmptyBucket = false
+            local slot = 1
             while slot <= cfg.inventorySize do
                 turtle.select(slot)
                 local d = turtle.getItemDetail()
-                if not d then
-                    --util.Print("no item in slot 1")
-                elseif (d.name == "minecraft:lava_bucket") then
+                if (d and d.name == "minecraft:lava_bucket") then
                     if hasEmptyBucket then
                         turtle.drop(slot)
                     else
