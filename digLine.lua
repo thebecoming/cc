@@ -117,6 +117,7 @@ function SetTurtleConfig(cfg)
 	if cfg.regionCode == "d" then
 		-- desert
 		if cfg.turtleID == 1 then
+			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
 			cfg.mineLoc = {x=232, z=1918, y=82, h="s"}
 		elseif cfg.turtleID == 2 then
 			error "not implemented"

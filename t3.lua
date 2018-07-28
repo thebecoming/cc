@@ -446,14 +446,14 @@ end
 							dropCount = dropCount + 1
 						end
 					end
-				else
+				else if not blockData then
 					SendMessage(cfg.port_log, " Inv ItemData notFound:")
 					SendMessage(cfg.port_log, data.name)
 				end
 			else
 				--util.Print("Empty slot")
 			end
-			if aDropCount and aDropCount == dropCount then return end
+			if aDropCount and aDropCount == dropCount then return true end
 		end
         os.sleep()
 		return success

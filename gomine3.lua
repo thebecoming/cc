@@ -133,32 +133,46 @@ function SetTurtleConfig(cfg)
         cfg.isResumeMiningdepth = true
 
 		-- mine 1
-        local newloc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        local newMineLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        local newHomeLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		if cfg.turtleID == 1 then
-			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
-			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
 
 		-- mine 2
 		elseif cfg.turtleID == 2 then
-			newloc.h = util.GetNewHeading(newloc.h, "r")
-			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
-			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
 
 		-- mine 3
 		elseif cfg.turtleID == 3 then
-			newloc.h = util.GetNewHeading(newloc.h, "r")
-			newloc.h = util.GetNewHeading(newloc.h, "r")
-			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
-			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
 
 		-- far side glass
 		elseif cfg.turtleID == 4 then
-			newloc.h = util.GetNewHeading(newloc.h, "l")
-			newloc = util.AddVectorToLoc(newloc, "f", baseCenterOffset)
-			newloc = util.AddVectorToLoc(newloc, "r", baseCenterOffset)
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
 
 		end
-        cfg.mineLoc = newloc
+        cfg.mineLoc = newMineLoc
+        cfg.startLoc = newHomeLoc
 
 		-- near side glass
 		-- elseif cfg.turtleID == 5 then
