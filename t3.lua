@@ -875,8 +875,8 @@ end
                         local currentLoc = GetCurrentLocation()
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
-                                GoRefuel();
-                                GoToPos(returnLoc, true);
+                                GoRefuel()
+                                --GoToPos(returnLoc, true)
                             end}, stopQueue)
 
                     elseif string.lower(command) == "unload" then
@@ -886,8 +886,8 @@ end
                         local currentLoc = GetCurrentLocation()
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
-								GoUnloadInventory();
-								GoToPos(returnLoc, true);
+								GoUnloadInventory()
+								--GoToPos(returnLoc, true)
                             end}, stopQueue)
 
 
