@@ -1,4 +1,4 @@
-print("Gomine3 v0.18")
+print("Gomine3 v2.0")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -106,7 +106,7 @@ function SetTurtleConfig(cfg)
 
 	-- water_base
 	if cfg.regionCode == "a" then
-		local locBaseCenter = {x=178, z=1900, y=70, h="w"} -- the space above the center block
+		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
 		local baseCenterOffset = 4
 		
 		-- plus sign above center block
