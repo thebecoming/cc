@@ -1,4 +1,4 @@
-print("Digline v0.02")
+print("Digline v0.03")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -170,7 +170,7 @@ function BeginMining()
 	local stuck = false
 	
 	while curDepth <= cfg.depth and not stuck do
-		while curWidth < cfg.width and not stuck do
+		while curWidth <= cfg.width and not stuck do
 			isDiggingOut = false
 			if not t3.DigAndGoForward() then stuck = true; return; end
 
@@ -198,16 +198,16 @@ function BeginMining()
 				if not t3.DigAndGoForward() then stuck = true; return; end
 				curWidth = curWidth + 1
 				if not t3.TurnLeft() then stuck = true; return; end
-			else
-				if not t3.TurnRight() then stuck = true; return; end
-				for n2=1, (cfg.width)-1 do
-					-- go back to the first slot
-					if not t3.Forward() then stuck = true; return; end
-					curWidth = 1
-				end
-				if not t3.TurnRight() then stuck = true; return; end
 			end
 		end
+		
+		if not t3.TurnRight() then stuck = true; return; end
+		for n2=1, (cfg.width)-1 do
+			-- go back to the first slot
+			if not t3.Forward() then stuck = true; return; end
+			curWidth = 1
+		end
+		if not t3.TurnRight() then stuck = true; return; end
 		
 		-- height turn manuever
 		if curDepth < cfg.depth and not stuck then
