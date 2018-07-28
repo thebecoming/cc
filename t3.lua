@@ -820,19 +820,28 @@ end
         while true do
             local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
             if senderChannel == cfg.port_turtleCmd then
-                local isProcessMessage = false
-                local command
+				local isProcessMessage = false
+				local stopQueue = true
+                local prefix, command, suffix
 
                 -- message comes in with "labelName command" schema
                 local idIndex = string.find(message, " ")
                 if idIndex then
-                    command = string.sub(message, idIndex+1)
-                    if string.sub(message, 0, idIndex-1) == os.getComputerLabel() then
+					command = string.sub(message, idIndex+1)
+					prefix = string.sub(message, 0, idIndex-1)
+                    if prefix == "all" or prefix == os.getComputerLabel() then
                         isProcessMessage = true
-                    end
-                else
-                    isProcessMessage = true
-                    command = message
+					end
+					
+					-- check for queue flag
+					idIndex = string.find(command, " ")
+					if idIndex then
+						suffix = string.sub(command, idIndex+1)
+						command = string.sub(command, 0, idIndex-1)
+						if suffix == "q" then
+							stopQueue = false
+						end
+					end
                 end
 
                 if isProcessMessage then
@@ -858,7 +867,7 @@ end
                         SendMessage(replyChannel, "gohome Received")
                         AddCommand({func=function()
                             GoHome("incoming_gohome");
-                        end}, true)
+                        end}, stopQueue)
 
                     elseif string.lower(command) == "refuel" then
                         -- refuel and go back to where it left off
@@ -867,10 +876,8 @@ end
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
                                 GoRefuel();
-                            end}, true)
-                        AddCommand({func=function()
                                 GoToPos(returnLoc, true);
-                            end}, false)
+                            end}, stopQueue)
 
                     elseif string.lower(command) == "unload" then
                         -- unload and go home
@@ -879,11 +886,9 @@ end
                         local currentLoc = GetCurrentLocation()
                         local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
-                                GoUnloadInventory();
-                            end}, true)
-                        AddCommand({func=function()
-                                GoToPos(returnLoc, true);
-                            end}, false)
+								GoUnloadInventory();
+								GoToPos(returnLoc, true);
+                            end}, stopQueue)
 
 
                     -- MANUAL LOCATION COMMANDS
@@ -945,7 +950,7 @@ end
                         --DispatchLocation()
 
                     elseif msgHandler then
-                        msgHandler(command, "")
+                        msgHandler(command, stopQueue, "")
                     end
                 end
             end

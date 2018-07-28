@@ -489,20 +489,10 @@ function BeginMining()
 	t3.SendMessage(cfg.port_log, "Mining END")
 end
 
-function IncomingMessageHandler(command)
-	if string.lower(command) == "test" then
-        t3.AddCommand({func=TestForward, args={10}})
-        os.sleep(2)
-        t3.AddCommand({func=TestBack, args={10}}, true)
-
-    elseif string.lower(command) == "test2" then
-        t3.AddCommand({func=TestForward, args={10}})
-        os.sleep(2)
-        t3.AddCommand({func=TestBack, args={10}})
-
-    elseif string.lower(command) == "gomine" then
+function IncomingMessageHandler(command, stopQueue)
+	if string.lower(command) == "gomine" then
 		stopReason = ""
-        t3.AddCommand({func=RunGoMine}, true)
+        t3.AddCommand({func=RunGoMine}, stopQueue)
 	end
 end
 
