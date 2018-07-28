@@ -1,4 +1,4 @@
-print("Gomine3 v2.0")
+print("Gomine3 v2.01")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -122,11 +122,11 @@ function SetTurtleConfig(cfg)
         cfg.fuelLoc = {x=locBaseCenter.x-1,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
 
-		cfg.flyCeiling = locBaseCenter.y + 3
+		cfg.flyCeiling = locBaseCenter.y + 4
 		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
-		cfg.maxRadius = 3 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
+		cfg.maxRadius = 10 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
 		cfg.nextdepth = 1
-		cfg.maxdepth = 100
+		cfg.maxdepth = 255
         cfg.isResumeMiningdepth = true
 
 		-- mine 1
