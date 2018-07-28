@@ -446,7 +446,7 @@ end
 							dropCount = dropCount + 1
 						end
 					end
-				else if not blockData then
+				elseif not blockData then
 					SendMessage(cfg.port_log, " Inv ItemData notFound:")
 					SendMessage(cfg.port_log, data.name)
 				end
