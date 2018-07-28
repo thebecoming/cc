@@ -1,10 +1,8 @@
 -- TODO: 
+-- Fly to home position on command (from reboot)
+-- Ditch rarity 1 upon movement with full inventory
 -- Need to return home when no more events left to process
--- Carry a lava bucket and have turtle dig a hold of lava under it and drop junk when full
--- The stop should only stop the current instruction, and as something senses the failure, reset the stop
--- so it may continue on to the next task.
--- if the parent class is handling some navigation, it will have to check the stop value on t and
--- have this same behavior`
+-- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
 local modem, util, cfg
 local undiggableBlockData = nil
@@ -140,8 +138,7 @@ end
                 end
                 slot = slot+1
             end
-
-            if not GoToPos(cfg.fuelLoc, true) then return false end
+            -- print "end refueling"
 		end
         return true
 	end

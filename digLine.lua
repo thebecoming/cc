@@ -1,205 +1,212 @@
-os.loadAPI("globals")
+print("Digline v0.01")
 os.loadAPI("util")
-os.loadAPI("t")
+os.loadAPI("t3")
 
-local mineLoc = globals.mineLoc
-local stopReason = ""
-local modem
-local isStop = false
-local curInventorySlot
-local currentLoc -- This gets updated as t changes it (by reference)
-local isRequireHomeBlock = true 
-local curLength, curWidth, curDepth
 local isDiggingOut
+
+
+-- 
+local stopReason = ""
+local currentLoc -- This gets updated as t changes it (by reference)
+local curLength, curWidth, curdepth
+
+local isRequireHomeBlock = false
+local modem
+local isMining = false
+
+
+local cfg = {
+    -- turtle base.. don't change
+    inventorySize = 16,
+    port_log = 969,
+    port_turtleCmd = 967,
+
+    turtleID = nil,
+    regionCode = nil,
+    flyCeiling = nil,
+    startLoc = nil,
+    mineLoc = nil,
+    destroyLoc = nil,
+    rarity2Loc = nil,
+    rarity3Loc = nil,
+    rarity4Loc = nil,
+    fuelLoc = nil,
+
+    -- placement programs
+    resourceName = nil,
+    isResourcePlacer = nil,
+    maxResourceCount = nil,
+    sandLoc = nil,
+    fillLoc = nil,
+
+    -- digmine only
+    length = nil,
+    width = nil,
+    depth = nil,
+    maxRadius = nil,
+    nextdepth = nil,
+    maxdepth = nil,
+    isResumeMiningdepth = nil,
+}
 
 function InitProgram()
 	util.Print("Init DigLine program")	
-	local isValidInit = true
-	
+    local isValidInit = true
+
+    util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
+	SetTurtleConfig(cfg)		
+
 	-- Init peripherals
-	modem = util.InitModem()	
+	modem = util.InitModem()
 	if not modem then
 		util.Print("No Modem Found!")
-		return false
-	end	
-	
-	local isCurLocValidated	
-	isCurLocValidated, currentLoc = t.GetCurrentLocation(globals.startLoc)		
-	
-	-- Check if on home block
-	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= globals.startLoc.x or currentLoc.z ~= globals.startLoc.z or currentLoc.y ~= globals.startLoc.y) then
-		stopReason = "init_not_on_home"
 		isValidInit = false
-	end	
-	
-	if not t.InitTurtle(modem, globals.startLoc, currentLoc) then 
-		util.Print("Init fail on t.lua")
-		isValidInit = false 
 	end
-	
+
+	if isValidInit then
+		t3.InitReferences(modem, util, cfg)
+
+		if cfg.startLoc then
+			t3.SetHomeLocation(cfg.startLoc)
+			currentLoc = t3.GetCurrentLocation()		
+			if not currentLoc then isValidInit = false end
+		else
+			currentLoc = t3.GetCurrentLocation()
+			if not currentLoc then
+				isValidInit = false
+			else
+				t3.SetHomeLocation(currentLoc)
+			end
+		end
+	end
+
+    if isValidInit then
+        if not t3.InitTurtle(currentLoc, IncomingMessageHandler) then
+            isValidInit = false
+        end
+    end
+
 	if not isValidInit then
 		util.Print("Unable to Initialize program")
-		util.Print("stopReason: " .. stopReason)
-	else
-		parallel.waitForAll(ListenForCommands, BeginTurtleNavigation)
+    else
+        -- this runs forever
+        t3.StartTurtleRun();
 	end
-	EndProgram()
+
+	t3.SendMessage(cfg.port_log, "digline program END")
 end
 
-function ListenForCommands()
-	t.RegisterCommandListener(CommandHandler)
-end
 
-function BeginTurtleNavigation()
-	isStop = false
+function SetTurtleConfig(cfg)
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    if tonumber(numSeg) ~= nil then
+        cfg.turtleID = tonumber(numSeg)
+        cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
+	end
 	
+	cfg.flyCeiling = 87
+	cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+	cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+	cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+	cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+	cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+	cfg.length = 3
+	cfg.width = 4
+	cfg.depth = 2
+
+	-- Home2 test area
+	if cfg.regionCode == "d" then
+		-- desert
+		if cfg.turtleID == 1 then
+			cfg.mineLoc = {x=232, z=1918, y=82, h="s"}
+		elseif cfg.turtleID == 2 then
+			error "not implemented"
+		end
+	end
+end
+
+function RunMiningProgram()
+    isMining = true	
 	while true do
-		t.ResetInventorySlot()
-		
-		-- fly To destination
-		util.Print("going to mineLoc")
-		if not t.GoToPos(mineLoc, true, false) then isStop = true end
+		if isMining then
+			t3.ResetInventorySlot()
 
-		-- Start mining
-		if not isStop then
-			DoStuff()
-		end
-		isStop = false
-		
-		-- these are local stopReasons so use these first
-		if stopReason ~= "incoming_stop" and stopReason ~= "incoming_gohome" and stopReason ~= "incoming_unload" then
-			stopReason = t.GetStopReason()
-		end
-		
-		-- don't return home for these situations
-		if stopReason == "incoming_stop" or stopReason == "out_of_fuel" then
-			util.Print("STOPPING IN PLACE!")
-			util.Print("stopReason:" .. stopReason)
-			return false
-		elseif stopReason == "incoming_refuel" then
-			t.GoRefuel()
-		elseif stopReason == "inventory_full" or stopReason == "hit_bedrock" or stopReason == "incoming_unload" then 
-			t.GoUnloadInventory()
-		end
-		
+			-- fly To destination
+			t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
+			if not t3.GoToPos(cfg.mineLoc, true) then isMining = false end
 
-		if stopReason == "inventory_full" or stopReason == "incoming_unload" then
-			-- Program will continue running and it will return to mining
-		else
-			-- Return home
-			isStop = false
-			stopReason = ""
-			util.Print("I am going home now..")
-			if isDiggingOut then t.TurnRight(); t.DigAndGoForward(); t.TurnLeft(); isDiggingOut=false end
-			if not t.GoToPos(mineLoc, false, false) then util.Print("can't return to mineLoc") end
-			if not t.GoToPos(globals.startLoc, true, true) then 
-				util.Print("Unable to return home!")
-				util.Print("stopReason: " .. stopReason)
-				return false
-			end		
-			util.Print("I have return home master")
-			util.Print("stopReason: " .. stopReason)
-			
-			local undiggableBlockData = t.GetUndiggableBlockData()
-			if undiggableBlockData then
-				util.Print("Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))	
+			-- Start mining
+			if isMining then
+				BeginMining()
 			end
-			
-			local isValidCommand = false
-			local command = ""
-			while not isValidCommand do
-				util.Print("What now? (resume/quit)")
-				command = io.read()
-				isValidCommand = (string.lower(command) == "resume" or string.lower(command) == "quit")
-				if not isValidCommand then util.Print("Invalid command") end
-			end
-			
-			if string.lower(command) == "resume" then
-				-- do nothing..  continues program
-			elseif input == "quit" then
-				break -- Aborting program
+
+			stopReason = t3.GetStopReason()
+            if stopReason == "hit_bedrock" then
+                t3.GoHome("hit_bedrock")
+			elseif stopReason == "inventory_full" then
+                -- don't return home for these situations
+				t3.GoUnloadInventory()
+			else
+				-- End the program
+				isMining = false
 			end
 		end
-		
-		-- Setting up to resume
-		isStop = false
-		stopReason = ""
-		
-	end
-	
+		os.sleep()
+	end	
 	EndProgram()	
 end
 
-function DoStuff()
+function BeginMining()
 	local n2
-	isStop = false
 	
 	-- drop into position
-	if not t.DigAndGoForward() then return false end
+	if not t3.DigAndGoForward() then return false end
 	
-	for curDepth=curDepth, globals.depth do
-		for curWidth=curWidth, globals.width do
+	for curDepth=curDepth, cfg.depth do
+		for curWidth=curWidth, cfg.width do
 			isDiggingOut = false
-			if not t.DigAndGoForward() then return false end
-			for curLength=1, globals.length do
-				if isStop then return false end
-				if not t.DigAndGoForward() then return false end
+			if not t3.DigAndGoForward() then return false end
+			for curLength=1, cfg.length do
+				if not t3.DigAndGoForward() then return false end
 			end
-			if not t.TurnRight() then return false end
-			if not t.DigAndGoForward() then return false end
+			if not t3.TurnRight() then return false end
+			if not t3.DigAndGoForward() then return false end
 			isDiggingOut = true
-			if not t.TurnRight() then return false end
-			for curLength=1, globals.length+1 do
-				if isStop then return false end
-				if not t.DigAndGoForward() then return false end
+			if not t3.TurnRight() then return false end
+			for curLength=1, cfg.length+1 do
+				if not t3.DigAndGoForward() then return false end
 			end
 			
 			-- width turn manuever
-			if curWidth < globals.width then
-				if not t.TurnLeft() then return false end
-				if not t.DigAndGoForward() then return false end
-				if not t.TurnLeft() then return false end
+			if curWidth < cfg.width then
+				if not t3.TurnLeft() then return false end
+				if not t3.DigAndGoForward() then return false end
+				if not t3.TurnLeft() then return false end
 			else
-				if not t.TurnRight() then return false end
-				for n2=1, (globals.width*2)-1 do
+				if not t3.TurnRight() then return false end
+				for n2=1, (cfg.width*2)-1 do
 					-- go back to the first slot
-					if not t.Forward() then return false end
+					if not t3.Forward() then return false end
 					curWidth = 1
 				end
-				if not t.TurnRight() then return false end
+				if not t3.TurnRight() then return false end
 			end
 		end
 		
 		-- height turn manuever
-		if curDepth < globals.depth then
-			if not t.DigAndGoDown() then return false end
+		if curDepth < cfg.depth then
+			if not t3.DigAndGoDown() then return false end
 		end
 	end
 	
 	EndProgram()	
 end
 
-
-function CommandHandler(command)
-	if string.lower(command) == "stop" then
-		stopReason = "incoming_stop"
-		isStop = true
-		
-	elseif string.lower(command) == "gohome" then
-		stopReason = "incoming_gohome"
-		isStop = true
-		
-	elseif string.lower(command) == "unload" then
-		stopReason = "incoming_unload"
-		isStop = true
-		
-	elseif string.lower(command) == "refuel" then
-		t.GoRefuel()
+function IncomingMessageHandler(command, stopQueue)
+	if string.lower(command) == "gomine" then
+		stopReason = ""
+        t3.AddCommand({func=RunMiningProgram}, stopQueue)
 	end
-end
-
-function EndProgram()
-	util.Print("digLine program END")
 end
 
 

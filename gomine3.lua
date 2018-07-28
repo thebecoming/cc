@@ -1,4 +1,4 @@
-print("Gomine3 v2.01")
+print("Gomine3 v2.02")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -15,28 +15,30 @@ local isFirstDecent
 
 
 local cfg = {
+    -- turtle base.. don't change
     inventorySize = 16,
-    flyCeiling = nil,
     port_log = 969,
     port_turtleCmd = 967,
+
     turtleID = nil,
     regionCode = nil,
-
+    flyCeiling = nil,
     startLoc = nil,
     mineLoc = nil,
-
     destroyLoc = nil,
     rarity2Loc = nil,
     rarity3Loc = nil,
     rarity4Loc = nil,
     fuelLoc = nil,
 
+    -- placement programs
     resourceName = nil,
     isResourcePlacer = nil,
     maxResourceCount = nil,
     sandLoc = nil,
     fillLoc = nil,
 
+    -- digmine only
     length = nil,
     width = nil,
     depth = nil,
@@ -96,7 +98,6 @@ function InitProgram()
 end
 
 
-
 function SetTurtleConfig(cfg)
     local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
     if tonumber(numSeg) ~= nil then
@@ -104,7 +105,7 @@ function SetTurtleConfig(cfg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
     end
 
-	-- water_base
+	-- Main shafts
 	if cfg.regionCode == "a" then
 		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
 		local baseCenterOffset = 4
@@ -186,10 +187,24 @@ function SetTurtleConfig(cfg)
 		-- 	cfg.resourceName = "minecraft:sand"
 		-- 	cfg.length = 20
 		-- 	cfg.width = 20
-		-- end
+        -- end
+        
+    elseif cfg.regionCode == "d" then
+		-- Home2
+		cfg.flyCeiling = 108
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
 
-	elseif cfg.regionCode == "d" then
-		-- desert
+		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
+		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
+		--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+		--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="n"}
+        -- cfg.resourceName = "minecraft:sand"
+        
 		if cfg.turtleID == 1 then
 			cfg.startLoc = {x=207, z=1920, y=83, h="n"}
 			cfg.mineLoc = {x=193, z=1934, y=107, h="e"}
@@ -231,111 +246,10 @@ function SetTurtleConfig(cfg)
 			cfg.startLoc = {x=-1557, z=7594, y=70, h="n"}
 		end
 
-		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
-
-		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
-		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
-		--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
-		--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
-		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="n"}
-		-- cfg.resourceName = "minecraft:sand"
-
-	-- Z = desert 2
-	elseif cfg.regionCode == "z" then
-		-- desert
-		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=-1517, z=7428, y=69, h="n"}
-			cfg.mineLoc = {x=-1524, z=7473, y=66, h="w"}
-		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=-1517, z=7426, y=69, h="n"}
-			cfg.mineLoc = {x=-1524, z=7453, y=66, h="w"}
-		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=-1517, z=7424, y=69, h="n"}
-			cfg.mineLoc = {x=-1524, z=7433, y=66, h="w"}
-		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=-1517, z=7422, y=69, h="n"}
-			cfg.mineLoc = {x=-1524, z=7413, y=68, h="w"}
-		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=-1517, z=7420, y=69, h="n"}
-			cfg.mineLoc = {x=-1524, z=7393, y=68, h="w"}
-
-		elseif cfg.turtleID == 6 then
-			cfg.startLoc = {x=-1517, z=7418, y=69, h="n"}
-			cfg.mineLoc = {x=-1523, z=7473, y=66, h="e"}
-		elseif cfg.turtleID == 7 then
-			cfg.startLoc = {x=-1517, z=7416, y=69, h="n"}
-			cfg.mineLoc = {x=-1523, z=7423, y=63, h="e"}
-		elseif cfg.turtleID == 8 then
-			cfg.startLoc = {x=-1517, z=7414, y=69, h="n"}
-			cfg.mineLoc = {x=-1523, z=7433, y=66, h="e"}
-		elseif cfg.turtleID == 9 then
-			cfg.startLoc = {x=-1517, z=7412, y=69, h="n"}
-			cfg.mineLoc = {x=-1523, z=7413, y=68, h="e"}
-		end
-
-		cfg.length = 59
-		cfg.width = 20
-		cfg.depth = 1
-
-		cfg.destroyLoc = {x=-1520, z=7428, y=69, h="s"}
-		cfg.rarity2Loc = {x=-1520, z=7426, y=69, h="w"}
-		cfg.rarity3Loc = {x=-1520, z=7424, y=69, h="w"}
-		cfg.rarity4Loc = {x=-1520, z=7422, y=69, h="w"}
-		cfg.fuelLoc = {x=-1520, z=7419, y=69, h="w"}
-
-
-	elseif cfg.regionCode == "s" then
-		-- shafts
-		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=6283, z=3539, y=70, h="n"}
-		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=6283, z=3537, y=70, h="n"}
-		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=6283, z=3535, y=70, h="n"}
-		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=6283, z=3533, y=70, h="n"}
-		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=6283, z=3531, y=70, h="n"}
-		end
-
-		cfg.destroyLoc = {x=6286, z=3534, y=70, h="e"}
-		cfg.rarity2Loc = {x=6286, z=3536, y=70, h="e"}
-		cfg.rarity3Loc = {x=6286, z=3538, y=70, h="e"}
-		cfg.rarity4Loc = {x=6286, z=3540, y=70, h="e"}
-
-	-- south main hole
-	-- ~~~~~~~~~~~~~~
-	-- cfg.mineLoc = {x=6285, z=3559, y=58, h="s"}
-	-- cfg.maxdepth = 58
-	-- maxcfg.width = 6
-	-- maxHeight = 100
-
-	-- digout
-	-- ~~~~~~~~~~~~~~
-	-- cfg.mineLoc = {x=6295, z=3527, y=7, h="e"}
-	-- cfg.maxdepth = 18
-	-- maxcfg.width = 2
-	-- maxHeight = 2
 	end
 end
 
-function TestForward(steps)
-    for i = 1, steps do
-        t3.Forward()
-    end
-end
-
-function TestBack(steps)
-    for i = 1, steps do
-        t3.Backward()
-    end
-end
-
-function RunGoMine()
+function RunMiningProgram()
     isMining = true
 	while true do
 		if isMining then
@@ -387,18 +301,16 @@ function BeginMining()
 		-- go down to correct curdepth
 		if cfg.isResumeMiningdepth and isFirstDecent then
 			isFirstDecent = false
-			while not turtle.detectDown() do
-				t3.Down()
-			end
+			while not turtle.detectDown() do t3.Down() end
 			curdepth = cfg.mineLoc.y - currentLoc.y
-			t3.SendMessage(cfg.port_log, "depth:" .. tostring(curdepth))
+			t3.SendMessage(cfg.port_log, "Resume depth:" .. tostring(curdepth))
 		else
 			local depthIncrement = cfg.nextdepth - curdepth
 			--util.Print("newD:" .. tostring(curdepth) .. " nxt:" .. tostring(cfg.nextdepth) .. " inc:" .. tostring(cfg.nextdepth - curdepth))
 			for n=1,cfg.nextdepth - curdepth do
 				if not t3.DigAndGoDown() then return false end
 			curdepth = cfg.mineLoc.y - currentLoc.y
-				t3.SendMessage(cfg.port_log, "depth:" .. tostring(curdepth))
+				t3.SendMessage(cfg.port_log, "New depth:" .. tostring(curdepth))
 			end
 		end
 
@@ -467,7 +379,6 @@ function BeginMining()
 			curRadius = curRadius-1
 			if curRadius >= 0 then
 				-- move to the next inner start position
-				if isStop then return false end
 				if not t3.Forward() then return false end
 				if not t3.TurnRight() then return false end
 				if not t3.DigAndGoForward() then return false end
@@ -492,11 +403,9 @@ end
 function IncomingMessageHandler(command, stopQueue)
 	if string.lower(command) == "gomine" then
 		stopReason = ""
-        t3.AddCommand({func=RunGoMine}, stopQueue)
+        t3.AddCommand({func=RunMiningProgram}, stopQueue)
 	end
 end
-
-
 
 
 InitProgram()
