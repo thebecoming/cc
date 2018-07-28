@@ -1,4 +1,4 @@
-local version = "0.05"
+local version = "0.06"
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -129,12 +129,12 @@ function RunMiningProgram()
 	t3.ResetInventorySlot()
 
 	-- fly To destination
-	t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
+	t3.SendMessage(cfg.port_log, "going to mineLoc")
 	if not t3.GoToPos(cfg.mineLoc, true) then isStuck = true end
 
 	-- Start mining
 	if not isStuck then
-		BeginMining()
+		if not BeginMining() then isStuck = true
 	else 
 		util.Print("I'm stuck!")
 	end

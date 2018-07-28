@@ -1,4 +1,4 @@
-local version = "2.05"
+local version = "2.06"
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -274,7 +274,7 @@ function RunMiningProgram()
 
 	-- Start mining
 	if not isStuck then
-		if not BeginMining() then isStuck = true
+		if not BeginMining() then isStuck = true end
 	else 
 		util.Print("I'm stuck!")
 	end

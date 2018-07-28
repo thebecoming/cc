@@ -1,10 +1,7 @@
 -- TODO: 
--- Fly to home position on command (from reboot)
--- Ditch rarity 1 upon movement with full inventory
--- Need to return home when no more events left to process
--- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
+-- TEST: Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
-local version = "0.02"
+local version = "0.03"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
