@@ -22,6 +22,8 @@ shell.run("delete gomine3")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/gomine3.lua gomine3")
 shell.run("delete startup")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/startTurtle3.lua startup")
+shell.run("delete digLine")
+shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/digLine.lua digLine")
 	
 end
 
