@@ -4,6 +4,7 @@
 -- Need to return home when no more events left to process
 -- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
+local version = "0.01"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -79,7 +80,7 @@ function AddCommand(cmdTable, isAbortCurrentCmd)
         -- util.Print("os.queueEvent stopEvent")
         queue = {}
         os.queueEvent("stopEvent")
-        sleep(.1)
+        sleep(1)
     end
     table.insert(queue,cmdTable)
 end
@@ -423,8 +424,9 @@ end
 		return success
     end
 
-	function DropBlocksByRarity(aRarity)
+	function DropBlocksByRarity(aRarity, aDropCount)
 		local slot = 1
+		local dropCount = 0
 		local success = true
 		for slot=1, cfg.inventorySize do
 			turtle.select(slot)
@@ -438,15 +440,20 @@ end
 						if blockData.rarity > 2 then
 							SendMessage(cfg.port_log, "Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
 						end
-						if not turtle.drop() then success = false end
+						if not turtle.drop() then 
+							success = false 
+						else 
+							dropCount = dropCount + 1
+						end
 					end
 				else
-					SendMessage(cfg.port_log, "BlockData NOT found:")
+					SendMessage(cfg.port_log, " Inv ItemData notFound:")
 					SendMessage(cfg.port_log, data.name)
 				end
 			else
 				--util.Print("Empty slot")
 			end
+			if aDropCount and aDropCount == dropCount then return end
 		end
         os.sleep()
 		return success
@@ -478,8 +485,12 @@ end
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				stopReason = "inventory_full"
-				return false
+				-- TODO, stop rarity 1
+				if not DropBlocksByRarity(1, 1) then 
+					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
+					stopReason = "inventory_full"
+					return false 
+				end
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				-- if flowing lava found, pick it up and try to refuel
@@ -725,6 +736,10 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- ACCESSORS AND CALLBACKS
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
+	function GetVersion()
+		return version
+	end
+
 	function GetLocation()
 		return loc
 	end

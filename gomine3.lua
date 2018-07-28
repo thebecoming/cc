@@ -1,4 +1,4 @@
-print("Gomine3 v2.02")
+local version = "2.04"
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -10,7 +10,7 @@ local curdepth
 local isRequireHomeBlock = false
 local torchSlot = 1
 local modem
-local isMining = false
+local isMining, isMiningCompleted
 local isFirstDecent
 
 
@@ -49,7 +49,9 @@ local cfg = {
 }
 
 function InitProgram()
-	print("Init Mining program")
+	print("Gomine v" .. version)	
+	print("Util v" .. util.GetVersion())
+	print("T3 v" .. t3.GetVersion())
     local isValidInit = true
 
     util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
@@ -250,7 +252,8 @@ function SetTurtleConfig(cfg)
 end
 
 function RunMiningProgram()
-    isMining = true
+	isMining = true	
+	isMiningCompleted = false
 	while true do
 		if isMining then
 			t3.ResetInventorySlot()
@@ -261,7 +264,7 @@ function RunMiningProgram()
 
 			-- Start mining
 			if isMining then
-				BeginMining()
+				if not BeginMining() then isMining = false end
 			end
 
 			stopReason = t3.GetStopReason()
@@ -274,6 +277,11 @@ function RunMiningProgram()
 				-- End the program
 				isMining = false
 			end
+		end
+		if isMiningCompleted then
+			AddCommand({func=function()
+				GoHome("Mining Complete");
+			end}, false)
 		end
 		os.sleep()
 	end
@@ -324,10 +332,10 @@ function BeginMining()
 
 		while curRadius >= 0 do
 			--util.Print("Current Radius:" .. tostring(curRadius))
-			local sideStepCount = ((curRadius)*2)+1
-			local stairSideStepCount = ((curRadius+1)*2)+1
+			local sideStepCount = ((curRadius) * 2) + 1
+			local stairSideStepCount = ((curRadius + 1) * 2) + 1
 
-			for curSideStep=1,sideStepCount*4 do
+			for (curSideStep = 1, sideStepCount * 4) do
 				local isAtSideStart = curSideStep % sideStepCount == 1
 
 				-- cut stairs notch
@@ -397,7 +405,9 @@ function BeginMining()
 		if not t3.GoToPos(cornerLoc, false) then return false end
 		cfg.nextdepth = curdepth+1
 	end
-	t3.SendMessage(cfg.port_log, "Mining END")
+
+	isMiningCompleted = true
+	return false
 end
 
 function IncomingMessageHandler(command, stopQueue)

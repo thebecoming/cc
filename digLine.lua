@@ -1,18 +1,15 @@
-print("Digline v0.03")
+local version = "0.04"
 os.loadAPI("util")
 os.loadAPI("t3")
 
 local isDiggingOut
-
-
--- 
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
 
 local isRequireHomeBlock = false
 local modem
-local isMining = false
+local isMining, isMiningCompleted
 
 
 local cfg = {
@@ -50,7 +47,9 @@ local cfg = {
 }
 
 function InitProgram()
-	util.Print("Init DigLine program")	
+	print("Digline v" .. version)	
+	print("Util v" .. util.GetVersion())
+	print("T3 v" .. t3.GetVersion())
     local isValidInit = true
 
     util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
@@ -126,7 +125,8 @@ function SetTurtleConfig(cfg)
 end
 
 function RunMiningProgram()
-    isMining = true	
+	isMining = true	
+	isMiningCompleted = false
 	while true do
 		if isMining then
 			t3.ResetInventorySlot()
@@ -137,7 +137,7 @@ function RunMiningProgram()
 
 			-- Start mining
 			if isMining then
-				BeginMining()
+				 if not BeginMining() then isMining = false end
 			end
 
 			stopReason = t3.GetStopReason()
@@ -151,6 +151,11 @@ function RunMiningProgram()
 				isMining = false
 			end
 		end
+		if isMiningCompleted then
+			AddCommand({func=function()
+				GoHome("Mining Complete");
+			end}, false)
+		end
 		os.sleep()
 	end	
 	EndProgram()	
@@ -158,63 +163,62 @@ end
 
 function BeginMining()
 	local n2
-
-	-- cfg.length = 3
-	-- cfg.width = 4
-	-- cfg.depth = 2
 	
 	-- drop into position
 	if not t3.DigAndGoForward() then return false end
 	curDepth = 1
 	curWidth = 1
-	local stuck = false
 	
-	while curDepth <= cfg.depth and not stuck do
-		while curWidth <= cfg.width and not stuck do
+	while curDepth <= cfg.depth do
+		while curWidth <= cfg.width do
 			isDiggingOut = false
-			if not t3.DigAndGoForward() then stuck = true; return; end
+			if not t3.DigAndGoForward() then return false return; end
 
 			curLength = 1
-			while curLength < cfg.length and not stuck do
-				if not t3.DigAndGoForward() then stuck = true; return; end
+			while curLength < cfg.length do
+				if not t3.DigAndGoForward() then return false return; end
 				curLength = curLength + 1
 			end
 
-			if not t3.TurnRight() then stuck = true; return; end
-			if not t3.DigAndGoForward() then stuck = true; return; end
+			if not t3.TurnRight() then return false return; end
+			if not t3.DigAndGoForward() then return false return; end
 			curWidth = curWidth + 1
 			isDiggingOut = true
-			if not t3.TurnRight() then stuck = true; return; end
+			if not t3.TurnRight() then return false return; end
 
 			curLength = 1
-			while curLength < cfg.length+1 and not stuck do
-				if not t3.DigAndGoForward() then stuck = true; return; end
+			while curLength < cfg.length+1 do
+				if not t3.DigAndGoForward() then return false return; end
 				curLength = curLength + 1
 			end
 			
 			-- width turn manuever
 			if curWidth < cfg.width then
-				if not t3.TurnLeft() then stuck = true; return; end
-				if not t3.DigAndGoForward() then stuck = true; return; end
+				if not t3.TurnLeft() then return false return; end
+				if not t3.DigAndGoForward() then return false return; end
 				curWidth = curWidth + 1
-				if not t3.TurnLeft() then stuck = true; return; end
+				if not t3.TurnLeft() then return false return; end
 			end
 		end
 		
-		if not t3.TurnRight() then stuck = true; return; end
-		for n2=1, (cfg.width)-1 do
+		if not t3.TurnRight() then return false return; end
+		while curWidth > 1 do
 			-- go back to the first slot
-			if not t3.Forward() then stuck = true; return; end
-			curWidth = 1
+			if not t3.Forward() then return false return; end
+			curWidth = curWidth - 1
 		end
-		if not t3.TurnRight() then stuck = true; return; end
+
+		if not t3.TurnRight() then return false return; end
 		
 		-- height turn manuever
-		if curDepth < cfg.depth and not stuck then
-			if not t3.DigAndGoDown() then stuck = true; return; end
+		if curDepth < cfg.depth then
+			if not t3.DigAndGoDown() then return false return; end
 			curDepth = curDepth + 1
 		end
 	end
+
+	isMiningCompleted = true
+	return false
 end
 
 function IncomingMessageHandler(command, stopQueue)

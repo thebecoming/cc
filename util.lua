@@ -1,3 +1,4 @@
+local version = "0.01"
 local modem
 local monitor = nil
 	
@@ -279,4 +280,8 @@ function AddVectorToLoc(aLoc, direction, steps)
 	end 
 
 	return newloc;
+end
+
+function GetVersion()
+	return version
 end
