@@ -10,6 +10,7 @@ local firstOpenInvSlot
 local queue = {}
 local msgHandler
 local fuelRefillThreshold = 900
+local unloading = false
 
 function InitReferences(aModem, aUtil, aCfg)
 	modem = aModem
@@ -194,6 +195,7 @@ end
 
 	function GoUnloadInventory()
 		SendMessage(cfg.port_log, "Going to unload...")
+		unloading = true
 		if not GoToPos(cfg.destroyLoc, true) then return false end
         if not DropBlocksByRarity(1) then return false end
 		if not GoToPos(cfg.rarity2Loc, false) then return false end
@@ -201,7 +203,8 @@ end
 		if not GoToPos(cfg.rarity3Loc, false) then return false end
         if not DropBlocksByRarity(3) then return false end
 		if not GoToPos(cfg.rarity4Loc, false) then return false end
-        if not DropBlocksByRarity(4) then return false end
+		if not DropBlocksByRarity(4) then return false end
+		unloading = false
         return true
 	end
 
@@ -482,8 +485,13 @@ end
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if not DropBlocksByRarity(1, 1) then 
-					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
+				if unloading then 
+					if not DropBlocksByRarity(1, 1) then 
+						SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
+						stopReason = "inventory_full"
+						return false 
+					end
+				else
 					stopReason = "inventory_full"
 					return false 
 				end
@@ -975,7 +983,7 @@ end
                         --DispatchLocation()
 
                     elseif msgHandler then
-                        msgHandler(command, stopQueue, "")
+                        msgHandler(command, stopQueue)
                     end
                 end
             end
