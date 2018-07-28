@@ -158,22 +158,35 @@ end
 
 function BeginMining()
 	local n2
+
+	-- cfg.length = 3
+	-- cfg.width = 4
+	-- cfg.depth = 2
 	
 	-- drop into position
 	if not t3.DigAndGoForward() then return false end
+	curDepth = 1
+	curWidth = 1
 	
-	for curDepth=curDepth, cfg.depth do
-		for curWidth=curWidth, cfg.width do
+	while curDepth < cfg.depth do
+		while curWidth < cfg.width do
 			isDiggingOut = false
 			if not t3.DigAndGoForward() then return false end
-			for curLength=1, cfg.length do
+
+			curLength = 1
+			while curLength < cfg.length do
 				if not t3.DigAndGoForward() then return false end
+				curLength = curLength + 1
 			end
+
 			if not t3.TurnRight() then return false end
 			if not t3.DigAndGoForward() then return false end
+			curWidth = curWidth + 1
 			isDiggingOut = true
 			if not t3.TurnRight() then return false end
-			for curLength=1, cfg.length+1 do
+
+			curLength = 1
+			while curLength < cfg.length+1 do
 				if not t3.DigAndGoForward() then return false end
 			end
 			
@@ -181,10 +194,11 @@ function BeginMining()
 			if curWidth < cfg.width then
 				if not t3.TurnLeft() then return false end
 				if not t3.DigAndGoForward() then return false end
+				curWidth = curWidth + 1
 				if not t3.TurnLeft() then return false end
 			else
 				if not t3.TurnRight() then return false end
-				for n2=1, (cfg.width*2)-1 do
+				for n2=1, (cfg.width)-1 do
 					-- go back to the first slot
 					if not t3.Forward() then return false end
 					curWidth = 1
@@ -196,10 +210,9 @@ function BeginMining()
 		-- height turn manuever
 		if curDepth < cfg.depth then
 			if not t3.DigAndGoDown() then return false end
+			curDepth = curDepth + 1
 		end
 	end
-	
-	EndProgram()	
 end
 
 function IncomingMessageHandler(command, stopQueue)

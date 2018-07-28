@@ -280,10 +280,10 @@ function RunMiningProgram()
 end
 
 function BeginMining()
-		--1,2,3 (1)
-		--2,3,4 (2)
-		--3,4,5 (3)
-		--15,16,1 (15)
+    --1,2,3 (1)
+    --2,3,4 (2)
+    --3,4,5 (3)
+    --15,16,1 (15)
 	local isFirstDecent = true
 	local curRadius = 1
 	local inspectSuccess, data
