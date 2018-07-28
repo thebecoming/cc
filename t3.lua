@@ -112,17 +112,35 @@ end
             SendMessage(cfg.port_log, "No fuel loc found!")
 		else
 			SendMessage(cfg.port_log, "Going to Refuel...")
-			local isFuelContainerEmpty
             if not GoToPos(cfg.fuelLoc, true) then return false end
 
-            local missingFuel = turtle.getFuelLimit() - turtle.getFuelLevel()
-            while missingFuel > 2000 and not isFuelContainerEmpty do
+            -- Suck lava buckets from the fuel depo
+            local isFuelContainerEmpty
+            while (turtle.getFuelLimit() - turtle.getFuelLevel()) > fuelRefillThreshold and not isFuelContainerEmpty do
                 if not turtle.suck() then
                     isFuelContainerEmpty = true
                 else
                     Refuel(false)
                 end
             end
+
+            -- Dump all lava buckets except 1 (for auto-refueling)
+            local hasEmptyBucket = false
+            while slot <= cfg.inventorySize do
+                turtle.select(slot)
+                local d = turtle.getItemDetail()
+                if not d then
+                    --util.Print("no item in slot 1")
+                elseif (d.name == "minecraft:lava_bucket") then
+                    if hasEmptyBucket then
+                        turtle.drop(slot)
+                    else
+                        hasEmptyBucket = true
+                    end
+                end
+                slot = slot+1
+            end
+
             if not GoToPos(cfg.fuelLoc, true) then return false end
 		end
         return true
@@ -469,18 +487,18 @@ end
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				-- if flowing lava found, pick it up and try to refuel
-				if data.metadata == 0 and data.state and data.state.level == 0 then
-					for n=1, cfg.inventorySize do
-						local detail = turtle.getItemDetail(n)
-						if detail and detail.name == "minecraft:bucket" then
-							turtle.select(n)
-							turtle.place()
-							if turtle.getFuelLevel() < (turtle.getFuelLimit() - 20000) then
-								turtle.refuel()
-							end
-						end
-					end
-				end
+                if turtle.getFuelLevel() < (turtle.getFuelLimit() - fuelRefillThreshold) then
+                    if data.metadata == 0 and data.state and data.state.level == 0 then
+                        for n=1, cfg.inventorySize do
+                            local detail = turtle.getItemDetail(n)
+                            if detail and detail.name == "minecraft:bucket" then
+                                turtle.select(n)
+                                turtle.place()
+                                turtle.refuel()
+                            end
+                        end
+                    end
+                end
 				return true -- do nothing
 			elseif data.name == "computercraft:turtle" then
 				return true -- do nothing (wait for turtle to pass)
@@ -633,30 +651,33 @@ end
 	end
 
 	function Refuel(aIsMoveCheck)
-		local fuelLevel = turtle.getFuelLevel()
-		if aIsMoveCheck and fuelLevel > 500 then return end
+        local fuelLevel = turtle.getFuelLevel()
+        local fuelLimit = turtle.getFuelLimit()
+		if aIsMoveCheck and fuelLevel > fuelRefillThreshold then return end
 
-		local slot = 1
-		while slot <= cfg.inventorySize do
+        local slot = 1
+        local minCheckAmount = 500
+		while slot <= cfg.inventorySize and ((fuelLimit - fuelLevel) > minCheckAmount)  do
+            turtle.select(slot)
+            
 			local selFuelAmount = 0
-			turtle.select(slot)
 			local d = turtle.getItemDetail()
 			if not d then
-					--util.Print("no item in slot 1")
+                --util.Print("no item in slot 1")
 			elseif (d.name == "minecraft:lava_bucket") then
-					selFuelAmount = 20000
+                selFuelAmount = 1000
 			elseif (d.name == "minecraft:coal") then
-					--todo
-					selFuelAmount = 5120
+                --todo
+                selFuelAmount = 5120
 			end
 
 			local isRefuel = false
 			if selFuelAmount > 0 then
 				if aIsMoveCheck then
-					if selFuelAmount <= (turtle.getFuelLimit() - fuelLevel) then
+					if selFuelAmount <= (fuelLimit - fuelLevel) then
 						isRefuel = true
 					end
-				elseif turtle.getFuelLimit() ~= fuelLevel then
+				elseif fuelLimit ~= fuelLevel then
 					isRefuel = true
 				end
 			end
@@ -670,7 +691,7 @@ end
 			slot = slot+1
 		end
 
-		if fuelLevel < 50 then
+		if aIsMoveCheck and fuelLevel < 50 then
 			SendMessage(cfg.port_log, "LOW ON FUEL!")
 		end
 	end
@@ -870,24 +891,15 @@ end
                         end}, stopQueue)
 
                     elseif string.lower(command) == "refuel" then
-                        -- refuel and go back to where it left off
                         SendMessage(replyChannel, "refuel Received")
-                        local currentLoc = GetCurrentLocation()
-                        local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
                                 GoRefuel()
-                                --GoToPos(returnLoc, true)
                             end}, stopQueue)
 
                     elseif string.lower(command) == "unload" then
-                        -- unload and go home
-                        -- make a copy to break the reference to homeLoc
                         SendMessage(replyChannel, "unload Received")
-                        local currentLoc = GetCurrentLocation()
-                        local returnLoc = {x=currentLoc.x,y=currentLoc.y,z=currentLoc.z,h=currentLoc.h}
                         AddCommand({func=function()
 								GoUnloadInventory()
-								--GoToPos(returnLoc, true)
                             end}, stopQueue)
 
 
