@@ -129,7 +129,7 @@ end
             while slot <= cfg.inventorySize do
                 turtle.select(slot)
                 local d = turtle.getItemDetail()
-                if (d and d.name == "minecraft:lava_bucket") then
+                if (d and d.name == "minecraft:bucket") then
                     if hasEmptyBucket then
                         turtle.drop(slot)
                     else
@@ -138,7 +138,6 @@ end
                 end
                 slot = slot+1
             end
-            -- print "end refueling"
 		end
         return true
 	end
