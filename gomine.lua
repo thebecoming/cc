@@ -1,127 +1,300 @@
-os.loadAPI("globals")
+local version = "2.06"
 os.loadAPI("util")
 os.loadAPI("t")
-
--- globals
-local mineLoc = globals.mineLoc
-local maxRadius = globals.maxRadius
-local maxDepth = globals.maxDepth
-local nextDepth = globals.nextDepth
 
 local isDigStairs = true
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
-local curDepth
+local curdepth
 
-local isRequireHomeBlock = true
+local isRequireHomeBlock = false
 local torchSlot = 1
 local modem
-local isStop = false
-local isFirstDecent;
+local isFirstDecent
+
+
+local cfg = {
+    -- turtle base.. don't change
+    inventorySize = 16,
+    port_log = 969,
+    port_turtleCmd = 967,
+
+    turtleID = nil,
+    regionCode = nil,
+    flyCeiling = nil,
+    startLoc = nil,
+    mineLoc = nil,
+    destroyLoc = nil,
+    rarity2Loc = nil,
+    rarity3Loc = nil,
+    rarity4Loc = nil,
+    fuelLoc = nil,
+
+    -- placement programs
+    resourceName = nil,
+    isResourcePlacer = nil,
+    maxResourceCount = nil,
+    sandLoc = nil,
+    fillLoc = nil,
+
+    -- digmine only
+    length = nil,
+    width = nil,
+    depth = nil,
+    maxRadius = nil,
+    nextdepth = nil,
+    maxdepth = nil,
+    isResumeMiningdepth = nil,
+}
 
 function InitProgram()
-	util.Print("Init Mining program")	
-	local isValidInit = true	
-	
+	print("Gomine v" .. version)	
+	print("Util v" .. util.GetVersion())
+	print("t v" .. t.GetVersion())
+    local isValidInit = true
+
+    util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
+	SetTurtleConfig(cfg)		
+
 	-- Init peripherals
-	modem = util.InitModem()	
+	modem = util.InitModem()
 	if not modem then
 		util.Print("No Modem Found!")
-		return false
-	end	
-	
-	local isCurLocValidated	
-	isCurLocValidated, currentLoc = t.GetCurrentLocation(globals.startLoc)		
-	
-	-- Check if on home block
-	if isRequireHomeBlock and (not isCurLocValidated or currentLoc.x ~= globals.startLoc.x or currentLoc.z ~= globals.startLoc.z or currentLoc.y ~= globals.startLoc.y) then
-		stopReason = "init_not_on_home"
 		isValidInit = false
-	end	
-	
-	if not t.InitTurtle(modem, globals.startLoc, currentLoc) then 
-		util.Print("Init fail on t.lua")
-		isValidInit = false 
 	end
-	
+
+	if isValidInit then
+		t.InitReferences(modem, util, cfg)
+
+		if cfg.startLoc then
+			t.SetHomeLocation(cfg.startLoc)
+			currentLoc = t.GetCurrentLocation()		
+			if not currentLoc then isValidInit = false end
+		else
+			currentLoc = t.GetCurrentLocation()
+			if not currentLoc then
+				isValidInit = false
+			else
+				t.SetHomeLocation(currentLoc)
+			end
+		end
+	end
+
+    if isValidInit then
+        if not t.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
+            isValidInit = false
+        end
+    end
+
 	if not isValidInit then
 		util.Print("Unable to Initialize program")
-		t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
-	else
-		parallel.waitForAll(ListenForCommands, BeginTurtleNavigation)
+    else
+        -- this runs forever
+        -- print("mineLoc x:" .. cfg.mineLoc.x .. " y:" .. cfg.mineLoc.y .. " z:" .. cfg.mineLoc.z)
+        -- print("currentLoc x:" .. currentLoc.x .. " y:" .. currentLoc.y .. " z:" .. currentLoc.z)
+        t.StartTurtleRun();
 	end
-	EndProgram()
+
+	t.SendMessage(cfg.port_log, "gomine program END")
 end
 
-function BeginTurtleNavigation()
-	isStop = false
-	
-	while true do
-		t.ResetInventorySlot()
-		
-		-- fly To destination
-		t.SendMessage(globals.port_log, "going to mineLoc")
-		if not t.GoToPos(mineLoc, true, false) then isStop = true end
 
-		-- Start mining
-		if not isStop then
-			BeginMining()
-		end
-		isStop = false
-		
-		-- these are local stopReasons so use these first
-		if stopReason ~= "incoming_stop" and stopReason ~= "incoming_gohome" and stopReason ~= "incoming_unload" then
-			stopReason = t.GetStopReason()
-		end
-		
-		-- don't return home for these situations
-		if stopReason == "incoming_stop" or stopReason == "out_of_fuel" then
-			t.SendMessage(globals.port_log, "STOPPING IN PLACE!")
-			t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
-			return false
-		elseif stopReason == "incoming_refuel" then
-			t.GoRefuel()
-		elseif stopReason == "inventory_full" or stopReason == "hit_bedrock" or stopReason == "incoming_unload" then 
-			t.GoUnloadInventory()
-		end
-		
+function SetTurtleConfig(cfg)
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    if tonumber(numSeg) ~= nil then
+        cfg.turtleID = tonumber(numSeg)
+        cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
+    end
 
-		if stopReason == "inventory_full" or stopReason == "incoming_unload" then
-			-- Program will continue running and it will return to mining
-		else
-			-- Return home
-			isStop = false
-			local lastStopReason = stopReason;
-			stopReason = ""
-			t.SendMessage(globals.port_log, "Coming home...")
-			if not t.GoToPos(globals.startLoc, true, true) then 
-				t.SendMessage(globals.port_log, "Unable to return home!")
-				t.SendMessage(globals.port_log, "stopReason:" .. stopReason)
-				return false
-			end		
-			t.SendMessage(globals.port_log, "I am home")
-			t.SendMessage(globals.port_log, "stopReason: " .. lastStopReason)
-			
-			local undiggableBlockData = t.GetUndiggableBlockData()
-			if undiggableBlockData then
-				t.SendMessage(globals.port_log, "Block:" .. undiggableBlockData.name .. "meta:".. undiggableBlockData.metadata.. " Variant:" .. util.GetBlockVariant(undiggableBlockData))
-			end			
+	-- Main shafts
+	if cfg.regionCode == "a" then
+		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
+		local baseCenterOffset = 4
+		
+		-- plus sign above center block
+        cfg.destroyLoc = {x=locBaseCenter.x-1, y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
+        cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
+        cfg.rarity3Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+        cfg.rarity4Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity4Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "l")
+        cfg.fuelLoc = {x=locBaseCenter.x-1,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
+
+		cfg.flyCeiling = locBaseCenter.y + 4
+		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
+		cfg.maxRadius = 10 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
+		cfg.nextdepth = 1
+		cfg.maxdepth = 255
+        cfg.isResumeMiningdepth = true
+
+		-- mine 1
+        local newMineLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+        local newHomeLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		if cfg.turtleID == 1 then
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+
+		-- mine 2
+		elseif cfg.turtleID == 2 then
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+
+		-- mine 3
+		elseif cfg.turtleID == 3 then
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+
+		-- far side glass
+		elseif cfg.turtleID == 4 then
+			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+			newHomeLoc.h = newMineLoc.h
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+
 		end
-		
-		-- Setting up to resume
-		isStop = false
-		stopReason = ""
-		
+        cfg.mineLoc = newMineLoc
+        cfg.startLoc = newHomeLoc
+
+		-- near side glass
+		-- elseif cfg.turtleID == 5 then
+		-- 	cfg.isResourcePlacer = true
+		-- 	cfg.startLoc = {x=5713, z=2797, y=68, h="w"}
+		-- 	cfg.fillLoc = {x=5683, z=2823, y=63, h="w"}
+
+		-- -- sand dropper
+		-- elseif cfg.turtleID == 6 then
+		-- 	cfg.startLoc = {x=5711, z=2797, y=68, h="w"}
+		-- 	cfg.fillLoc = {x=5644, z=2824, y=64, h="s"}
+		-- end
+
+		-- resourceContLoc1 = {x=5719, z=2806, y=67, h="n"}
+		-- resourceContLoc2 = {x=5718, z=2806, y=67, h="n"}
+		-- resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+		-- resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- cfg.maxResourceCount = 448
+
+		-- if cfg.isResourcePlacer then
+		-- 	cfg.resourceName = "minecraft:glass"
+		-- 	resourceContLoc1 = {x=5715, z=2806, y=67, h="n"}
+		-- 	if cfg.turtleID == 4 or cfg.turtleID == 5 then
+		-- 		cfg.length = 20
+		-- 	end
+		-- 	cfg.width = 2
+		-- else
+		-- 	cfg.resourceName = "minecraft:sand"
+		-- 	cfg.length = 20
+		-- 	cfg.width = 20
+        -- end
+        
+    elseif cfg.regionCode == "d" then
+		-- Home2
+		cfg.flyCeiling = 108
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+
+		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
+		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
+		--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
+		--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="n"}
+        -- cfg.resourceName = "minecraft:sand"
+        
+		if cfg.turtleID == 1 then
+			cfg.startLoc = {x=207, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=193, z=1934, y=107, h="e"}
+			cfg.maxRadius = 5 -- ex: 5 = 11 cfg.width (double radius +1)
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255 -- TODO: changing height messes up stair y axis?
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 2 then
+			cfg.startLoc = {x=209, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=217, z=1934, y=106, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 3 then
+			cfg.startLoc = {x=211, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=231, z=1934, y=91, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		elseif cfg.turtleID == 4 then
+			cfg.startLoc = {x=213, z=1920, y=83, h="n"}
+			cfg.mineLoc = {x=245, z=1934, y=97, h="s"}
+			cfg.maxRadius = 5
+			cfg.nextdepth = 1
+			cfg.maxdepth = 255
+			cfg.isResumeMiningdepth = true
+		-- 	cfg.startLoc = {x=-1557, z=7596, y=70, h="n"}
+		-- 	cfg.mineLoc = {x=-1558, z=7606, y=69, h="e"}
+		-- 	cfg.maxRadius = 8
+		-- 	cfg.nextdepth = 1
+		-- 	cfg.maxdepth = 0
+		-- 	cfg.isResumeMiningdepth = true
+		-- 	cfg.length = 62
+		-- 	cfg.width = 3
+		-- 	cfg.depth = 2
+		elseif cfg.turtleID == 5 then
+			cfg.startLoc = {x=-1557, z=7594, y=70, h="n"}
+		end
+
 	end
-	
-	EndProgram()	
+end
+
+function RunMiningProgram()
+	local isStuck = false	
+	t.ResetInventorySlot()
+
+	-- fly To destination
+	t.SendMessage(cfg.port_log, "going to mineLoc")
+	if not t.GoToPos(cfg.mineLoc, true) then isStuck = true end
+
+	-- Start mining
+	if not isStuck then
+		if not BeginMining() then isStuck = true end
+	else 
+		util.Print("I'm stuck!")
+	end
+
+	stopReason = t.GetStopReason()
+	if stopReason == "inventory_full" then
+		t.GoUnloadInventory()
+        t.AddCommand({func=RunMiningProgram}, true)
+	end
+
+	t.AddCommand({func=function()
+		t.GoHome("End mining: " .. stopReason);
+	end}, false)
 end
 
 function BeginMining()
-		--1,2,3 (1)
-		--2,3,4 (2)
-		--3,4,5 (3)
-		--15,16,1 (15)
+    --1,2,3 (1)
+    --2,3,4 (2)
+    --3,4,5 (3)
+    --15,16,1 (15)
 	local isFirstDecent = true
 	local curRadius = 1
 	local inspectSuccess, data
@@ -129,58 +302,52 @@ function BeginMining()
 	-- 0 = 3*4=12
 	-- 1 = 5*4=20
 	-- 2 = 7*4=28
-	local outerStepCount = (3 + (maxRadius * 2)) * 4
-	
-	t.SetHeading(mineLoc["h"])
+	local outerStepCount = (3 + (cfg.maxRadius * 2)) * 4
+
+	t.SetHeading(cfg.mineLoc.h)
 	while true do
 		-- loops once for each y unit
-		if isStop then return false end		
-		curDepth = mineLoc["y"] - t.GetLocation()["y"]
-		
-		-- go down to correct curDepth		
-		if globals.isResumeMiningDepth and isFirstDecent then
+		curdepth = cfg.mineLoc.y - t.GetLocation().y
+
+		-- go down to correct curdepth
+		if cfg.isResumeMiningdepth and isFirstDecent then
 			isFirstDecent = false
-			while not turtle.detectDown() do
-				t.Down();
-			end
-			curDepth = mineLoc["y"] - currentLoc["y"]
-			t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
-			if isStop then return false end	
+			while not turtle.detectDown() do t.Down() end
+			curdepth = cfg.mineLoc.y - currentLoc.y
+			t.SendMessage(cfg.port_log, "Resume depth:" .. tostring(curdepth))
 		else
-			local depthIncrement = nextDepth - curDepth
-			--util.Print("newD:" .. tostring(curDepth) .. " nxt:" .. tostring(nextDepth) .. " inc:" .. tostring(nextDepth - curDepth))
-			for n=1,nextDepth - curDepth do
-				if not t.DigAndGoDown() then return false end	
-			curDepth = mineLoc["y"] - currentLoc["y"]
-				t.SendMessage(globals.port_log, "Depth:" .. tostring(curDepth))
-				if isStop then return false end	
+			local depthIncrement = cfg.nextdepth - curdepth
+			--util.Print("newD:" .. tostring(curdepth) .. " nxt:" .. tostring(cfg.nextdepth) .. " inc:" .. tostring(cfg.nextdepth - curdepth))
+			for n=1,cfg.nextdepth - curdepth do
+				if not t.DigAndGoDown() then return false end
+			curdepth = cfg.mineLoc.y - currentLoc.y
+				t.SendMessage(cfg.port_log, "New depth:" .. tostring(curdepth))
 			end
 		end
-		
-		curRadius = maxRadius
-		
+
+		curRadius = cfg.maxRadius
+
 		-- calculate position to start cutting stairs
-		local stairCutPos1 = (curDepth % outerStepCount)
-		local stairCutPos2 = ((curDepth+1) % outerStepCount)
-		local stairCutPos3 = ((curDepth+2) % outerStepCount)
-		local stairCutPos4 = ((curDepth+3) % outerStepCount)
-		
+		local stairCutPos1 = (curdepth % outerStepCount)
+		local stairCutPos2 = ((curdepth+1) % outerStepCount)
+		local stairCutPos3 = ((curdepth+2) % outerStepCount)
+		local stairCutPos4 = ((curdepth+3) % outerStepCount)
+
 		while curRadius >= 0 do
-			--util.Print("Current Radius:" .. tostring(curRadius))			
-			local sideStepCount = ((curRadius)*2)+1
-			local stairSideStepCount = ((curRadius+1)*2)+1			
-			
-			for curSideStep=1,sideStepCount*4 do
-				if isStop then return false end				
+			--util.Print("Current Radius:" .. tostring(curRadius))
+			local sideStepCount = ((curRadius) * 2) + 1
+			local stairSideStepCount = ((curRadius + 1) * 2) + 1
+
+			for curSideStep = 1, sideStepCount * 4 do
 				local isAtSideStart = curSideStep % sideStepCount == 1
-				
+
 				-- cut stairs notch
-				if isDigStairs and curRadius == maxRadius then
+				if isDigStairs and curRadius == cfg.maxRadius then
 					--local stairCurSideStep = curSideStep+1
 					if curSideStep == stairCutPos1 or curSideStep == stairCutPos2 or curSideStep == stairCutPos3 or curSideStep == stairCutPos4 then
 							--make the cut
 							if isAtSideStart then
-								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
 								if not t.TurnLeft() then return false end
 								if not t.DigAndGoForward() then return false end
 								if not t.TurnLeft() then return false end
@@ -189,7 +356,7 @@ function BeginMining()
 								if not t.DigAndGoForward() then return false end
 								if not t.TurnLeft() then return false end
 								if not t.DigAndGoForward() then return false end
-								
+
 								-- add some style (torches)
 								if curSideStep == stairCutPos3 then
 									local data = turtle.getItemDetail(1)
@@ -201,77 +368,61 @@ function BeginMining()
 									end
 								end
 							else
-								--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
 								if not t.TurnLeft() then return false end
 								if not t.Dig() then return false end
 								if not t.TurnRight() then return false end
 							end
 					else
-						--util.Print("D:" .. tostring(curDepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
+						--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
 					end
 				end
-				
-				
+
+
 				-- go forward normally
 				if not t.DigAndGoForward() then return false end
-				
+
 				if curSideStep%sideStepCount == 0 then
 					if not t.TurnRight() then return false end
 				end
-			end				
-			
+			end
+
 			curRadius = curRadius-1
 			if curRadius >= 0 then
 				-- move to the next inner start position
-				if isStop then return false end
 				if not t.Forward() then return false end
 				if not t.TurnRight() then return false end
 				if not t.DigAndGoForward() then return false end
 				if not t.TurnLeft() then return false end
 			end
 		end
-		
+
 		-- stopped at inner radius
-		if maxDepth > 0 and curDepth == maxDepth then
-			t.SendMessage(globals.port_log, "Max curDepth: " .. tostring(maxDepth) .. " hit")
+		if cfg.maxdepth > 0 and curdepth == cfg.maxdepth then
+			t.SendMessage(cfg.port_log, "Max curdepth: " .. tostring(cfg.maxdepth) .. " hit")
 			return false
 		end
-		
+
 		local curLoc = t.GetLocation()
-		local cornerLoc = {x=mineLoc["x"],y=curLoc["y"],z=mineLoc["z"],h=mineLoc["h"]}
-		if not t.GoToPos(cornerLoc, false, false) then return false end
-		nextDepth = curDepth+1
+		local cornerLoc = {x=cfg.mineLoc.x,y=curLoc.y,z=cfg.mineLoc.z,h=cfg.mineLoc.h}
+		if not t.GoToPos(cornerLoc, false) then return false end
+		cfg.nextdepth = curdepth+1
 	end
-	t.SendMessage(globals.port_log, "Mining END")
+	
 end
 
-
-function ListenForCommands()
-	t.ListenForReturnMsg(ListenForReturnMsg_Callback)
+function IncomingMessageHandler(command, stopQueue)
+	if string.lower(command) == "gomine" then
+		stopReason = ""
+        t.AddCommand({func=RunMiningProgram}, stopQueue)
+	end
 end
 
-function ListenForReturnMsg_Callback(command)
-	if string.lower(command) == "stop" then
-		stopReason = "incoming_stop"
-		isStop = true
-		
-	elseif string.lower(command) == "gohome" then
-		stopReason = "incoming_gohome"
-		isStop = true
-
-	elseif string.lower(command) == "unload" then
-		stopReason = "incoming_unload"
-		isStop = true
-		
-	elseif string.lower(command) == "refuel" then
+function LowFuelCallback()
+	t.AddCommand({func=function()
 		t.GoRefuel()
-	end
+	end}, true)
+	t.AddCommand({func=RunMiningProgram}, false)
 end
-
-
-function EndProgram()
-	t.SendMessage(globals.port_log, "gomine program END")
-end
-
 
 InitProgram()

@@ -1,1 +1,0 @@
-shell.run("gomine3")

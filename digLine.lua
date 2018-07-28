@@ -1,6 +1,6 @@
 local version = "0.06"
 os.loadAPI("util")
-os.loadAPI("t3")
+os.loadAPI("t")
 
 local isDiggingOut
 local stopReason = ""
@@ -48,7 +48,7 @@ local cfg = {
 function InitProgram()
 	print("Digline v" .. version)	
 	print("Util v" .. util.GetVersion())
-	print("T3 v" .. t3.GetVersion())
+	print("t v" .. t.GetVersion())
     local isValidInit = true
 
     util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
@@ -62,24 +62,24 @@ function InitProgram()
 	end
 
 	if isValidInit then
-		t3.InitReferences(modem, util, cfg)
+		t.InitReferences(modem, util, cfg)
 
 		if cfg.startLoc then
-			t3.SetHomeLocation(cfg.startLoc)
-			currentLoc = t3.GetCurrentLocation()		
+			t.SetHomeLocation(cfg.startLoc)
+			currentLoc = t.GetCurrentLocation()		
 			if not currentLoc then isValidInit = false end
 		else
-			currentLoc = t3.GetCurrentLocation()
+			currentLoc = t.GetCurrentLocation()
 			if not currentLoc then
 				isValidInit = false
 			else
-				t3.SetHomeLocation(currentLoc)
+				t.SetHomeLocation(currentLoc)
 			end
 		end
 	end
 
     if isValidInit then
-        if not t3.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
+        if not t.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
             isValidInit = false
         end
     end
@@ -88,10 +88,10 @@ function InitProgram()
 		util.Print("Unable to Initialize program")
     else
         -- this runs forever
-        t3.StartTurtleRun();
+        t.StartTurtleRun();
 	end
 
-	t3.SendMessage(cfg.port_log, "digline program END")
+	t.SendMessage(cfg.port_log, "digline program END")
 end
 
 
@@ -126,11 +126,11 @@ end
 
 function RunMiningProgram()
 	local isStuck = false	
-	t3.ResetInventorySlot()
+	t.ResetInventorySlot()
 
 	-- fly To destination
-	t3.SendMessage(cfg.port_log, "going to mineLoc")
-	if not t3.GoToPos(cfg.mineLoc, true) then isStuck = true end
+	t.SendMessage(cfg.port_log, "going to mineLoc")
+	if not t.GoToPos(cfg.mineLoc, true) then isStuck = true end
 
 	-- Start mining
 	if not isStuck then
@@ -139,14 +139,14 @@ function RunMiningProgram()
 		util.Print("I'm stuck!")
 	end
 
-	stopReason = t3.GetStopReason()
+	stopReason = t.GetStopReason()
 	if stopReason == "inventory_full" then
-		t3.GoUnloadInventory()
-        t3.AddCommand({func=RunMiningProgram}, true)
+		t.GoUnloadInventory()
+        t.AddCommand({func=RunMiningProgram}, true)
 	end
 
-	t3.AddCommand({func=function()
-		t3.GoHome("End mining: " .. stopReason);
+	t.AddCommand({func=function()
+		t.GoHome("End mining: " .. stopReason);
 	end}, false)
 end
 
@@ -155,55 +155,55 @@ function BeginMining()
 	local isMiningCompleted = false
 	
 	-- drop into position
-	if not t3.DigAndGoForward() then return false end
+	if not t.DigAndGoForward() then return false end
 	curDepth = 1
 	curWidth = 1
 	
 	while not isMiningCompleted do
 		while curWidth < cfg.width do
 			isDiggingOut = false
-			--if not t3.DigAndGoForward() then return false end
+			--if not t.DigAndGoForward() then return false end
 
 			curLength = 0
 			while curLength < cfg.length do
-				if not t3.DigAndGoForward() then return false end
+				if not t.DigAndGoForward() then return false end
 				curLength = curLength + 1
 			end
 
-			if not t3.TurnRight() then return false end
-			if not t3.DigAndGoForward() then return false end
+			if not t.TurnRight() then return false end
+			if not t.DigAndGoForward() then return false end
 			curWidth = curWidth + 1
 			isDiggingOut = true
-			if not t3.TurnRight() then return false end
+			if not t.TurnRight() then return false end
 
 			-- about to come back after turnaround
 			while curLength > 0 do
-				if not t3.DigAndGoForward() then return false end
+				if not t.DigAndGoForward() then return false end
 				curLength = curLength - 1
 			end
 			
 			-- width turn manuever
 			if curWidth < cfg.width then
-				if not t3.TurnLeft() then return false end
-				if not t3.DigAndGoForward() then return false end
+				if not t.TurnLeft() then return false end
+				if not t.DigAndGoForward() then return false end
 				curWidth = curWidth + 1
-				if not t3.TurnLeft() then return false end
+				if not t.TurnLeft() then return false end
 			end
 		end
 		
 		-- turtle is at last row facing away from hole
-		if not t3.TurnRight() then return false end
+		if not t.TurnRight() then return false end
 		while curWidth > 1 do
 			-- go back to the first slot
-			if not t3.Forward() then return false end
+			if not t.Forward() then return false end
 			curWidth = curWidth - 1
 		end
 
-		if not t3.TurnRight() then return false end
+		if not t.TurnRight() then return false end
 		
 		-- decend to the next level
 		if curDepth < cfg.depth then
-			if not t3.DigAndGoDown() then return false end
+			if not t.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
 		else
 			isMiningCompleted = true
@@ -214,15 +214,15 @@ end
 function IncomingMessageHandler(command, stopQueue)
 	if string.lower(command) == "gomine" then
 		stopReason = ""
-        t3.AddCommand({func=RunMiningProgram}, stopQueue)
+        t.AddCommand({func=RunMiningProgram}, stopQueue)
 	end
 end
 
 function LowFuelCallback()
-	t3.AddCommand({func=function()
+	t.AddCommand({func=function()
 		t.GoRefuel()
 	end}, true)
-	t3.AddCommand({func=RunMiningProgram}, false)
+	t.AddCommand({func=RunMiningProgram}, false)
 }
 
 

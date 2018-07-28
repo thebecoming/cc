@@ -1,9 +1,6 @@
 -- ****************************
 -- Written by TheBecoming
 -- ****************************
-
-os.loadAPI("globals")
-
 local redstoneSide = "left"
 local isDoorOpen = false
 
