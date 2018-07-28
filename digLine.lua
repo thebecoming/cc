@@ -170,12 +170,15 @@ function BeginMining()
 	curDepth = 1
 	curWidth = 1
 	
+	-- cfg.length = 3
+	-- cfg.width = 4
+	-- cfg.depth = 2
 	while curDepth <= cfg.depth do
-		while curWidth <= cfg.width do
+		while curWidth < cfg.width do
 			isDiggingOut = false
-			if not t3.DigAndGoForward() then return false end
+			--if not t3.DigAndGoForward() then return false end
 
-			curLength = 1
+			curLength = 0
 			while curLength < cfg.length do
 				if not t3.DigAndGoForward() then return false end
 				curLength = curLength + 1
@@ -187,10 +190,10 @@ function BeginMining()
 			isDiggingOut = true
 			if not t3.TurnRight() then return false end
 
-			curLength = 1
-			while curLength < cfg.length+1 do
+			-- about to come back after turnaround
+			while curLength > 0 do
 				if not t3.DigAndGoForward() then return false end
-				curLength = curLength + 1
+				curLength = curLength - 1
 			end
 			
 			-- width turn manuever
@@ -202,6 +205,7 @@ function BeginMining()
 			end
 		end
 		
+		-- turtle is at last row facing away from hole
 		if not t3.TurnRight() then return false end
 		while curWidth > 1 do
 			-- go back to the first slot
@@ -211,7 +215,7 @@ function BeginMining()
 
 		if not t3.TurnRight() then return false end
 		
-		-- height turn manuever
+		-- decend to the next level
 		if curDepth < cfg.depth then
 			if not t3.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
