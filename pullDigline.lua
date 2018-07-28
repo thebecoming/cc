@@ -1,16 +1,5 @@
 function InitProgram()
-    -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullPDA.lua pullPDA
-    -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullGomine.lua pullGomine
-    
-    shell.run("delete gomine2")
-    shell.run("delete gomine3")
-    shell.run("delete t2")
-    shell.run("delete t3")
-    shell.run("delete globals")
-    shell.run("delete pullTurtle2")
-    shell.run("delete pullTurtle3")
-    shell.run("delete startTurtle")
-    shell.run("delete digLine")
+    -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullDigline.lua pullDigline
     
     shell.run("delete edit")
     shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/edit.lua edit")

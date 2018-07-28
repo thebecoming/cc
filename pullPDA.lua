@@ -1,9 +1,5 @@
 function InitProgram()
--- shell.run("delete pullPDA")
--- shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullPDA.lua pullPDA")
--- shell.run("delete pullTurtle")
--- shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullTurtle.lua pullTurtle")
--- return false
+-- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullPDA.lua pullPDA
 
 shell.run("delete edit")
 shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/edit.lua edit")

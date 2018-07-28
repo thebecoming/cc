@@ -1,4 +1,4 @@
-local version = "2.06"
+local version = "2.07"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -98,6 +98,160 @@ function InitProgram()
 	t.SendMessage(cfg.port_log, "gomine program END")
 end
 
+function RunMiningProgram()
+	util.Print("RunMiningProgram() gomine")
+	local isStuck = false	
+	t.ResetInventorySlot()
+
+	-- fly To destination
+	t.SendMessage(cfg.port_log, "going to mineLoc")
+	if not t.GoToPos(cfg.mineLoc, true) then isStuck = true end
+
+	-- Start mining
+	if not isStuck then
+		if not BeginMining() then 
+			isStuck = true 
+			util.Print("stuck!")
+		end
+		util.Print("Done mining")
+	else 
+		util.Print("I'm stuck!")
+	end
+
+	stopReason = t.GetStopReason()
+	if stopReason == "inventory_full" then
+		util.Print("inventory full in gomine")
+		t.GoUnloadInventory()
+		util.Print("unload complete in gomine")
+        t.AddCommand({func=RunMiningProgram}, true)
+		util.Print("RunMiningProgram re-called in gomine")
+	end
+
+	t.AddCommand({func=function()
+		t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
+	end}, false)
+end
+
+function BeginMining()
+    --1,2,3 (1)
+    --2,3,4 (2)
+    --3,4,5 (3)
+    --15,16,1 (15)
+	local isFirstDecent = true
+	local curRadius = 1
+	local inspectSuccess, data
+	local n, n2, n3, curSideStep
+	-- 0 = 3*4=12
+	-- 1 = 5*4=20
+	-- 2 = 7*4=28
+	local outerStepCount = (3 + (cfg.maxRadius * 2)) * 4
+
+	t.SetHeading(cfg.mineLoc.h)
+	while true do
+		-- loops once for each y unit
+		curdepth = cfg.mineLoc.y - t.GetLocation().y
+
+		-- go down to correct curdepth
+		if cfg.isResumeMiningdepth and isFirstDecent then
+			isFirstDecent = false
+			while not turtle.detectDown() do t.Down() end
+			curdepth = cfg.mineLoc.y - currentLoc.y
+			t.SendMessage(cfg.port_log, "Resume depth:" .. tostring(curdepth))
+		else
+			local depthIncrement = cfg.nextdepth - curdepth
+			--util.Print("newD:" .. tostring(curdepth) .. " nxt:" .. tostring(cfg.nextdepth) .. " inc:" .. tostring(cfg.nextdepth - curdepth))
+			for n=1,cfg.nextdepth - curdepth do
+				if not t.DigAndGoDown() then return false end
+			curdepth = cfg.mineLoc.y - currentLoc.y
+				t.SendMessage(cfg.port_log, "New depth:" .. tostring(curdepth))
+			end
+		end
+
+		curRadius = cfg.maxRadius
+
+		-- calculate position to start cutting stairs
+		local stairCutPos1 = (curdepth % outerStepCount)
+		local stairCutPos2 = ((curdepth+1) % outerStepCount)
+		local stairCutPos3 = ((curdepth+2) % outerStepCount)
+		local stairCutPos4 = ((curdepth+3) % outerStepCount)
+
+		while curRadius >= 0 do
+			--util.Print("Current Radius:" .. tostring(curRadius))
+			local sideStepCount = ((curRadius) * 2) + 1
+			local stairSideStepCount = ((curRadius + 1) * 2) + 1
+
+			for curSideStep = 1, sideStepCount * 4 do
+				local isAtSideStart = curSideStep % sideStepCount == 1
+
+				-- cut stairs notch
+				if isDigStairs and curRadius == cfg.maxRadius then
+					--local stairCurSideStep = curSideStep+1
+					if curSideStep == stairCutPos1 or curSideStep == stairCutPos2 or curSideStep == stairCutPos3 or curSideStep == stairCutPos4 then
+							--make the cut
+							if isAtSideStart then
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
+								if not t.TurnLeft() then return false end
+								if not t.DigAndGoForward() then return false end
+								if not t.TurnLeft() then return false end
+								if not t.DigAndGoForward() then return false end
+								if not t.TurnLeft() then return false end
+								if not t.DigAndGoForward() then return false end
+								if not t.TurnLeft() then return false end
+								if not t.DigAndGoForward() then return false end
+
+								-- add some style (torches)
+								if curSideStep == stairCutPos3 then
+									local data = turtle.getItemDetail(1)
+									if data and data.name == "minecraft:torch" then
+										if not t.TurnLeft() then return false end
+										turtle.select(1)
+										if not turtle.detect() then turtle.place() end
+										if not t.TurnRight() then return false end
+									end
+								end
+							else
+								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
+								if not t.TurnLeft() then return false end
+								if not t.Dig() then return false end
+								if not t.TurnRight() then return false end
+							end
+					else
+						--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
+					end
+				end
+
+
+				-- go forward normally
+				if not t.DigAndGoForward() then return false end
+
+				if curSideStep%sideStepCount == 0 then
+					if not t.TurnRight() then return false end
+				end
+			end
+
+			curRadius = curRadius-1
+			if curRadius >= 0 then
+				-- move to the next inner start position
+				if not t.Forward() then return false end
+				if not t.TurnRight() then return false end
+				if not t.DigAndGoForward() then return false end
+				if not t.TurnLeft() then return false end
+			end
+		end
+
+		-- stopped at inner radius
+		if cfg.maxdepth > 0 and curdepth == cfg.maxdepth then
+			t.SendMessage(cfg.port_log, "Max curdepth: " .. tostring(cfg.maxdepth) .. " hit")
+			return false
+		end
+
+		local curLoc = t.GetLocation()
+		local cornerLoc = {x=cfg.mineLoc.x,y=curLoc.y,z=cfg.mineLoc.z,h=cfg.mineLoc.h}
+		if not t.GoToPos(cornerLoc, false) then return false end
+		cfg.nextdepth = curdepth+1
+	end
+	
+end
 
 function SetTurtleConfig(cfg)
     local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
@@ -262,153 +416,6 @@ function SetTurtleConfig(cfg)
 		end
 
 	end
-end
-
-function RunMiningProgram()
-	local isStuck = false	
-	t.ResetInventorySlot()
-
-	-- fly To destination
-	t.SendMessage(cfg.port_log, "going to mineLoc")
-	if not t.GoToPos(cfg.mineLoc, true) then isStuck = true end
-
-	-- Start mining
-	if not isStuck then
-		if not BeginMining() then isStuck = true end
-	else 
-		util.Print("I'm stuck!")
-	end
-
-	stopReason = t.GetStopReason()
-	if stopReason == "inventory_full" then
-		t.GoUnloadInventory()
-        t.AddCommand({func=RunMiningProgram}, true)
-	end
-
-	t.AddCommand({func=function()
-		t.GoHome("End mining: " .. stopReason);
-	end}, false)
-end
-
-function BeginMining()
-    --1,2,3 (1)
-    --2,3,4 (2)
-    --3,4,5 (3)
-    --15,16,1 (15)
-	local isFirstDecent = true
-	local curRadius = 1
-	local inspectSuccess, data
-	local n, n2, n3, curSideStep
-	-- 0 = 3*4=12
-	-- 1 = 5*4=20
-	-- 2 = 7*4=28
-	local outerStepCount = (3 + (cfg.maxRadius * 2)) * 4
-
-	t.SetHeading(cfg.mineLoc.h)
-	while true do
-		-- loops once for each y unit
-		curdepth = cfg.mineLoc.y - t.GetLocation().y
-
-		-- go down to correct curdepth
-		if cfg.isResumeMiningdepth and isFirstDecent then
-			isFirstDecent = false
-			while not turtle.detectDown() do t.Down() end
-			curdepth = cfg.mineLoc.y - currentLoc.y
-			t.SendMessage(cfg.port_log, "Resume depth:" .. tostring(curdepth))
-		else
-			local depthIncrement = cfg.nextdepth - curdepth
-			--util.Print("newD:" .. tostring(curdepth) .. " nxt:" .. tostring(cfg.nextdepth) .. " inc:" .. tostring(cfg.nextdepth - curdepth))
-			for n=1,cfg.nextdepth - curdepth do
-				if not t.DigAndGoDown() then return false end
-			curdepth = cfg.mineLoc.y - currentLoc.y
-				t.SendMessage(cfg.port_log, "New depth:" .. tostring(curdepth))
-			end
-		end
-
-		curRadius = cfg.maxRadius
-
-		-- calculate position to start cutting stairs
-		local stairCutPos1 = (curdepth % outerStepCount)
-		local stairCutPos2 = ((curdepth+1) % outerStepCount)
-		local stairCutPos3 = ((curdepth+2) % outerStepCount)
-		local stairCutPos4 = ((curdepth+3) % outerStepCount)
-
-		while curRadius >= 0 do
-			--util.Print("Current Radius:" .. tostring(curRadius))
-			local sideStepCount = ((curRadius) * 2) + 1
-			local stairSideStepCount = ((curRadius + 1) * 2) + 1
-
-			for curSideStep = 1, sideStepCount * 4 do
-				local isAtSideStart = curSideStep % sideStepCount == 1
-
-				-- cut stairs notch
-				if isDigStairs and curRadius == cfg.maxRadius then
-					--local stairCurSideStep = curSideStep+1
-					if curSideStep == stairCutPos1 or curSideStep == stairCutPos2 or curSideStep == stairCutPos3 or curSideStep == stairCutPos4 then
-							--make the cut
-							if isAtSideStart then
-								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Startcut")
-								if not t.TurnLeft() then return false end
-								if not t.DigAndGoForward() then return false end
-								if not t.TurnLeft() then return false end
-								if not t.DigAndGoForward() then return false end
-								if not t.TurnLeft() then return false end
-								if not t.DigAndGoForward() then return false end
-								if not t.TurnLeft() then return false end
-								if not t.DigAndGoForward() then return false end
-
-								-- add some style (torches)
-								if curSideStep == stairCutPos3 then
-									local data = turtle.getItemDetail(1)
-									if data and data.name == "minecraft:torch" then
-										if not t.TurnLeft() then return false end
-										turtle.select(1)
-										if not turtle.detect() then turtle.place() end
-										if not t.TurnRight() then return false end
-									end
-								end
-							else
-								--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3) .. " -Cut")
-								if not t.TurnLeft() then return false end
-								if not t.Dig() then return false end
-								if not t.TurnRight() then return false end
-							end
-					else
-						--util.Print("D:" .. tostring(curdepth) .. " step:" .. tostring(curSideStep) .. " s1:" .. tostring(stairCutPos1) .. " s2:" .. tostring(stairCutPos2) .. " s3:" .. tostring(stairCutPos3))
-					end
-				end
-
-
-				-- go forward normally
-				if not t.DigAndGoForward() then return false end
-
-				if curSideStep%sideStepCount == 0 then
-					if not t.TurnRight() then return false end
-				end
-			end
-
-			curRadius = curRadius-1
-			if curRadius >= 0 then
-				-- move to the next inner start position
-				if not t.Forward() then return false end
-				if not t.TurnRight() then return false end
-				if not t.DigAndGoForward() then return false end
-				if not t.TurnLeft() then return false end
-			end
-		end
-
-		-- stopped at inner radius
-		if cfg.maxdepth > 0 and curdepth == cfg.maxdepth then
-			t.SendMessage(cfg.port_log, "Max curdepth: " .. tostring(cfg.maxdepth) .. " hit")
-			return false
-		end
-
-		local curLoc = t.GetLocation()
-		local cornerLoc = {x=cfg.mineLoc.x,y=curLoc.y,z=cfg.mineLoc.z,h=cfg.mineLoc.h}
-		if not t.GoToPos(cornerLoc, false) then return false end
-		cfg.nextdepth = curdepth+1
-	end
-	
 end
 
 function IncomingMessageHandler(command, stopQueue)

@@ -1,4 +1,4 @@
-local version = "0.06"
+local version = "0.07"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -94,37 +94,8 @@ function InitProgram()
 	t.SendMessage(cfg.port_log, "digline program END")
 end
 
-
-function SetTurtleConfig(cfg)
-    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
-    if tonumber(numSeg) ~= nil then
-        cfg.turtleID = tonumber(numSeg)
-        cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
-	end
-	
-	cfg.flyCeiling = 87
-	cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-	cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-	cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-	cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-	cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
-	cfg.length = 1
-	cfg.width = 2
-	cfg.depth = 2
-
-	-- Home2 test area
-	if cfg.regionCode == "d" then
-		-- desert
-		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
-			cfg.mineLoc = {x=232, z=1918, y=82, h="s"}
-		elseif cfg.turtleID == 2 then
-			error "not implemented"
-		end
-	end
-end
-
 function RunMiningProgram()
+	util.Print("RunMiningProgram()")
 	local isStuck = false	
 	t.ResetInventorySlot()
 
@@ -134,19 +105,26 @@ function RunMiningProgram()
 
 	-- Start mining
 	if not isStuck then
-		if not BeginMining() then isStuck = true end
+		if not BeginMining() then 
+			isStuck = true 
+			util.Print("stuck!")
+		end
+		util.Print("Done mining")
 	else 
 		util.Print("I'm stuck!")
 	end
 
 	stopReason = t.GetStopReason()
 	if stopReason == "inventory_full" then
+		util.Print("inventory full in gomine")
 		t.GoUnloadInventory()
+		util.Print("unload complete in gomine")
         t.AddCommand({func=RunMiningProgram}, true)
+		util.Print("RunMiningProgram re-called in gomine")
 	end
 
 	t.AddCommand({func=function()
-		t.GoHome("End mining: " .. stopReason);
+		t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
 	end}, false)
 end
 
@@ -207,6 +185,35 @@ function BeginMining()
 			curDepth = curDepth + 1
 		else
 			isMiningCompleted = true
+		end
+	end
+end
+
+function SetTurtleConfig(cfg)
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    if tonumber(numSeg) ~= nil then
+        cfg.turtleID = tonumber(numSeg)
+        cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
+	end
+	
+	cfg.flyCeiling = 87
+	cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+	cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+	cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+	cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+	cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+	cfg.length = 1
+	cfg.width = 2
+	cfg.depth = 2
+
+	-- Home2 test area
+	if cfg.regionCode == "d" then
+		-- desert
+		if cfg.turtleID == 1 then
+			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
+			cfg.mineLoc = {x=232, z=1918, y=82, h="s"}
+		elseif cfg.turtleID == 2 then
+			error "not implemented"
 		end
 	end
 end

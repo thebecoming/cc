@@ -1,7 +1,7 @@
 -- TODO: 
 -- TEST: Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
-local version = "0.03"
+local version = "0.04"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -578,6 +578,8 @@ end
 			elseif data.name == "minecraft:bedrock" then
 				stopReason = "hit_bedrock"
 				return false
+			elseif data.name == "computercraft:turtle" then
+				return true -- do nothing (wait for turtle to pass)
 			else
 				if not turtle.digDown() then
 					SendMessage(cfg.port_log, "Unable to digDown!")
@@ -617,6 +619,8 @@ end
 			elseif data.name == "minecraft:bedrock" then
 				stopReason = "hit_bedrock"
 				return false
+			elseif data.name == "computercraft:turtle" then
+				return true -- do nothing (wait for turtle to pass)
 			else
 				if not turtle.digUp() then
 					SendMessage(cfg.port_log, "Unable to digUp!")
