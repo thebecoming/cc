@@ -9,8 +9,12 @@ local homeLoc, loc, destLoc
 local firstOpenInvSlot
 local queue = {}
 local msgHandler
-local fuelRefillThreshold = 900
 local unloading = false
+
+local fuelRefillThreshold = 900
+local lowFuelThreshold = 100
+local refueling = false
+local lowFuelCallback
 
 function InitReferences(aModem, aUtil, aCfg)
 	modem = aModem
@@ -22,9 +26,10 @@ function InitReferences(aModem, aUtil, aCfg)
 	end
 end
 
-function InitTurtle(aCurLoc, aMessageHander)
+function InitTurtle(aCurLoc, aMessageHander, aLowFuelCallback)
     loc = aCurLoc
     msgHandler = aMessageHander
+	lowFuelCallback = aLowFuelCallback
 
 	-- Print warnings
 	if turtle.getFuelLevel() == 0 then
@@ -110,6 +115,7 @@ end
             SendMessage(cfg.port_log, "No fuel loc found!")
 		else
 			SendMessage(cfg.port_log, "Going to Refuel...")
+			refueling = true
             if not GoToPos(cfg.fuelLoc, true) then return false end
 
             -- Suck lava buckets from the fuel depo
@@ -136,7 +142,8 @@ end
                     end
                 end
                 slot = slot+1
-            end
+			end
+			refueling = false
 		end
         return true
 	end
@@ -486,7 +493,7 @@ end
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				if unloading then 
-					if not DropBlocksByRarity(1, 1) then 
+					if not DropBlocksByRarity(1, 2) then 
 						SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 						stopReason = "inventory_full"
 						return false 
@@ -708,8 +715,9 @@ end
 			slot = slot+1
 		end
 
-		if aIsMoveCheck and fuelLevel < 50 then
+		if aIsMoveCheck and fuelLevel <= lowFuelThreshold and not refueling then
 			SendMessage(cfg.port_log, "LOW ON FUEL!")
+			lowFuelCallback()
 		end
 	end
 

@@ -79,7 +79,7 @@ function InitProgram()
 	end
 
     if isValidInit then
-        if not t3.InitTurtle(currentLoc, IncomingMessageHandler) then
+        if not t3.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
             isValidInit = false
         end
     end
@@ -134,22 +134,20 @@ function RunMiningProgram()
 
 	-- Start mining
 	if not isStuck then
-		if not BeginMining() then isStuck = true
+		if not BeginMining() then isStuck = true end
 	else 
 		util.Print("I'm stuck!")
 	end
 
 	stopReason = t3.GetStopReason()
-	if stopReason == "hit_bedrock" then
-		t3.GoHome("hit_bedrock")
-	elseif stopReason == "inventory_full" then
-		-- don't return home for these situations
+	if stopReason == "inventory_full" then
 		t3.GoUnloadInventory()
+        t3.AddCommand({func=RunMiningProgram}, true)
 	end
 
 	t3.AddCommand({func=function()
-		t3.GoHome("Mining Complete");
-	end}, false)	
+		t3.GoHome("End mining: " .. stopReason);
+	end}, false)
 end
 
 function BeginMining()
@@ -219,6 +217,13 @@ function IncomingMessageHandler(command, stopQueue)
         t3.AddCommand({func=RunMiningProgram}, stopQueue)
 	end
 end
+
+function LowFuelCallback()
+	t3.AddCommand({func=function()
+		t.GoRefuel()
+	end}, true)
+	t3.AddCommand({func=RunMiningProgram}, false)
+}
 
 
 InitProgram()
