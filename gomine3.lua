@@ -293,7 +293,7 @@ function RunMiningProgram()
 			end
 		end
 		if isMiningCompleted then
-			AddCommand({func=function()
+			t3.AddCommand({func=function()
 				GoHome("Mining Complete");
 			end}, false)
 		end

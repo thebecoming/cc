@@ -9,7 +9,6 @@ local curLength, curWidth, curdepth
 
 local isRequireHomeBlock = false
 local modem
-local isMining, isMiningCompleted
 
 
 local cfg = {
@@ -126,54 +125,43 @@ function SetTurtleConfig(cfg)
 end
 
 function RunMiningProgram()
-	isMining = true	
-	isMiningCompleted = false
-	while true do
-		if isMining then
-			t3.ResetInventorySlot()
+	local isStuck = false	
+	t3.ResetInventorySlot()
 
-			-- fly To destination
-			t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
-			if not t3.GoToPos(cfg.mineLoc, true) then isMining = false end
+	-- fly To destination
+	t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
+	if not t3.GoToPos(cfg.mineLoc, true) then isStuck = true end
 
-			-- Start mining
-			if isMining then
-				 if not BeginMining() then isMining = false end
-			end
+	-- Start mining
+	if not isStuck then
+		BeginMining()
+	else 
+		util.Print("I'm stuck!")
+	end
 
-			stopReason = t3.GetStopReason()
-            if stopReason == "hit_bedrock" then
-                t3.GoHome("hit_bedrock")
-			elseif stopReason == "inventory_full" then
-                -- don't return home for these situations
-				t3.GoUnloadInventory()
-			else
-				-- End the program
-				isMining = false
-			end
-		end
-		if isMiningCompleted then
-			AddCommand({func=function()
-				GoHome("Mining Complete");
-			end}, false)
-		end
-		os.sleep()
-	end	
-	EndProgram()	
+	stopReason = t3.GetStopReason()
+	if stopReason == "hit_bedrock" then
+		t3.GoHome("hit_bedrock")
+	elseif stopReason == "inventory_full" then
+		-- don't return home for these situations
+		t3.GoUnloadInventory()
+	end
+
+	t3.AddCommand({func=function()
+		GoHome("Mining Complete");
+	end}, true)	
 end
 
 function BeginMining()
 	local n2
+	local isMiningCompleted = false
 	
 	-- drop into position
 	if not t3.DigAndGoForward() then return false end
 	curDepth = 1
 	curWidth = 1
 	
-	-- cfg.length = 3
-	-- cfg.width = 4
-	-- cfg.depth = 2
-	while curDepth <= cfg.depth do
+	while not isMiningCompleted do
 		while curWidth < cfg.width do
 			isDiggingOut = false
 			--if not t3.DigAndGoForward() then return false end
@@ -219,11 +207,10 @@ function BeginMining()
 		if curDepth < cfg.depth then
 			if not t3.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
+		else
+			isMiningCompleted = true
 		end
 	end
-
-	isMiningCompleted = true
-	return false
 end
 
 function IncomingMessageHandler(command, stopQueue)
