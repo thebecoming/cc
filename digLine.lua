@@ -1,4 +1,4 @@
-print("Digline v0.01")
+print("Digline v0.02")
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -167,49 +167,51 @@ function BeginMining()
 	if not t3.DigAndGoForward() then return false end
 	curDepth = 1
 	curWidth = 1
+	local stuck = false
 	
-	while curDepth < cfg.depth do
-		while curWidth < cfg.width do
+	while curDepth <= cfg.depth and not stuck do
+		while curWidth < cfg.width and not stuck do
 			isDiggingOut = false
-			if not t3.DigAndGoForward() then return false end
+			if not t3.DigAndGoForward() then stuck = true; return; end
 
 			curLength = 1
-			while curLength < cfg.length do
-				if not t3.DigAndGoForward() then return false end
+			while curLength < cfg.length and not stuck do
+				if not t3.DigAndGoForward() then stuck = true; return; end
 				curLength = curLength + 1
 			end
 
-			if not t3.TurnRight() then return false end
-			if not t3.DigAndGoForward() then return false end
+			if not t3.TurnRight() then stuck = true; return; end
+			if not t3.DigAndGoForward() then stuck = true; return; end
 			curWidth = curWidth + 1
 			isDiggingOut = true
-			if not t3.TurnRight() then return false end
+			if not t3.TurnRight() then stuck = true; return; end
 
 			curLength = 1
-			while curLength < cfg.length+1 do
-				if not t3.DigAndGoForward() then return false end
+			while curLength < cfg.length+1 and not stuck do
+				if not t3.DigAndGoForward() then stuck = true; return; end
+				curLength = curLength + 1
 			end
 			
 			-- width turn manuever
 			if curWidth < cfg.width then
-				if not t3.TurnLeft() then return false end
-				if not t3.DigAndGoForward() then return false end
+				if not t3.TurnLeft() then stuck = true; return; end
+				if not t3.DigAndGoForward() then stuck = true; return; end
 				curWidth = curWidth + 1
-				if not t3.TurnLeft() then return false end
+				if not t3.TurnLeft() then stuck = true; return; end
 			else
-				if not t3.TurnRight() then return false end
+				if not t3.TurnRight() then stuck = true; return; end
 				for n2=1, (cfg.width)-1 do
 					-- go back to the first slot
-					if not t3.Forward() then return false end
+					if not t3.Forward() then stuck = true; return; end
 					curWidth = 1
 				end
-				if not t3.TurnRight() then return false end
+				if not t3.TurnRight() then stuck = true; return; end
 			end
 		end
 		
 		-- height turn manuever
-		if curDepth < cfg.depth then
-			if not t3.DigAndGoDown() then return false end
+		if curDepth < cfg.depth and not stuck then
+			if not t3.DigAndGoDown() then stuck = true; return; end
 			curDepth = curDepth + 1
 		end
 	end
