@@ -172,47 +172,47 @@ function BeginMining()
 	while curDepth <= cfg.depth do
 		while curWidth <= cfg.width do
 			isDiggingOut = false
-			if not t3.DigAndGoForward() then return false return; end
+			if not t3.DigAndGoForward() then return false end
 
 			curLength = 1
 			while curLength < cfg.length do
-				if not t3.DigAndGoForward() then return false return; end
+				if not t3.DigAndGoForward() then return false end
 				curLength = curLength + 1
 			end
 
-			if not t3.TurnRight() then return false return; end
-			if not t3.DigAndGoForward() then return false return; end
+			if not t3.TurnRight() then return false end
+			if not t3.DigAndGoForward() then return false end
 			curWidth = curWidth + 1
 			isDiggingOut = true
-			if not t3.TurnRight() then return false return; end
+			if not t3.TurnRight() then return false end
 
 			curLength = 1
 			while curLength < cfg.length+1 do
-				if not t3.DigAndGoForward() then return false return; end
+				if not t3.DigAndGoForward() then return false end
 				curLength = curLength + 1
 			end
 			
 			-- width turn manuever
 			if curWidth < cfg.width then
-				if not t3.TurnLeft() then return false return; end
-				if not t3.DigAndGoForward() then return false return; end
+				if not t3.TurnLeft() then return false end
+				if not t3.DigAndGoForward() then return false end
 				curWidth = curWidth + 1
-				if not t3.TurnLeft() then return false return; end
+				if not t3.TurnLeft() then return false end
 			end
 		end
 		
-		if not t3.TurnRight() then return false return; end
+		if not t3.TurnRight() then return false end
 		while curWidth > 1 do
 			-- go back to the first slot
-			if not t3.Forward() then return false return; end
+			if not t3.Forward() then return false end
 			curWidth = curWidth - 1
 		end
 
-		if not t3.TurnRight() then return false return; end
+		if not t3.TurnRight() then return false end
 		
 		-- height turn manuever
 		if curDepth < cfg.depth then
-			if not t3.DigAndGoDown() then return false return; end
+			if not t3.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
 		end
 	end
