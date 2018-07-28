@@ -2,7 +2,7 @@ os.loadAPI("globals")
 os.loadAPI("util")
 
 local modem, monitor
-local isListenLogPort = false
+local isListenLogPort = true
 
 function InitProgram()
 	--print("MessageListener Init()")

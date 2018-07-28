@@ -423,6 +423,6 @@ function LowFuelCallback()
 		t.GoRefuel()
 	end}, true)
 	t3.AddCommand({func=RunMiningProgram}, false)
-}
+end
 
 InitProgram()
