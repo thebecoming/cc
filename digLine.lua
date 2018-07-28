@@ -1,4 +1,4 @@
-local version = "0.04"
+local version = "0.05"
 os.loadAPI("util")
 os.loadAPI("t3")
 

@@ -1,4 +1,4 @@
-local version = "2.04"
+local version = "2.05"
 os.loadAPI("util")
 os.loadAPI("t3")
 
@@ -335,7 +335,7 @@ function BeginMining()
 			local sideStepCount = ((curRadius) * 2) + 1
 			local stairSideStepCount = ((curRadius + 1) * 2) + 1
 
-			for (curSideStep = 1, sideStepCount * 4) do
+			for curSideStep = 1, sideStepCount * 4 do
 				local isAtSideStart = curSideStep % sideStepCount == 1
 
 				-- cut stairs notch

@@ -4,7 +4,7 @@
 -- Need to return home when no more events left to process
 -- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
-local version = "0.01"
+local version = "0.02"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -485,7 +485,6 @@ end
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				-- TODO, stop rarity 1
 				if not DropBlocksByRarity(1, 1) then 
 					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 					stopReason = "inventory_full"
@@ -545,8 +544,11 @@ end
 		local inspectSuccess, data = turtle.inspectDown()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				stopReason = "inventory_full"
-				return false
+				if not DropBlocksByRarity(1, 1) then 
+					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
+					stopReason = "inventory_full"
+					return false 
+				end
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				return true -- do nothing
@@ -581,8 +583,11 @@ end
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				stopReason = "inventory_full"
-				return false
+				if not DropBlocksByRarity(1, 1) then 
+					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
+					stopReason = "inventory_full"
+					return false 
+				end
 			end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
 				return true -- do nothing

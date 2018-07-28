@@ -1,4 +1,4 @@
-local version = "0.01"
+local version = "0.02"
 local modem
 local monitor = nil
 	
