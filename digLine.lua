@@ -108,8 +108,8 @@ function SetTurtleConfig(cfg)
 	cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
 	cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
 	cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
-	cfg.length = 3
-	cfg.width = 4
+	cfg.length = 1
+	cfg.width = 2
 	cfg.depth = 2
 
 	-- Home2 test area
@@ -148,8 +148,8 @@ function RunMiningProgram()
 	end
 
 	t3.AddCommand({func=function()
-		GoHome("Mining Complete");
-	end}, true)	
+		t3.GoHome("Mining Complete");
+	end}, false)	
 end
 
 function BeginMining()

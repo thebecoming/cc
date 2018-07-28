@@ -10,7 +10,6 @@ local curdepth
 local isRequireHomeBlock = false
 local torchSlot = 1
 local modem
-local isMining, isMiningCompleted
 local isFirstDecent
 
 
@@ -266,39 +265,31 @@ function SetTurtleConfig(cfg)
 end
 
 function RunMiningProgram()
-	isMining = true	
-	isMiningCompleted = false
-	while true do
-		if isMining then
-			t3.ResetInventorySlot()
+	local isStuck = false	
+	t3.ResetInventorySlot()
 
-			-- fly To destination
-			t3.SendMessage(cfg.port_log, "going to cfg.mineLoc")
-			if not t3.GoToPos(cfg.mineLoc, true) then isMining = false end
+	-- fly To destination
+	t3.SendMessage(cfg.port_log, "going to mineLoc")
+	if not t3.GoToPos(cfg.mineLoc, true) then isStuck = true end
 
-			-- Start mining
-			if isMining then
-				if not BeginMining() then isMining = false end
-			end
-
-			stopReason = t3.GetStopReason()
-            if stopReason == "hit_bedrock" then
-                t3.GoHome("hit_bedrock")
-			elseif stopReason == "inventory_full" then
-                -- don't return home for these situations
-				t3.GoUnloadInventory()
-			else
-				-- End the program
-				isMining = false
-			end
-		end
-		if isMiningCompleted then
-			t3.AddCommand({func=function()
-				GoHome("Mining Complete");
-			end}, false)
-		end
-		os.sleep()
+	-- Start mining
+	if not isStuck then
+		if not BeginMining() then isStuck = true
+	else 
+		util.Print("I'm stuck!")
 	end
+
+	stopReason = t3.GetStopReason()
+	if stopReason == "hit_bedrock" then
+		t3.GoHome("hit_bedrock")
+	elseif stopReason == "inventory_full" then
+		-- don't return home for these situations
+		t3.GoUnloadInventory()
+	end
+
+	t3.AddCommand({func=function()
+		t3.GoHome("Mining Complete");
+	end}, false)	
 end
 
 function BeginMining()
@@ -419,9 +410,7 @@ function BeginMining()
 		if not t3.GoToPos(cornerLoc, false) then return false end
 		cfg.nextdepth = curdepth+1
 	end
-
-	isMiningCompleted = true
-	return false
+	
 end
 
 function IncomingMessageHandler(command, stopQueue)
