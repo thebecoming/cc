@@ -96,7 +96,8 @@ end
 	function GoHome(aStopReason)
 		-- Return home
         SendMessage(cfg.port_log, "Going home...")
-        if aStopReason then SendMessage(cfg.port_log, "Reason: " .. aStopReason) end
+		if aStopReason then SendMessage(cfg.port_log, "Reason: " .. aStopReason) end
+		--print("homeLoc x:" .. homeLoc.x .. " y:" .. homeLoc.y .. " z:" .. homeLoc.z)
 		if not GoToPos(homeLoc, true) then  return false end
 		SendMessage(cfg.port_log, "I am home")
 		-- local undiggableBlockData = GetUndiggableBlockData()
@@ -751,7 +752,7 @@ end
         if loc then
             -- break the reference before handing over
             local newloc = {x=loc.x,y=loc.y,z=loc.z,h=loc.h}
-            return true, newloc
+            return newloc
         end
 
 		local isGpsSuccess
@@ -803,7 +804,7 @@ end
     end
 
     function SetHomeLocation(aHomeLoc)
-        homeLoc = aHomeLoc
+		homeLoc = {x=aHomeLoc.x,y=aHomeLoc.y,z=aHomeLoc.z,h=aHomeLoc.h}
     end
 --
 
