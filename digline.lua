@@ -6,8 +6,6 @@ local isDiggingOut
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
-
-local isRequireHomeBlock = false
 local isStepDown = true
 local modem
 
@@ -95,8 +93,8 @@ function InitProgram()
 	t.SendMessage(cfg.port_log, "digline program END")
 end
 
-function RunMiningProgram()
-	util.Print("RunMiningProgram() digline")
+function RunProgram()
+	util.Print("RunProgram() digline")
 	local isStuck = false	
 	t.ResetInventorySlot()
 
@@ -118,10 +116,10 @@ function RunMiningProgram()
 	stopReason = t.GetStopReason()
 	if stopReason == "inventory_full" then
 		t.GoUnloadInventory()
-        t.AddCommand({func=RunMiningProgram}, true)
+        t.AddCommand({func=RunProgram}, true)
 	else
 		t.AddCommand({func=function()
-			t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
+			t.GoHome("Gohome from RunProgram: " .. stopReason);
 		end}, false)
 	end
 end
@@ -253,7 +251,7 @@ end
 function IncomingMessageHandler(command, stopQueue)
 	if string.lower(command) == "gomine" then
 		stopReason = ""
-        t.AddCommand({func=RunMiningProgram}, stopQueue)
+        t.AddCommand({func=RunProgram}, stopQueue)
 	end
 end
 
@@ -261,7 +259,7 @@ function LowFuelCallback()
 	t.AddCommand({func=function()
 		t.GoRefuel()
 	end}, true)
-	t.AddCommand({func=RunMiningProgram}, false)
+	t.AddCommand({func=RunProgram}, false)
 end
 
 

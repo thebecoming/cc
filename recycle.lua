@@ -2,12 +2,8 @@ local version = "0.01"
 os.loadAPI("util")
 os.loadAPI("t")
 
-local isDiggingOut
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
-local curLength, curWidth, curdepth, stairInvSlot
-
-local isRequireHomeBlock = false
 local modem
 
 
@@ -21,32 +17,15 @@ local cfg = {
     regionCode = nil,
     flyCeiling = nil,
     startLoc = nil,
-    mineLoc = nil,
     destroyLoc = nil,
     rarity2Loc = nil,
     rarity3Loc = nil,
     rarity4Loc = nil,
-    fuelLoc = nil,
-
-    -- placement programs
-    resourceName = nil,
-    isResourcePlacer = nil,
-    maxResourceCount = nil,
-    sandLoc = nil,
-    fillLoc = nil,
-
-    -- digmine only
-    length = nil,
-    width = nil,
-    depth = nil,
-    maxRadius = nil,
-    nextdepth = nil,
-    maxdepth = nil,
-    isResumeMiningdepth = nil,
+    fuelLoc = nil
 }
 
 function InitProgram()
-	print("digstair v" .. version)	
+	print("v" .. version)	
 	print("Util v" .. util.GetVersion())
 	print("t v" .. t.GetVersion())
     local isValidInit = true
@@ -91,11 +70,11 @@ function InitProgram()
         t.StartTurtleRun();
 	end
 
-	t.SendMessage(cfg.port_log, "digline program END")
+	t.SendMessage(cfg.port_log, "program END")
 end
 
-function RunMiningProgram()
-	util.Print("RunMiningProgram() digline")
+function RunProgram()
+	util.Print("RunProgram()")
 	local isStuck = false	
 	t.ResetInventorySlot()
 
@@ -117,10 +96,10 @@ function RunMiningProgram()
 	stopReason = t.GetStopReason()
 	if stopReason == "inventory_full" then
 		t.GoUnloadInventory()
-        t.AddCommand({func=RunMiningProgram}, true)
+        t.AddCommand({func=RunProgram}, true)
 	else
 		t.AddCommand({func=function()
-			t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
+			t.GoHome("Gohome from RunProgram: " .. stopReason);
 		end}, false)
 	end
 end
@@ -280,9 +259,9 @@ function SetTurtleConfig(cfg)
 end
 
 function IncomingMessageHandler(command, stopQueue)
-	if string.lower(command) == "gomine" then
+	if string.lower(command) == "run" then
 		stopReason = ""
-        t.AddCommand({func=RunMiningProgram}, stopQueue)
+        t.AddCommand({func=RunProgram}, stopQueue)
 	end
 end
 
@@ -290,7 +269,7 @@ function LowFuelCallback()
 	t.AddCommand({func=function()
 		t.GoRefuel()
 	end}, true)
-	t.AddCommand({func=RunMiningProgram}, false)
+	t.AddCommand({func=RunProgram}, false)
 end
 
 
