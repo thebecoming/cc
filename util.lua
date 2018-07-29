@@ -126,6 +126,53 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
+
+	-- MOBS
+	tmpData = {uid = "minecraft:zombie_villager", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:skeleton_horse", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:zombie_horse", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:donkey", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:mule", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:evocation_illager", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:vex", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:vindication_illager", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:illusion_illager", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:creeper", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:skeleton", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:spider", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:giant", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:zombie", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:slime", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:ghast", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:zombie_pigman", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:enderman", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:cave_spider", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:silverfish", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:blaze", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:magma_cube", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:ender_dragon", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:wither", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:bat", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:witch", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:endermite", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:guardian", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:shulker", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:pig", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:sheep", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:cow", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:chicken", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:squid", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:wolf", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:mooshroom", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:snowman", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:ocelot", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:villager_golem", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:horse", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:rabbit", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:polar_bear", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:llama", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:parrot", isMob=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:villager", isMob=true}; blockData[tmpData.uid] = tmpData
 end
 
 function GetBlockUID(data)

@@ -261,19 +261,23 @@ function SetTurtleConfig(cfg)
 		local baseCenterOffset = 4
 		
 		-- plus sign above center block
-        cfg.destroyLoc = {x=locBaseCenter.x-1, y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.destroyLoc = util.AddVectorToLoc(locBaseCenter, h=locBaseCenter.h, 1)
+		-- containers are 1 y above center point, and turtles fly over them 1 y
+		cfg.destroyLoc.y = cfg.destroyLoc.y + 2
 		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
-        cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
-        cfg.rarity3Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
-		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
-        cfg.rarity4Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-		cfg.rarity4Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "l")
-        cfg.fuelLoc = {x=locBaseCenter.x-1,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
+		cfg.destroyLoc = util.AddVectorToLoc(cfg.destroyLoc, h=locBaseCenter.h, 1)
+		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
 
-		cfg.flyCeiling = locBaseCenter.y + 4
+		cfg.destroyLoc2 = util.AddVectorToLoc(cfg.destroyLoc, cfg.destroyLoc.h, 1)
+		cfg.rarity2Loc = util.AddVectorToLoc(cfg.destroyLoc2, cfg.destroyLoc2.h, 1)
+		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
+
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Loc, cfg.rarity2Loc.h, 2)
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, cfg.rarity3Loc.h, 1)
+		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc, cfg.rarity4Loc.h, 1)
+
+		cfg.flyCeiling = locBaseCenter.y + 3
 		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
 		cfg.maxRadius = 10 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
 		cfg.nextdepth = 1

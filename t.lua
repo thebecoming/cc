@@ -1,5 +1,7 @@
 -- TODO: 
--- TEST: Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
+-- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
+-- Add a tracelog flag to SendMessage, to not send spammy messages that are used for debugging
+-- Move program init logic into util, along with the cfg object creation
 
 local version = "0.05"
 local modem, util, cfg
@@ -134,7 +136,7 @@ end
             -- Suck lava buckets from the fuel depo
             local isFuelContainerEmpty
             while (turtle.getFuelLimit() - turtle.getFuelLevel()) > fuelRefillThreshold and not isFuelContainerEmpty do
-                if not turtle.suck() then
+                if not turtle.suckDown() then
                     isFuelContainerEmpty = true
                 else
                     Refuel(false)
@@ -149,7 +151,7 @@ end
                 local d = turtle.getItemDetail()
                 if (d and d.name == "minecraft:bucket") then
                     if hasEmptyBucket then
-                        turtle.drop(slot)
+                        turtle.dropDown(slot)
                     else
                         hasEmptyBucket = true
                     end
@@ -217,13 +219,31 @@ end
 		SendMessage(cfg.port_log, "Going to unload...")
 		unloading = true
 		if not GoToPos(cfg.destroyLoc, true) then return false end
-        if not DropBlocksByRarity(1) then return false end
+		if not DropBlocksByRarity(1, "d") then 
+			if not GoToPos(cfg.destroyLoc2, true) then return false end
+			if not DropBlocksByRarity(1, "d") then 
+				SendMessage(cfg.port_log, "Rarity 1 container FULL!")
+				return false 
+			end
+		end		
+		
 		if not GoToPos(cfg.rarity2Loc, false) then return false end
-        if not DropBlocksByRarity(2) then return false end
+		if not DropBlocksByRarity(2, "d") then 
+			SendMessage(cfg.port_log, "Rarity 2 container FULL!")
+			return false 
+		end
+		
 		if not GoToPos(cfg.rarity3Loc, false) then return false end
-        if not DropBlocksByRarity(3) then return false end
+		if not DropBlocksByRarity(3, "d") then 
+			SendMessage(cfg.port_log, "Rarity 3 container FULL!")
+			return false 
+		end
+		
 		if not GoToPos(cfg.rarity4Loc, false) then return false end
-		if not DropBlocksByRarity(4) then return false end
+		if not DropBlocksByRarity(4, "d") then 
+			SendMessage(cfg.port_log, "Rarity 4 FULL? (you wish)")
+			return false 
+		end
 		unloading = false
         return true
 	end
@@ -440,7 +460,7 @@ end
 		return success
     end
 
-	function DropBlocksByRarity(aRarity, aDropCount)
+	function DropBlocksByRarity(aRarity, aDirection, aDropCount)
 		local slot = 1
 		local dropCount = 0
 		local success = true
@@ -456,7 +476,7 @@ end
 						if blockData.rarity > 2 then
 							SendMessage(cfg.port_log, "Rarity " .. tostring(blockData.rarity) .. ": " .. data.name)
 						end
-						if not turtle.drop() then 
+						if not DropDirection(aDirection) then 
 							success = false 
 						else 
 							dropCount = dropCount + 1
@@ -473,6 +493,17 @@ end
 		end
         os.sleep()
 		return success
+	end
+
+	function DropDirection(aDirection)
+		if aDirection == "f" then 
+			return turtle.drop() 
+		elseif aDirection == "u" then 
+			return turtle.dropUp() 
+		elseif aDirection == "d" then 
+			return turtle.dropDown()
+		end 
+		return false;
 	end
 
 	function PlaceResourceDown()
@@ -500,9 +531,10 @@ end
 		local n
 		local inspectSuccess, data = turtle.inspect()
 		if inspectSuccess then
+			-- Check for inventory space
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				if unloading then 
-					if not DropBlocksByRarity(1, 2) then 
+					if not DropBlocksByRarity(1, "f", 2) then 
 						SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 						stopReason = "inventory_full"
 						return false 
@@ -512,8 +544,9 @@ end
 					return false 
 				end
 			end
+
+			-- if flowing lava found, pick it up and try to refuel
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
-				-- if flowing lava found, pick it up and try to refuel
                 if turtle.getFuelLevel() < (turtle.getFuelLimit() - fuelRefillThreshold) then
                     if data.metadata == 0 and data.state and data.state.level == 0 then
                         for n=1, cfg.inventorySize do
@@ -526,35 +559,61 @@ end
                         end
                     end
                 end
-				return true -- do nothing
-			elseif data.name == "computercraft:turtle" then
-				return true -- do nothing (wait for turtle to pass)
+				return true
 			end
+
+			-- do nothing (wait for turtle to pass)
+			if data.name == "computercraft:turtle" then return true end
 
 			local blockData = util.GetBlockData(data)
 			if not blockData then
 				SendMessage(cfg.port_log, "Block doesn't exist in data")
 				SendMessage(cfg.port_log,"Name:" .. data.name .. " meta:" .. data.metadata)
-				-- return false
-				if not turtle.dig() then
-					SendMessage(cfg.port_log, "Unable to dig!")
+			else
+				if not blockData.isDiggable then
+					undiggableBlockData = data
+					SendMessage(cfg.port_log, "Undiggable block found")
+					SendMessage(cfg.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
 					return false
 				end
-			elseif not blockData.isDiggable then
-				undiggableBlockData = data
-				SendMessage(cfg.port_log, "Undiggable block found")
-				SendMessage(cfg.port_log, "Name:" .. data.name .. " meta:" .. data.metadata)
-				return false
-			elseif data.name == "minecraft:bedrock" then
-				stopReason = "hit_bedrock"
+
+				if data.name == "minecraft:bedrock" then
+					stopReason = "hit_bedrock"
+					return false
+				end
+				
+				if data.isMob then
+					local deadmob
+					local tryCount = 0
+					while not deadmob do
+						turtle.attack()
+						os.sleep(1)
+						inspectSuccess, data = turtle.inspect()
+						if inspectSuccess then
+							blockData = util.GetBlockData(data)
+							if not blockData or not blockData.isMob then
+								deadmob = true
+							end
+						else
+							deadmob = true
+						end
+						if tryCount == 50 then 
+							SendMessage(cfg.port_log, "This mob won't die!")
+							return false 
+						end
+						tryCount = tryCount + 1
+					end
+					turtle.suck()
+					return true
+				end
+			end
+
+			-- Perform the dig
+			if not turtle.dig() then
+				SendMessage(cfg.port_log, "Unable to dig!")
 				return false
 			else
-				if not turtle.dig() then
-					SendMessage(cfg.port_log, "Unable to dig!")
-					return false
-				else
-					PrintDigResult(data, blockData)
-				end
+				PrintDigResult(data, blockData)
 			end
         end
         os.sleep()
@@ -565,7 +624,7 @@ end
 		local inspectSuccess, data = turtle.inspectDown()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if not DropBlocksByRarity(1, 1) then 
+				if not DropBlocksByRarity(1, "f", 1) then 
 					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 					stopReason = "inventory_full"
 					return false 
@@ -606,7 +665,7 @@ end
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if not DropBlocksByRarity(1, 1) then 
+				if not DropBlocksByRarity(1, "d", 1) then 
 					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 					stopReason = "inventory_full"
 					return false 
@@ -645,13 +704,15 @@ end
 
 	function DigAndGoForward()
 		-- handle sand/gravel
-            local success = false
+		local success = false
 		local n
 		for n=1,20 do
 			if not Dig() then return false end
 			if Forward() then
 				success = true
 				break
+			else
+				-- There may be a mob in front..
 			end
 		end
 		return success
@@ -743,7 +804,7 @@ end
 	end
 
 	function PrintDigResult(data, blockData)
-		if blockData.rarity == 4 then
+		if blockData and blockData.rarity == 4 then
 			SendMessage(cfg.port_log, "LOOT: " .. string.gsub(data.name, "minecraft:", ""))
 		end
 	end
@@ -763,14 +824,6 @@ end
 		end
 	end	
 --
-
-
-
-
-function PlaceStair()
-
-end
-
 
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
