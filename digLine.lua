@@ -197,25 +197,52 @@ function SetTurtleConfig(cfg)
         cfg.turtleID = tonumber(numSeg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
 	end
-	
-	cfg.flyCeiling = 87
-	cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-	cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-	cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-	cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-	cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
-	cfg.length = 1
-	cfg.width = 2
-	cfg.depth = 2
 
 	-- Home2 test area
-	if cfg.regionCode == "d" then
-		-- desert
+	if cfg.regionCode == "t" then	
+		cfg.flyCeiling = 87
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		cfg.length = 4
+		cfg.width = 4
+		cfg.depth = 3
+
 		if cfg.turtleID == 1 then
 			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
-			cfg.mineLoc = {x=232, z=1918, y=82, h="s"}
+			cfg.mineLoc = {x=232, z=1918, y=82, h="n"}
 		elseif cfg.turtleID == 2 then
 			error "not implemented"
+		end
+		
+	-- Home3 stairs
+	elseif cfg.regionCode == "s" then	
+		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block		
+		-- plus sign above center block
+        cfg.destroyLoc = {x=locBaseCenter.x-1, y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
+        cfg.rarity2Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
+        cfg.rarity3Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+        cfg.rarity4Loc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.rarity4Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "l")
+        cfg.fuelLoc = {x=locBaseCenter.x-1,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		cfg.fuelLoc.h = util.GetNewHeading(cfg.fuelLoc.h, "l")
+
+		cfg.flyCeiling = locBaseCenter.y + 4
+		cfg.length = 4
+		cfg.width = 4
+		cfg.depth = 3
+
+		if cfg.turtleID == 1 then
+			cfg.startLoc = {x=365, z=2101, y=75, h="s"}
+			cfg.mineLoc = {x=362, z=2098, y=72, h="s"}
+		else
+			error "turleID not configured"
 		end
 	end
 end
