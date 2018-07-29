@@ -135,7 +135,7 @@ function BeginMining()
 	
 	while not isMiningCompleted do
 		while curWidth < cfg.width do
-			local length = cfg.width - curLength
+			local length = cfg.length - curLength
 			isDiggingOut = false
 			for i=0, length do
 				if not t.DigAndGoForward() then return false end
@@ -163,13 +163,13 @@ function BeginMining()
 
 		if not t.Backward() then return false end
 		curLength = curLength + 1
-		if not t.PlaceStair() then return false end
+		if not PlaceStair() then return false end
 		while curWidth > 1 do
 			if not t.TurnRight() then return false end
 			if not t.Forward() then return false end
 			curWidth = curWidth - 1
 			if not t.TurnLeft() then return false end
-			if not t.PlaceStair() then return false end
+			if not PlaceStair() then return false end
 		end
 
 		if not t.TurnRight() then return false end
@@ -203,7 +203,7 @@ function PlaceStair()
 			if (d and d.name == "minecraft:stone_stairs") then
 				stairInvSlot = slot
 			end
-			slot = slot+1
+			slot = slot + 1
 		end
 	end
 
@@ -216,6 +216,7 @@ function PlaceStair()
 		table.insert(newqueue, {func=function() t.GoHome() end})
 		t.SetQueue(newqueue)
 	end
+	return true
 end
 
 function SetTurtleConfig(cfg)
