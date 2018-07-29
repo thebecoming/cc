@@ -1,4 +1,4 @@
-local version = "0.07"
+local version = "0.08"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -136,13 +136,14 @@ function BeginMining()
 	curWidth = 1
 	
 	while not isMiningCompleted do
+		isDiggingOut = false
+		local lengthTarget = cfg.length
+		if isStepDown then
+			lengthTarget = cfg.length - (curDepth-1)
+			if not t.DigAndGoForward() then return false end
+		end
 		while curWidth < cfg.width do
 			isDiggingOut = false
-			local lengthTarget = cfg.length
-			if isStepDown then
-				lengthTarget = cfg.length - (curDepth-1)
-				if not t.DigAndGoForward() then return false end
-			end
 
 			curLength = 0
 			while curLength < lengthTarget do
