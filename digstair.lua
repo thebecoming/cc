@@ -1,4 +1,4 @@
-local version = "0.08"
+local version = "0.01"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -8,7 +8,6 @@ local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
 
 local isRequireHomeBlock = false
-local isStepDown = true
 local modem
 
 
@@ -47,7 +46,7 @@ local cfg = {
 }
 
 function InitProgram()
-	print("Digline v" .. version)	
+	print("digstair v" .. version)	
 	print("Util v" .. util.GetVersion())
 	print("t v" .. t.GetVersion())
     local isValidInit = true
@@ -126,27 +125,20 @@ function RunMiningProgram()
 	end
 end
 
+
+-- make mineLoc the position dropped down into the first stair cut height
 function BeginMining()
-	local n2
 	local isMiningCompleted = false
-	
-	-- drop into position
-	if not t.DigAndGoForward() then return false end
-	curLength = 0
+	curLength = 1
 	curDepth = 1
 	curWidth = 1
 	
 	while not isMiningCompleted do
-		-- cfg.length = 21
-		-- cfg.width = 4
-		-- cfg.depth = 3
-
 		while curWidth < cfg.width do
-			local stepLength = curLength;
+			local length = cfg.width - curLength
 			isDiggingOut = false
-			while curLength < cfg.length do
+			for i=0, length do
 				if not t.DigAndGoForward() then return false end
-				curLength = curLength + 1
 			end
 
 			if not t.TurnRight() then return false end
@@ -155,10 +147,9 @@ function BeginMining()
 			isDiggingOut = true
 			if not t.TurnRight() then return false end
 
-			-- about to come back after turnaround
-			while curLength > stepLength do
+			-- about to come back after turnaround			
+			for i=0, length do
 				if not t.DigAndGoForward() then return false end
-				curLength = curLength - 1
 			end
 			
 			-- width turn manuever
@@ -173,19 +164,18 @@ function BeginMining()
 		-- turtle is at last row facing away from hole
 		if not t.TurnRight() then return false end
 		while curWidth > 1 do
-			-- go back to the first slot
+			-- go back to the length=1 row
 			if not t.Forward() then return false end
 			curWidth = curWidth - 1
 		end
 
 		if not t.TurnRight() then return false end
-		
-		-- decend to the next level
-		if isStepDown then 
+
+		if curDepth < cfg.depth and curLength < cfg.length then		
+			-- move forward and decend to the next level
 			if not t.DigAndGoForward() then return false end
 			curLength = curLength + 1
-		end
-		if curDepth < cfg.depth then
+
 			if not t.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
 		else
@@ -212,6 +202,7 @@ function SetTurtleConfig(cfg)
 		cfg.length = 4
 		cfg.width = 4
 		cfg.depth = 3
+		
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
@@ -240,10 +231,13 @@ function SetTurtleConfig(cfg)
 		cfg.length = 21
 		cfg.width = 4
 		cfg.depth = 3
+		-- cfg.length = 5
+		-- cfg.width = 4
+		-- cfg.depth = 3
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = {x=365, z=2101, y=75, h="n"}
-			cfg.mineLoc = {x=362, z=2098, y=72, h="n"}
+			cfg.mineLoc = {x=362, z=2097, y=72, h="n"}
 		else
 			error "turleID not configured"
 		end
