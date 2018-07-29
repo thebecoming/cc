@@ -83,7 +83,7 @@ function AddCommand(cmdTable, isAbortCurrentCmd)
 		ClearQueue()
 		table.insert(queue,cmdTable)
         os.queueEvent("stopEvent")
-        os.sleep()
+        os.sleep(1)
     else
 		table.insert(queue,cmdTable)
 	end
@@ -326,9 +326,9 @@ end
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
+			os.sleep()
 			if not ProcessMovementChange() then return false end
 		end
-        os.sleep()
 		return result
 	end
 
@@ -347,24 +347,24 @@ end
 			else
 				util.Print("ERROR! loc['h'] is wrong")
 			end
+			os.sleep()
 			if not ProcessMovementChange() then return false end
 		else
 			util.Print("turtle.back() failed")
 		end
-        os.sleep()
 		return result
 	end
 
 	function Up()
-		CheckFuelOnMove()
+			CheckFuelOnMove()
 		local result = turtle.up()
 		if result then
 			loc.y = loc.y + 1
 			if not ProcessMovementChange() then return false end
+			os.sleep()
 		else
 			util.Print("turtle.up() failed")
 		end
-        os.sleep()
 		return result
 	end
 
@@ -373,11 +373,11 @@ end
 		local result = turtle.down()
 		if result then
 			loc.y = loc.y - 1
+			os.sleep()
 			if not ProcessMovementChange() then return false end
 		else
 			util.Print("turtle.down() failed")
 		end
-        os.sleep()
 		return result
 	end
 
@@ -392,13 +392,11 @@ end
 				loc.h = "e"
 			elseif loc.h == "w" then
 				loc.h = "s"
-			else
-				util.Print("ERROR! loc['h'] is wrong")
 			end
+			os.sleep()
 		else
 			util.Print("turtle.turnLeft() failed")
 		end
-        os.sleep()
 		return result
 	end
 
@@ -413,13 +411,11 @@ end
 				loc.h = "w"
 			elseif loc.h == "w" then
 				loc.h = "n"
-			else
-				util.Print("ERROR! loc['h'] is wrong")
 			end
+			os.sleep()
 		else
 			util.Print("turtle.turnRight() failed")
 		end
-        os.sleep()
 		return result
 	end
 
