@@ -46,7 +46,7 @@ local cfg = {
 }
 
 function InitProgram()
-	print("Gomine v" .. version)	
+	print("v" .. version)	
 	print("Util v" .. util.GetVersion())
 	print("t v" .. t.GetVersion())
     local isValidInit = true
@@ -93,11 +93,11 @@ function InitProgram()
         t.StartTurtleRun();
 	end
 
-	t.SendMessage(cfg.port_log, "gomine program END")
+	t.SendMessage(cfg.port_log, "program END")
 end
 
 function RunProgram()
-	util.Print("RunProgram() gomine")
+	util.Print("RunProgram()")
 	local isStuck = false	
 	t.ResetInventorySlot()
 
@@ -414,7 +414,7 @@ function SetTurtleConfig(cfg)
 end
 
 function IncomingMessageHandler(command, stopQueue)
-	if string.lower(command) == "gomine" then
+	if string.lower(command) == "run" then
 		stopReason = ""
 		t.AddCommand({func=function()
 			RunProgram();

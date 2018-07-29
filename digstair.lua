@@ -280,7 +280,7 @@ function SetTurtleConfig(cfg)
 end
 
 function IncomingMessageHandler(command, stopQueue)
-	if string.lower(command) == "gomine" then
+	if string.lower(command) == "run" then
 		stopReason = ""
         t.AddCommand({func=RunMiningProgram}, stopQueue)
 	end
