@@ -263,8 +263,8 @@ function SetTurtleConfig(cfg)
 		-- plus sign above center block
 		cfg.destroyLoc = util.AddVectorToLoc(locBaseCenter, "f", 1)
 		cfg.destroyLoc = util.AddVectorToLoc(cfg.destroyLoc, "r", 1)
-		-- containers are 1 y above center point, and turtles fly over them 1 y
-		cfg.destroyLoc.y = cfg.destroyLoc.y + 2
+		-- turtles fly over the chests
+		cfg.destroyLoc.y = cfg.destroyLoc.y + 1
 		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
 		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
 
