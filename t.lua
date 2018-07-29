@@ -89,6 +89,12 @@ function AddCommand(cmdTable, isAbortCurrentCmd)
 	end
 end
 
+function SetQueue (newQueue)
+	queue = newQueue
+	os.queueEvent("stopEvent")
+	os.sleep(1)
+end
+
 function ClearQueue()
 	for k in pairs (queue) do
 		queue[k] = nil
@@ -755,8 +761,17 @@ end
 			modem.transmit(cfg.port_log, cfg.port_turtleCmd,
 				os.getComputerLabel() .. " L x:" .. tostring(loc.x) .. " z:" .. tostring(loc.z) .. " y:" .. tostring(loc.y) .. " h:" .. loc.h)
 		end
-	end
+	end	
 --
+
+
+
+
+function PlaceStair()
+
+end
+
+
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- ACCESSORS AND CALLBACKS

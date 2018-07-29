@@ -5,7 +5,7 @@ os.loadAPI("t")
 local isDiggingOut
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
-local curLength, curWidth, curdepth
+local curLength, curWidth, curdepth, stairInvSlot
 
 local isRequireHomeBlock = false
 local modem
@@ -152,35 +152,69 @@ function BeginMining()
 				if not t.DigAndGoForward() then return false end
 			end
 			
-			-- width turn manuever
 			if curWidth < cfg.width then
+				-- turn into next length row
 				if not t.TurnLeft() then return false end
 				if not t.DigAndGoForward() then return false end
 				curWidth = curWidth + 1
 				if not t.TurnLeft() then return false end
 			end
 		end
-		
-		-- turtle is at last row facing away from hole
-		if not t.TurnRight() then return false end
+
+		if not t.Backward() then return false end
+		curLength = curLength + 1
+		if not t.PlaceStair() then return false end
 		while curWidth > 1 do
-			-- go back to the length=1 row
+			if not t.TurnRight() then return false end
 			if not t.Forward() then return false end
 			curWidth = curWidth - 1
+			if not t.TurnLeft() then return false end
+			if not t.PlaceStair() then return false end
 		end
 
 		if not t.TurnRight() then return false end
+		if not t.TurnRight() then return false end
 
 		if curDepth < cfg.depth and curLength < cfg.length then		
-			-- move forward and decend to the next level
-			if not t.DigAndGoForward() then return false end
-			curLength = curLength + 1
-
+			-- Decend to the next level
 			if not t.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
 		else
 			isMiningCompleted = true
 		end
+	end
+end
+
+function PlaceStair()
+	if stairInvSlot then
+		turtle.select(stairInvSlot)
+		local d = turtle.getItemDetail()
+		if (not d or d.name ~= "minecraft:stone_stairs") then
+			stairInvSlot = nil;
+		end
+	end
+
+	if not stairInvSlot then
+		-- find more stairs..
+		local slot = 1	
+		while slot <= cfg.inventorySize and not stairInvSlot do
+			turtle.select(slot)
+			local d = turtle.getItemDetail()
+			if (d and d.name == "minecraft:stone_stairs") then
+				stairInvSlot = slot
+			end
+			slot = slot+1
+		end
+	end
+
+	if stairInvSlot then 
+		if not turtle.place(stairInvSlot) then return false end
+	else
+		util.Print("no stairs found")
+		local newqueue = {}			
+		table.insert(newqueue, {func=function() t.GoUnloadInventory() end})
+		table.insert(newqueue, {func=function() t.GoHome() end})
+		t.SetQueue(newqueue)
 	end
 end
 
