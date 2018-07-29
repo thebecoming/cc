@@ -583,6 +583,7 @@ end
 				end
 				
 				if data.isMob then
+					SendMessage(cfg.port_log, "Killing: " .. data.name)
 					local deadmob
 					local tryCount = 0
 					while not deadmob do

@@ -45,11 +45,11 @@ local cfg = {
     isResumeMiningdepth = nil,
 }
 
+
 function InitProgram()
 	print("v" .. version)	
 	print("Util v" .. util.GetVersion())
 	print("t v" .. t.GetVersion())
-    local isValidInit = true
 
     util.InitUtil()
 	SetTurtleConfig(cfg)		
@@ -58,41 +58,39 @@ function InitProgram()
 	modem = util.InitModem()
 	if not modem then
 		util.Print("No Modem Found!")
-		isValidInit = false
-	end
+        return false
+    end
+    
+    local fl = turtle.getFuelLevel()
+    if fl < 100 then 
+        util.Print("OUT OF GAS")
+        return false
+    end
 
-	if isValidInit then
-		t.InitReferences(modem, util, cfg)
-
-		if cfg.startLoc then
-			t.SetHomeLocation(cfg.startLoc)
-			currentLoc = t.GetCurrentLocation()		
-			if not currentLoc then isValidInit = false end
-		else
-			currentLoc = t.GetCurrentLocation()
-			if not currentLoc then
-				isValidInit = false
-			else
-				t.SetHomeLocation(currentLoc)
-			end
-		end
-	end
-
-    if isValidInit then
-        if not t.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
-            isValidInit = false
+    t.InitReferences(modem, util, cfg)
+    if cfg.startLoc then
+        t.SetHomeLocation(cfg.startLoc)
+        currentLoc = t.GetCurrentLocation()		
+        if not currentLoc then 
+            util.Print("failure in t.GetCurrentLocation with startloc")
+            return false
+        end
+    else
+        currentLoc = t.GetCurrentLocation()
+        if not currentLoc then
+            util.Print("failure in t.GetCurrentLocation")
+            return false
+        else
+            t.SetHomeLocation(currentLoc)
         end
     end
 
-	if not isValidInit then
-		util.Print("Unable to Initialize program")
-    else
-        -- this runs forever
-        -- print("mineLoc x:" .. cfg.mineLoc.x .. " y:" .. cfg.mineLoc.y .. " z:" .. cfg.mineLoc.z)
-        -- print("currentLoc x:" .. currentLoc.x .. " y:" .. currentLoc.y .. " z:" .. currentLoc.z)
-        t.StartTurtleRun();
-	end
+    if not t.InitTurtle(currentLoc, IncomingMessageHandler, LowFuelCallback) then
+        util.Print("failure in t.InitTurtle")
+        return false
+    end
 
+    t.StartTurtleRun();
 	t.SendMessage(cfg.port_log, "program END")
 end
 
