@@ -1,7 +1,7 @@
 -- TODO: 
 -- TEST: Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
 
-local version = "0.04"
+local version = "0.05"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -52,7 +52,7 @@ end
 
 function ProcessQueue()
     while true do
-        sleep(.1)
+        os.sleep(.1)
         if #queue > 0 then
             local tbl = table.remove(queue,1)
             local func = tbl.func
@@ -80,12 +80,16 @@ end
 
 function AddCommand(cmdTable, isAbortCurrentCmd)
     if isAbortCurrentCmd then
-        -- util.Print("os.queueEvent stopEvent")
-        queue = {}
+		-- util.Print("os.queueEvent stopEvent")
+		for k in pairs (queue) do
+			queue[k] = nil
+		end
+		table.insert(queue,cmdTable)
         os.queueEvent("stopEvent")
-        sleep(1)
-    end
-    table.insert(queue,cmdTable)
+        os.sleep()
+    else
+		table.insert(queue,cmdTable)
+	end
 end
 
 function GetIsOnHomeBlock()

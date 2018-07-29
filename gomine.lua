@@ -125,11 +125,11 @@ function RunMiningProgram()
 		util.Print("unload complete in gomine")
         t.AddCommand({func=RunMiningProgram}, true)
 		util.Print("RunMiningProgram re-called in gomine")
+	else
+		t.AddCommand({func=function()
+			t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
+		end}, false)
 	end
-
-	t.AddCommand({func=function()
-		t.GoHome("Gohome from RunMiningProgram: " .. stopReason);
-	end}, false)
 end
 
 function BeginMining()
