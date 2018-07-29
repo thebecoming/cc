@@ -421,7 +421,9 @@ end
 function IncomingMessageHandler(command, stopQueue)
 	if string.lower(command) == "gomine" then
 		stopReason = ""
-        t.AddCommand({func=RunMiningProgram}, stopQueue)
+		t.AddCommand({func=function()
+			RunMiningProgram();
+		end}, stopQueue)
 	end
 end
 

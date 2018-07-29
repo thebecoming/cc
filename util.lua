@@ -1,4 +1,4 @@
-local version = "0.02"
+local version = "0.03"
 local modem
 local monitor = nil
 	
@@ -211,6 +211,9 @@ end
 function Print(msg)
 	print(msg)
 	if modem and isBroadcastPrints then
+		if not port_log then print("port_log not defined!") end
+		if not port_turtleCmd then print("port_turtleCmd not defined!") end
+		if not msg then print("msg not defined!") end
 		modem.transmit(port_log, port_turtleCmd, os.getComputerLabel() .. ":" .. msg)
 	end
 	if monitor then
