@@ -53,7 +53,7 @@ function InitProgram()
 	print("t v" .. t.GetVersion())
     local isValidInit = true
 
-    util.InitUtil(true, cfg.port_log, cfg.port_turtleCmd)
+    util.InitUtil()
 	SetTurtleConfig(cfg)		
 
 	-- Init peripherals

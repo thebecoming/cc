@@ -1,4 +1,4 @@
-local version = "0.03"
+local version = "0.04"
 local modem
 local monitor = nil
 	
@@ -13,14 +13,11 @@ local blockData = {}
 local monScreenWidth = 0
 local monScreenHeight = 0
 local screenLineDataTbl = {}
-local port_log
-local port_turtleCmd
+local port_log = 969
+local port_turtleCmd = 967
 local isBroadcastPrints = true
 
-function InitUtil(aIsBroadcastPrints, port_log, port_turtleCmd)
-	isBroadcastPrints = aIsBroadcastPrints
-	port_log = aPort_log
-	port_turtleCmd = aPort_turtleCmd
+function InitUtil()
 	InitBlockData()
 end
 
