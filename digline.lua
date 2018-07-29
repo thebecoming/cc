@@ -132,21 +132,15 @@ function BeginMining()
 	
 	-- drop into position
 	if not t.DigAndGoForward() then return false end
+	curLength = 0
 	curDepth = 1
 	curWidth = 1
 	
 	while not isMiningCompleted do
-		isDiggingOut = false
-		local lengthTarget = cfg.length
-		if isStepDown then
-			lengthTarget = cfg.length - (curDepth-1)
-			if not t.DigAndGoForward() then return false end
-		end
 		while curWidth < cfg.width do
+			local stepLength = curLength;
 			isDiggingOut = false
-
-			curLength = 0
-			while curLength < lengthTarget do
+			while curLength < cfg.length do
 				if not t.DigAndGoForward() then return false end
 				curLength = curLength + 1
 			end
@@ -158,7 +152,7 @@ function BeginMining()
 			if not t.TurnRight() then return false end
 
 			-- about to come back after turnaround
-			while curLength > 0 do
+			while curLength > stepLength do
 				if not t.DigAndGoForward() then return false end
 				curLength = curLength - 1
 			end
@@ -183,6 +177,10 @@ function BeginMining()
 		if not t.TurnRight() then return false end
 		
 		-- decend to the next level
+		if isStepDown then 
+			if not t.DigAndGoForward() then return false end
+			curLength = curLength + 1
+		end
 		if curDepth < cfg.depth then
 			if not t.DigAndGoDown() then return false end
 			curDepth = curDepth + 1
@@ -240,8 +238,8 @@ function SetTurtleConfig(cfg)
 		cfg.depth = 3
 
 		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=365, z=2101, y=75, h="s"}
-			cfg.mineLoc = {x=362, z=2098, y=72, h="s"}
+			cfg.startLoc = {x=365, z=2101, y=75, h="n"}
+			cfg.mineLoc = {x=362, z=2098, y=72, h="n"}
 		else
 			error "turleID not configured"
 		end
