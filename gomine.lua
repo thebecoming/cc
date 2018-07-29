@@ -108,23 +108,20 @@ function RunMiningProgram()
 	if not t.GoToPos(cfg.mineLoc, true) then isStuck = true end
 
 	-- Start mining
-	if not isStuck then
+	if isStuck then
+		util.Print("Stuck going to mineLoc")
+	else 
 		if not BeginMining() then 
 			isStuck = true 
-			util.Print("stuck!")
+			util.Print("Stuck from BeginMining")
 		end
 		util.Print("Done mining")
-	else 
-		util.Print("I'm stuck!")
 	end
 
 	stopReason = t.GetStopReason()
 	if stopReason == "inventory_full" then
-		util.Print("inventory full in gomine")
 		t.GoUnloadInventory()
-		util.Print("unload complete in gomine")
         t.AddCommand({func=RunMiningProgram}, true)
-		util.Print("RunMiningProgram re-called in gomine")
 	else
 		t.AddCommand({func=function()
 			t.GoHome("Gohome from RunMiningProgram: " .. stopReason);

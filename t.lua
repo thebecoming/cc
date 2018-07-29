@@ -80,15 +80,18 @@ end
 
 function AddCommand(cmdTable, isAbortCurrentCmd)
     if isAbortCurrentCmd then
-		-- util.Print("os.queueEvent stopEvent")
-		for k in pairs (queue) do
-			queue[k] = nil
-		end
+		ClearQueue()
 		table.insert(queue,cmdTable)
         os.queueEvent("stopEvent")
         os.sleep()
     else
 		table.insert(queue,cmdTable)
+	end
+end
+
+function ClearQueue()
+	for k in pairs (queue) do
+		queue[k] = nil
 	end
 end
 
@@ -918,8 +921,9 @@ end
 
                     elseif string.lower(command) == "stop" then
                         SendMessage(replyChannel, "stop Received")
-                        queue = {}
-                        os.queueEvent("stopEvent")
+                        ClearQueue()
+						os.queueEvent("stopEvent")
+						os.sleep()
 
                     elseif string.lower(command) == "gohome" then
                         SendMessage(replyChannel, "gohome Received")
