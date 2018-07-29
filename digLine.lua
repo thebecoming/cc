@@ -8,6 +8,7 @@ local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
 
 local isRequireHomeBlock = false
+local isStepDown = true
 local modem
 
 
@@ -137,10 +138,14 @@ function BeginMining()
 	while not isMiningCompleted do
 		while curWidth < cfg.width do
 			isDiggingOut = false
-			--if not t.DigAndGoForward() then return false end
+			local lengthTarget = cfg.length
+			if isStepDown then
+				lengthTarget = cfg.length - (curDepth-1)
+				if not t.DigAndGoForward() then return false end
+			end
 
 			curLength = 0
-			while curLength < cfg.length do
+			while curLength < lengthTarget do
 				if not t.DigAndGoForward() then return false end
 				curLength = curLength + 1
 			end
@@ -227,7 +232,7 @@ function LowFuelCallback()
 		t.GoRefuel()
 	end}, true)
 	t.AddCommand({func=RunMiningProgram}, false)
-}
+end
 
 
 InitProgram()
