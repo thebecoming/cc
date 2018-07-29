@@ -265,10 +265,7 @@ function SetTurtleConfig(cfg)
 		cfg.flyCeiling = locBaseCenter.y + 4
 		cfg.length = 21
 		cfg.width = 4
-		cfg.depth = 3
-		-- cfg.length = 5
-		-- cfg.width = 4
-		-- cfg.depth = 3
+		cfg.depth = 255
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = {x=365, z=2101, y=75, h="n"}
