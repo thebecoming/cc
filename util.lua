@@ -100,7 +100,6 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:dark_oak_fence", isDiggable=true, rarity=1, isDungeon=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:acacia_fence", isDiggable=true, rarity=1, isDungeon=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:frosted_ice", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:torch", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:stone_stairs", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:sandstone_stairs", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	
@@ -128,7 +127,10 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:bucket", rarity=3}; blockData[tmpData.uid] = tmpData
+
+	-- These items stay on turtles
+	tmpData = {uid = "minecraft:torch", isDiggable=true}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:bucket"}; blockData[tmpData.uid] = tmpData
 
 	-- MOBS
 	tmpData = {uid = "minecraft:zombie_villager", isMob=true}; blockData[tmpData.uid] = tmpData
@@ -340,4 +342,8 @@ end
 
 function GetVersion()
 	return version
+end
+
+function CompareLoc(l1, l2)
+	return l1.x == l2.x and l1.y == l2.y and l1.z == l2.z and l1.h == l2.h
 end
