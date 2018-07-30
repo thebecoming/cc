@@ -1,6 +1,7 @@
 function InitProgram()
     -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullPDA.lua pullPDA
     -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullGomine.lua pullGomine
+    -- wget https://raw.githubusercontent.com/thebecoming/cc/master/junkbot.lua junkbot
     
     shell.run("delete edit")
     shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/edit.lua edit")

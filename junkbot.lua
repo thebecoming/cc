@@ -1,4 +1,4 @@
-local version = "0.01"
+local version = "0.02"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -107,30 +107,29 @@ function MainLoop()
 	if PullCoal("right") then isCoalFound = true end -- r1b
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
+
 	if not t.Forward() then isStuck = true end
 	if not t.Forward() then isStuck = true end
 	if PullCoal("right") then isCoalFound = true end -- r1c
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r2a
-	
+	if PullCoal("right") then isCoalFound = true end -- r2a	
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
+
 	if not t.Forward() then isStuck = true end
 	if not t.Forward() then isStuck = true end
 	if PullCoal("right") then isCoalFound = true end -- r2b
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r3
-	
+	if PullCoal("right") then isCoalFound = true end -- r3	
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
+
 	if not t.Forward() then isStuck = true end
 	if not t.Forward() then isStuck = true end
 	if PullCoal("right") then isCoalFound = true end -- r4
+	if not t.Forward() then isStuck = true end -- front of fuel depot		
 	if not t.Forward() then isStuck = true end
-	-- front of fuel depot
-	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end
-	if not t.Forward() then isStuck = true end	
+	if not t.TurnRight() then isStuck = true end
 	if not t.Forward() then isStuck = true end
 	-- back at home
 	
@@ -149,7 +148,7 @@ function SetTurtleConfig(cfg)
 
 	-- Home3 (need to change this convention...)
 	if cfg.regionCode == "c" then	
-		cfg.flyCeiling = 87
+		cfg.flyCeiling = locBaseCenter.y + 3
 		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}		
 
 		if cfg.turtleID == 1 then
