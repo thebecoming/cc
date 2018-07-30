@@ -115,6 +115,8 @@ function InitBlockData()
 	tmpData = {uid = "chisel:limestone2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "chisel:basalt2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	-- computercraft:turtle_expanded
+	tmpData = {uid = "quark:glowcelium", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "quark:glowshroom", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	
 	-- NON BLOCK ITEMS
 	tmpData = {uid = "minecraft:gold", rarity=4}; blockData[tmpData.uid] = tmpData
@@ -126,6 +128,7 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:bucket", rarity=3}; blockData[tmpData.uid] = tmpData
 
 	-- MOBS
 	tmpData = {uid = "minecraft:zombie_villager", isMob=true}; blockData[tmpData.uid] = tmpData

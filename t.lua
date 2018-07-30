@@ -460,9 +460,9 @@ end
 		return success
     end
 
-	function DropBlocksByRarity(aRarity, aDirection, aDropCount)
+	function DropBlocksByRarity(aRarity, aDirection, aStackDropCount)
 		local slot = 1
-		local dropCount = 0
+		local stackDropCount = 0
 		local success = true
 		for slot=1, cfg.inventorySize do
 			turtle.select(slot)
@@ -479,7 +479,7 @@ end
 						if not DropDirection(aDirection) then 
 							success = false 
 						else 
-							dropCount = dropCount + 1
+							stackDropCount = stackDropCount + 1
 						end
 					end
 				elseif not blockData then
@@ -489,7 +489,7 @@ end
 			else
 				--util.Print("Empty slot")
 			end
-			if aDropCount and aDropCount == dropCount then return true end
+			if aDropCount and aDropCount == stackDropCount then return true end
 		end
         os.sleep()
 		return success
