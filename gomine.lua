@@ -269,7 +269,7 @@ function SetTurtleConfig(cfg)
 		cfg.destroyLoca.y = cfg.destroyLoca.y + 1
 
 		-- top right corner
-		cfg.destroyLoca = util.AddVectorToLoc(cfg.destroyLoca, "f", 1)
+		cfg.destroyLocb = util.AddVectorToLoc(cfg.destroyLoca, "f", 1)
 		cfg.destroyLocb.h = util.GetNewHeading(cfg.destroyLocb.h, "r")
 
 		cfg.destroyLocc = util.AddVectorToLoc(cfg.destroyLocb, "f", 1)
@@ -281,7 +281,7 @@ function SetTurtleConfig(cfg)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
 
 		-- bottom left corner
-		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 2)
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
 		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
 
 		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)

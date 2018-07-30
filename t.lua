@@ -55,7 +55,7 @@ end
 function ProcessQueue()
     while true do
         os.sleep(.1)
-        if GetTableSize(queue) > 0 then
+        if util.GetTableSize(queue) > 0 then
             local tbl = table.remove(queue,1)
             local func = tbl.func
             local args = tbl.args
