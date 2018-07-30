@@ -133,30 +133,35 @@ end
 			refueling = true
             if not GoToPos(cfg.fuelLoc, true) then return false end
 
-            -- Suck lava buckets from the fuel depo
-            local isFuelContainerEmpty
-            while (turtle.getFuelLimit() - turtle.getFuelLevel()) > fuelRefillThreshold and not isFuelContainerEmpty do
-                if not turtle.suckDown() then
-                    isFuelContainerEmpty = true
-                else
-                    Refuel(false)
-                end
-            end
+			local isfull
+			while not isfull do
+				local beginLevel = turtle.getFuelLevel()
+				while turtle.suckDown() do
+					-- suckin up as much lava as i can fit
+				end
+				RefuelFromInventory(false)
 
-            -- Dump all lava buckets except 1 (for auto-refueling)
-            local hasEmptyBucket = false
-            local slot = 1
-            while slot <= cfg.inventorySize do
-                turtle.select(slot)
-                local d = turtle.getItemDetail()
-                if (d and d.name == "minecraft:bucket") then
-                    if hasEmptyBucket then
-                        turtle.dropDown(slot)
-                    else
-                        hasEmptyBucket = true
-                    end
-                end
-                slot = slot+1
+				-- Dump all lava buckets except 1 (for auto-refueling)
+				local hasEmptyBucket = false
+				local slot = 1
+				while slot <= cfg.inventorySize do
+					turtle.select(slot)
+					local d = turtle.getItemDetail()
+					if (d and d.name == "minecraft:bucket") then
+						if hasEmptyBucket then
+							turtle.dropDown(slot)
+						else
+							hasEmptyBucket = true
+						end
+					elseif (d and d.name == "minecraft:lava_bucket") then
+						turtle.dropDown(slot)
+					end
+					slot = slot+1
+				end
+				local endLevel = turtle.getFuelLevel()
+				if (endLevel >= (turtle.getFuelLimit() - fuelRefillThreshold) or beginLevel == endLevel then
+					isfull = true
+				end
 			end
 			refueling = false
 		end
@@ -339,23 +344,30 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	function Forward()
 		CheckFuelOnMove()
-		local result = turtle.forward()
-		if result then
-			if loc.h == "n" then
-				loc.z = loc.z - 1
-			elseif loc.h == "e" then
-				loc.x = loc.x + 1
-			elseif loc.h == "s" then
-				loc.z = loc.z + 1
-			elseif loc.h == "w" then
-				loc.x = loc.x - 1
-			else
-				util.Print("ERROR! loc['h'] is wrong")
-			end
+		local n = 0
+		while not turtle.forward() then			
+			turtle.attack()
 			os.sleep()
-			if not ProcessMovementChange() then return false end
+			n = n + 1
+			if n == 20 then 
+				SendMessage(cfg.port_log, "I can't move forward!")
+				return false 
+			end
 		end
-		return result
+		if loc.h == "n" then
+			loc.z = loc.z - 1
+		elseif loc.h == "e" then
+			loc.x = loc.x + 1
+		elseif loc.h == "s" then
+			loc.z = loc.z + 1
+		elseif loc.h == "w" then
+			loc.x = loc.x - 1
+		else
+			util.Print("ERROR! loc['h'] is wrong")
+		end
+		os.sleep()
+		if not ProcessMovementChange() then return false end		
+		return true
 	end
 
 	function Backward()
@@ -581,32 +593,6 @@ end
 					stopReason = "hit_bedrock"
 					return false
 				end
-				
-				if data.isMob then
-					SendMessage(cfg.port_log, "Killing: " .. data.name)
-					local deadmob
-					local tryCount = 0
-					while not deadmob do
-						turtle.attack()
-						os.sleep(1)
-						inspectSuccess, data = turtle.inspect()
-						if inspectSuccess then
-							blockData = util.GetBlockData(data)
-							if not blockData or not blockData.isMob then
-								deadmob = true
-							end
-						else
-							deadmob = true
-						end
-						if tryCount == 50 then 
-							SendMessage(cfg.port_log, "This mob won't die!")
-							return false 
-						end
-						tryCount = tryCount + 1
-					end
-					turtle.suck()
-					return true
-				end
 			end
 
 			-- Perform the dig
@@ -737,7 +723,7 @@ end
 	function CheckFuelOnMove()
 		-- Checks fuel every 20 movements
 		if checkFuelCallCount == 0 then
-			Refuel(true)
+			RefuelFromInventory(true)
 		elseif checkFuelCallCount < 20 then
 			checkFuelCallCount = checkFuelCallCount + 1
 		else
@@ -749,7 +735,7 @@ end
 		firstOpenInvSlot = GetFirstOpenInvSlot()
 	end
 
-	function Refuel(aIsMoveCheck)
+	function RefuelFromInventory(aIsMoveCheck)
         local fuelLevel = turtle.getFuelLevel()
         local fuelLimit = turtle.getFuelLimit()
 		if aIsMoveCheck and fuelLevel > fuelRefillThreshold then return end
