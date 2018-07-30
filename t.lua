@@ -3,7 +3,7 @@
 -- Add a tracelog flag to SendMessage, to not send spammy messages that are used for debugging
 -- Move program init logic into util, along with the cfg object creation
 
-local version = "0.05"
+local version = "0.06"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -159,7 +159,7 @@ end
 					slot = slot+1
 				end
 				local endLevel = turtle.getFuelLevel()
-				if (endLevel >= (turtle.getFuelLimit() - fuelRefillThreshold) or beginLevel == endLevel then
+				if (endLevel >= (turtle.getFuelLimit() - fuelRefillThreshold) or beginLevel == endLevel) then
 					isfull = true
 				end
 			end
@@ -345,7 +345,7 @@ end
 	function Forward()
 		CheckFuelOnMove()
 		local n = 0
-		while not turtle.forward() then			
+		while not turtle.forward() do			
 			turtle.attack()
 			os.sleep()
 			n = n + 1
