@@ -148,11 +148,11 @@ function SetTurtleConfig(cfg)
 
 	-- Home3 (need to change this convention...)
 	if cfg.regionCode == "c" then	
+		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
 		cfg.flyCeiling = locBaseCenter.y + 3
 		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}		
 
 		if cfg.turtleID == 1 then
-			local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
 			cfg.startLoc = util.AddVectorToLoc(locBaseCenter, "f", 2)
 			cfg.startLoc.h = util.GetNewHeading(cfg.startLoc.h, "r")
 		elseif cfg.turtleID == 2 then
