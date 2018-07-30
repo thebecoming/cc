@@ -1,4 +1,4 @@
-local version = "2.08"
+local version = "2.09"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -21,12 +21,16 @@ local cfg = {
     regionCode = nil,
     flyCeiling = nil,
     startLoc = nil,
-    mineLoc = nil,
-    destroyLoc = nil,
-    rarity2Loc = nil,
+	mineLoc = nil,
+	
+    destroyLoca = nil,
+    destroyLocb = nil,
+    destroyLocc = nil,
+    rarity2Loca = nil,
+    rarity2Locb = nil,
     rarity3Loc = nil,
     rarity4Loc = nil,
-    fuelLoc = nil,
+	fuelLoc = nil,
 
     -- placement programs
     resourceName = nil,
@@ -259,20 +263,30 @@ function SetTurtleConfig(cfg)
 		local baseCenterOffset = 4
 		
 		-- plus sign above center block
-		cfg.destroyLoc = util.AddVectorToLoc(locBaseCenter, "f", 1)
-		cfg.destroyLoc = util.AddVectorToLoc(cfg.destroyLoc, "r", 1)
+		cfg.destroyLoca = util.AddVectorToLoc(locBaseCenter, "f", 1)
+		cfg.destroyLoca.h = util.GetNewHeading(cfg.destroyLoca.h, "r")
 		-- turtles fly over the chests
-		cfg.destroyLoc.y = cfg.destroyLoc.y + 1
-		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
-		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
+		cfg.destroyLoca.y = cfg.destroyLoca.y + 1
 
-		cfg.destroyLoc2 = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
-		cfg.rarity2Loc = util.AddVectorToLoc(cfg.destroyLoc2, "f", 1)
-		cfg.rarity2Loc.h = util.GetNewHeading(cfg.rarity2Loc.h, "r")
+		-- top right corner
+		cfg.destroyLoca = util.AddVectorToLoc(cfg.destroyLoca, "f", 1)
+		cfg.destroyLocb.h = util.GetNewHeading(cfg.destroyLocb.h, "r")
 
-		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Loc, "f", 2)
+		cfg.destroyLocc = util.AddVectorToLoc(cfg.destroyLocb, "f", 1)
+
+		-- bottom right corner
+		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLocc, "f", 1)
+		cfg.rarity2Loca.h = util.GetNewHeading(cfg.rarity2Loca.h, "r")
+
+		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
+
+		-- bottom left corner
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 2)
 		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
+
 		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)
+
+		-- top left corner
 		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc,"f", 1)
 
 		cfg.flyCeiling = locBaseCenter.y + 3

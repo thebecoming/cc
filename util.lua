@@ -243,6 +243,12 @@ function PrintToMonitor(msg)
 	end
 end
 
+function GetTableSize(tbl)
+	local count = 0
+	for _ in pairs(tbl) do count = count + 1 end
+	return count
+end
+
 function GetBlockVariant(data)
 	if data.state and data.state.variant then
 		return data.state.variant
@@ -268,8 +274,8 @@ function Print(msg)
 	end
 end
 
-function PrintTable(obj)
-	for key, value in pairs(obj) do
+function PrintTable(tbl)
+	for key, value in pairs(tbl) do
 		print("key:" .. key)
 	end
 end

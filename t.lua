@@ -55,7 +55,7 @@ end
 function ProcessQueue()
     while true do
         os.sleep(.1)
-        if #queue > 0 then
+        if GetTableSize(queue) > 0 then
             local tbl = table.remove(queue,1)
             local func = tbl.func
             local args = tbl.args
@@ -223,32 +223,25 @@ end
 	function GoUnloadInventory()
 		SendMessage(cfg.port_log, "Going to unload...")
 		unloading = true
-		if not GoToPos(cfg.destroyLoc, true) then return false end
-		if not DropBlocksByRarity(1, "d") then 
-			if not GoToPos(cfg.destroyLoc2, true) then return false end
-			if not DropBlocksByRarity(1, "d") then 
-				SendMessage(cfg.port_log, "Rarity 1 container FULL!")
-				return false 
-			end
-		end		
+		-- Go through all steps so turtles don't collide
+		if not GoToPos(cfg.destroyLoca, true) then return false end
+		DropBlocksByRarity(1, "d")
+		if not GoToPos(cfg.destroyLocb, true) then return false end
+		DropBlocksByRarity(1, "d")
+		if not GoToPos(cfg.destroyLocc, true) then return false end
+		DropBlocksByRarity(1, "d")
+
+		if not GoToPos(cfg.rarity2Loca, true) then return false end
+		DropBlocksByRarity(2, "d")
+		if not GoToPos(cfg.rarity2Locb, true) then return false end
+		DropBlocksByRarity(2, "d")
 		
-		if not GoToPos(cfg.rarity2Loc, false) then return false end
-		if not DropBlocksByRarity(2, "d") then 
-			SendMessage(cfg.port_log, "Rarity 2 container FULL!")
-			return false 
-		end
+		if not GoToPos(cfg.rarity3Loc, true) then return false end
+		DropBlocksByRarity(3, "d")
 		
-		if not GoToPos(cfg.rarity3Loc, false) then return false end
-		if not DropBlocksByRarity(3, "d") then 
-			SendMessage(cfg.port_log, "Rarity 3 container FULL!")
-			return false 
-		end
-		
-		if not GoToPos(cfg.rarity4Loc, false) then return false end
-		if not DropBlocksByRarity(4, "d") then 
-			SendMessage(cfg.port_log, "Rarity 4 FULL? (you wish)")
-			return false 
-		end
+		if not GoToPos(cfg.rarity4Loc, true) then return false end
+		DropBlocksByRarity(4, "d")
+
 		unloading = false
         return true
 	end
@@ -992,6 +985,7 @@ end
                         SendMessage(replyChannel, "unload Received")
                         AddCommand({func=function()
 								GoUnloadInventory()
+								GoRefuel() -- why not?
                             end}, stopQueue)
 
 
