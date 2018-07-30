@@ -10,8 +10,11 @@ function InitProgram()
     shell.run("delete t")
     shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/t.lua t")
 
+    shell.run("delete junkbot")
+    shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/junkbot.lua junkbot")
+
     shell.run("delete startup")
-    shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/junkbot.lua startup")
+    shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/startJunkbot.lua startup")
         
     end
     
