@@ -83,50 +83,54 @@ function RunProgram()
 	end}, false)
 end
 
-function PullCoal(aDirection)
-	local isCoalFound
+function PullItems(aName, aWrapDirection, aPullDirection)
+	local isFound
 	-- start with the first chest on the right..
-	local chest = peripheral.wrap(aDirection)
-	local chestList = chest.list()
-	local maxInvSlot = util.GetTableSize(chestList)
-	for i=1, maxInvSlot, 1 do
-		local item = chestList[i]
-		if item.name == "minecraft:coal" then
-			if chest.pullItems(aDirection, i) > 0 then isCoalFound = true end
+	local cont = peripheral.wrap(aWrapDirection)
+	local itemList = cont.list()
+	for i=1, #itemList, 1 do
+		local item = itemList[i]
+		if item and item.name == aName then
+			if cont.pullItems(aWrapDirection .. "." .. aPullDirection, i) > 0 then 
+				isFound = true 
+			else
+				-- inventory full
+				break
+			end
 		end
 	end
-	return isCoalFound
+	return isFound
 end
 
 -- make mineLoc the position dropped down into the first stair cut height
 function MainLoop()
 	local isCoalFound, isStuck
 	
-	if PullCoal("right") then isCoalFound = true end -- r1a
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r1a
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r1b
-	if not t.Forward() then isStuck = true end
-	if not t.TurnRight() then isStuck = true end
-
-	if not t.Forward() then isStuck = true end
-	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r1c
-	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r2a	
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r1b
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
 
 	if not t.Forward() then isStuck = true end
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r2b
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r1c
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r3	
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r2a	
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
 
 	if not t.Forward() then isStuck = true end
 	if not t.Forward() then isStuck = true end
-	if PullCoal("right") then isCoalFound = true end -- r4
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r2b
+	if not t.Forward() then isStuck = true end
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r3	
+	if not t.Forward() then isStuck = true end
+	if not t.TurnRight() then isStuck = true end
+
+	if not t.Forward() then isStuck = true end
+	if not t.Forward() then isStuck = true end
+	if PullItems("minecraft:coal","right","up_side") then isCoalFound = true end -- r4
 	if not t.Forward() then isStuck = true end -- front of fuel depot		
 	if not t.Forward() then isStuck = true end
 	if not t.TurnRight() then isStuck = true end
