@@ -88,9 +88,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	for i=1, #itemList, 1 do
 		local item = itemList[i]
 		if item and item.name == aName then
-			local ct = cont.pushItems(pushDirection, i)
-			util.Print("pushed:" .. tostring(ct) .. "coal")
-			if ct and > 0 then 
+			if cont.pushItems(pushDirection, i) > 0 then 
 				isFound = true 
 			else
 				-- inventory full
@@ -120,80 +118,84 @@ end
 
 function MainLoop()
 	while true do
-		local isCoalFound, isStuck
+		local isStuck
 		
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r1a
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r1a
 		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r1b
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r1c
-		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r2a	
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r1b
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 
 		if not t.Forward() then isStuck = true end
 		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r2b
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r1c
 		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then 
-			isCoalFound = true 
-			util.Print("COAL!")
-		else
-			util.Print("NO COAL!")
-		end -- r3	
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r2a	
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 
 		if not t.Forward() then isStuck = true end
 		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r4
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r2b
+		if not t.Forward() then isStuck = true end
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r3	
+		if not t.Forward() then isStuck = true end
+		if not t.TurnRight() then isStuck = true end
+
+		if not t.Forward() then isStuck = true end
+		if not t.Forward() then isStuck = true end
+		GetIems("minecraft:coal", "right", currentLoc.h) -- r4
 		if not t.Forward() then isStuck = true end -- front of fuel depot		
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 		if not t.Forward() then isStuck = true end
 		if not t.Forward() then isStuck = true end
 		-- back at home
-		
-		util.Print("isCoalFound:" .. tostring(isCoalFound))
-		if not isCoalFound then return true end
-		
-		
-		-- start the loop over but this time dump the coal
-		FuelFurnace("minecraft:coal","down") -- r1a
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r1b
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
 
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r1c
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r2a	
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
+		local hasCoal
+		for slot = 1, cfg.inventorySize, 1 do
+			turtle.select(slot)
+			local d = turtle.getItemDetail()
+			if (d and d.name == "minecraft:coal") then
+				hasCoal = true
+				break
+			end
+		end
+		
+		if hasCoal then
+			-- start the loop over but this time dump the coal
+			FuelFurnace("minecraft:coal","down") -- r1a
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r1b
+			if not t.Forward() then isStuck = true end
+			if not t.TurnRight() then isStuck = true end
 
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r2b
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r3	
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r1c
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r2a	
+			if not t.Forward() then isStuck = true end
+			if not t.TurnRight() then isStuck = true end
 
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		FuelFurnace("minecraft:coal","down") -- r4
-		if not t.Forward() then isStuck = true end -- front of fuel depot		
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		-- back at home
+			if not t.Forward() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r2b
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r3	
+			if not t.Forward() then isStuck = true end
+			if not t.TurnRight() then isStuck = true end
+
+			if not t.Forward() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			FuelFurnace("minecraft:coal","down") -- r4
+			if not t.Forward() then isStuck = true end -- front of fuel depot		
+			if not t.Forward() then isStuck = true end
+			if not t.TurnRight() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			-- back at home
+		end
 		
 		os.sleep(10)
 	end
