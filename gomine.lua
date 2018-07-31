@@ -432,17 +432,15 @@ end
 function IncomingMessageHandler(command, stopQueue)
 	if string.lower(command) == "run" then
 		stopReason = ""
-		t.AddCommand({func=function()
-			RunProgram();
-		end}, stopQueue)
+        t.AddCommand({func=RunProgram}, stopQueue)
 	end
 end
 
 function LowFuelCallback()
-	t.AddCommand({func=function()
-		t.GoRefuel()
-	end}, true)
-	t.AddCommand({func=RunProgram}, false)
+	local newQueue = {}
+	table.insert(newQueue,{func=t.GoRefuel})
+	table.insert(newQueue,{func=RunProgram})
+	t.SetQueue(newQueue)
 end
 
 InitProgram()

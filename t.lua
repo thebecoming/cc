@@ -136,32 +136,38 @@ end
 			refueling = true
             if not GoToPos(cfg.fuelLoc, true) then return false end
 
-			local beginLevel = turtle.getFuelLevel()
-			while turtle.suckDown() do
-				-- suckin up as much lava as i can fit
-			end
-			RefuelFromInventory(false)
-
-			-- Dump all lava buckets except 1 (for auto-refueling)
-			-- Reload torches
-			local hasEmptyBucket = false
-			local slot = 1
-			while slot <= cfg.inventorySize do
-				turtle.select(slot)
-				local d = turtle.getItemDetail()
-				if (d and d.name == "minecraft:bucket") then
-					if not hasEmptyBucket then 
-						hasEmptyBucket = true
-						turtle.dropDown(turtle.getItemCount() - 1)
-					else
-						turtle.dropDown(turtle.getItemCount())
-					end					
-				elseif (d and d.name == "minecraft:lava_bucket") then
-					turtle.dropDown(1)
+			local isComplete = false
+			while not isComplete do
+				local beginLevel = turtle.getFuelLevel()
+				while turtle.suckDown() do
+					-- suckin up as much lava as i can fit
 				end
-				slot = slot + 1
+				RefuelFromInventory(false)
+
+				-- Dump all lava buckets except 1 (for auto-refueling)
+				local hasEmptyBucket = false
+				local slot = 1
+				while slot <= cfg.inventorySize do
+					turtle.select(slot)
+					local d = turtle.getItemDetail()
+					if (d and d.name == "minecraft:bucket") then
+						if not hasEmptyBucket then 
+							hasEmptyBucket = true
+							turtle.dropDown(turtle.getItemCount() - 1)
+						else
+							turtle.dropDown(turtle.getItemCount())
+						end					
+					elseif (d and d.name == "minecraft:lava_bucket") then
+						turtle.dropDown(1)
+					end
+					slot = slot + 1
+				end
+
+				local endLevel = turtle.getFuelLevel()
+				if (endLevel >= (turtle.getFuelLimit() - fuelRefillThreshold) or beginLevel == endLevel) then
+					isComplete = true
+				end
 			end
-			
 			refueling = false
 		end
         return true
@@ -944,13 +950,27 @@ end
 
                 if isProcessMessage then
                     if string.lower(command) == "locate" then
-                        DispatchLocation()
+						local x,y,z = gps.locate(5)
+						if x then
+							modem.transmit(replyChannel, cfg.port_turtleCmd,
+								os.getComputerLabel() .. " G x:" .. tostring(x) .. " z:" .. tostring(z) .. " y:" .. tostring(y))
+						else
+							modem.transmit(replyChannel, cfg.port_turtleCmd,
+								os.getComputerLabel() .. " L x:" .. tostring(loc.x) .. " z:" .. tostring(loc.z) .. " y:" .. tostring(loc.y) .. " h:" .. loc.h)
+						end
 
                     elseif string.lower(command) == "ping" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
 
                     elseif string.lower(command) == "names" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel())
+
+					elseif string.lower(command) == "invcount" then
+						local count = 0
+						for n=1,cfg.inventorySize do
+							if turtle.getItemCount(n) > 0 then count = count + 1 end
+						end
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. "Free Space:" .. tostring(cfg.inventorySize - count))
 
                     elseif string.lower(command) == "getfuel" then
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
