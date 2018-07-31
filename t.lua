@@ -230,22 +230,22 @@ end
 		cur_queue_status = "unloading"
 		-- Go through all steps so turtles don't collide
 		if not GoToPos(cfg.destroyLoca, true) then return false end
-		DropBlocksByRarity(1, "d")
+		DropBlocksByRarity(1, "down")
 		if not GoToPos(cfg.destroyLocb, false) then return false end
-		DropBlocksByRarity(1, "d")
+		DropBlocksByRarity(1, "down")
 		if not GoToPos(cfg.destroyLocc, false) then return false end
-		DropBlocksByRarity(1, "d")
+		DropBlocksByRarity(1, "down")
 
 		if not GoToPos(cfg.rarity2Loca, false) then return false end
-		DropBlocksByRarity(2, "d")
+		DropBlocksByRarity(2, "down")
 		if not GoToPos(cfg.rarity2Locb, false) then return false end
-		DropBlocksByRarity(2, "d")
+		DropBlocksByRarity(2, "down")
 		
 		if not GoToPos(cfg.rarity3Loc, false) then return false end
-		DropBlocksByRarity(3, "d")
+		DropBlocksByRarity(3, "down")
 		
 		if not GoToPos(cfg.rarity4Loc, false) then return false end
-		DropBlocksByRarity(4, "d")
+		DropBlocksByRarity(4, "down")
         return true
 	end
 
@@ -503,13 +503,13 @@ end
 		return success
 	end
 
-	function DropDirection(aDirection)
-		if aDirection == "f" then 
-			return turtle.drop() 
-		elseif aDirection == "u" then 
-			return turtle.dropUp() 
-		elseif aDirection == "d" then 
-			return turtle.dropDown()
+	function DropDirection(aDirection, aCount)
+		if aDirection == "front" then 
+			if aCount then return turtle.drop(aCount) else return turtle.drop() end
+		elseif aDirection == "up" then 
+			if aCount then return turtle.dropUp(aCount) else return turtle.dropUp() end
+		elseif aDirection == "down" then 
+			if aCount then return turtle.dropDown(aCount) else return turtle.dropDown() end
 		end 
 		return false;
 	end
@@ -542,7 +542,7 @@ end
 			-- Check for inventory space
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
 				if unloading == "unloading" then 
-					if not DropBlocksByRarity(1, "f", 2) then 
+					if not DropBlocksByRarity(1, "down", 2) then 
 						SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 						stopReason = "inventory_full"
 						return false 
@@ -607,7 +607,7 @@ end
 		local inspectSuccess, data = turtle.inspectDown()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if not DropBlocksByRarity(1, "f", 1) then 
+				if not DropBlocksByRarity(1, "down", 1) then 
 					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 					stopReason = "inventory_full"
 					return false 
@@ -648,7 +648,7 @@ end
 		local inspectSuccess, data = turtle.inspectUp()
 		if inspectSuccess then
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if not DropBlocksByRarity(1, "d", 1) then 
+				if not DropBlocksByRarity(1, "down", 1) then 
 					SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 					stopReason = "inventory_full"
 					return false 

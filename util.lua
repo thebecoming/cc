@@ -361,3 +361,18 @@ function GetFullHeading(h)
 		error("Bad heading in GetPeripheralHeading()")
 	end
 end
+
+function GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
+	local pushDirection
+	if aWrapDirection == "right" then 
+		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
+	elseif aWrapDirection == "front" then 
+		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
+		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
+	elseif aWrapDirection == "left" then 
+		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "r"))
+	elseif aWrapDirection == "back" then 
+		pushDirection = GetFullHeading(aCurHeading)
+	end
+	return pushDirection
+end
