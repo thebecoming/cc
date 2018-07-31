@@ -1,4 +1,4 @@
-local version = "0.03"
+local version = "0.04"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -88,7 +88,9 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	for i=1, #itemList, 1 do
 		local item = itemList[i]
 		if item and item.name == aName then
-			if cont.pushItems(pushDirection, i) > 0 then 
+			local ct = cont.pushItems(pushDirection, i)
+			util.Print("pushed:" .. tostring(ct) .. "coal")
+			if ct and > 0 then 
 				isFound = true 
 			else
 				-- inventory full
@@ -108,7 +110,7 @@ function FuelFurnace(aName, aDropDirection)
 		-- TODO, change amt to distribute evenly
 		local amt = turtle.getItemCount()
 		if data and data.name == aName then
-			if not t.DropDirection(aDropDirection . ".up_side", amt) then return false end
+			if not t.DropDirection(aDropDirection .. ".up_side", amt) then return false end
 		end
 		slot = slot + 1
 	end
@@ -138,7 +140,12 @@ function MainLoop()
 		if not t.Forward() then isStuck = true end
 		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r2b
 		if not t.Forward() then isStuck = true end
-		if GetItems("minecraft:coal", "right", currentLoc.h) then isCoalFound = true end -- r3	
+		if GetItems("minecraft:coal", "right", currentLoc.h) then 
+			isCoalFound = true 
+			util.Print("COAL!")
+		else
+			util.Print("NO COAL!")
+		end -- r3	
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 
@@ -149,8 +156,10 @@ function MainLoop()
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 		if not t.Forward() then isStuck = true end
+		if not t.Forward() then isStuck = true end
 		-- back at home
 		
+		util.Print("isCoalFound:" .. tostring(isCoalFound))
 		if not isCoalFound then return true end
 		
 		
