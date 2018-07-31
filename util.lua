@@ -358,7 +358,7 @@ function GetFullHeading(h)
 	elseif h == "w" then 
 		return "west"
 	else
-		error("Bad heading in GetPeripheralHeading()")
+		error("Bad heading: h in GetPeripheralHeading()")
 	end
 end
 
@@ -373,6 +373,10 @@ function GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
 		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "r"))
 	elseif aWrapDirection == "back" then 
 		pushDirection = GetFullHeading(aCurHeading)
+	else
+		print("GetDirectionOppositeOfWrap invalid:")
+		print("aWrapDirection:" .. aWrapDirection)
+		print("aCurHeading:" .. aCurHeading)
 	end
 	return pushDirection
 end

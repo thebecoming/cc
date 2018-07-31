@@ -82,13 +82,13 @@ end
 
 function GetItems(aName, aWrapDirection, aCurHeading)
 	local isFound
-	local pushDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading.h)
+	local pushDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
 	local cont = peripheral.wrap(aWrapDirection)
 	local itemList = cont.list()
 	for i=1, #itemList, 1 do
 		local item = itemList[i]
 		if item and item.name == aName then
-			if cont.pushItems(GetFullHeading(pushDirection), i) > 0 then 
+			if cont.pushItems(util.GetFullHeading(pushDirection), i) > 0 then 
 				isFound = true 
 			else
 				-- inventory full
