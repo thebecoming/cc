@@ -136,36 +136,32 @@ end
 			refueling = true
             if not GoToPos(cfg.fuelLoc, true) then return false end
 
-			local isfull
-			while not isfull do
-				local beginLevel = turtle.getFuelLevel()
-				while turtle.suckDown() do
-					-- suckin up as much lava as i can fit
-				end
-				RefuelFromInventory(false)
-
-				-- Dump all lava buckets except 1 (for auto-refueling)
-				local hasEmptyBucket = false
-				local slot = 1
-				while slot <= cfg.inventorySize do
-					turtle.select(slot)
-					local d = turtle.getItemDetail()
-					if (d and d.name == "minecraft:bucket") then
-						if hasEmptyBucket then
-							turtle.dropDown(slot)
-						else
-							hasEmptyBucket = true
-						end
-					elseif (d and d.name == "minecraft:lava_bucket") then
-						turtle.dropDown(slot)
-					end
-					slot = slot+1
-				end
-				local endLevel = turtle.getFuelLevel()
-				if (endLevel >= (turtle.getFuelLimit() - fuelRefillThreshold) or beginLevel == endLevel) then
-					isfull = true
-				end
+			local beginLevel = turtle.getFuelLevel()
+			while turtle.suckDown() do
+				-- suckin up as much lava as i can fit
 			end
+			RefuelFromInventory(false)
+
+			-- Dump all lava buckets except 1 (for auto-refueling)
+			-- Reload torches
+			local hasEmptyBucket = false
+			local slot = 1
+			while slot <= cfg.inventorySize do
+				turtle.select(slot)
+				local d = turtle.getItemDetail()
+				if (d and d.name == "minecraft:bucket") then
+					if not hasEmptyBucket then 
+						hasEmptyBucket = true
+						turtle.dropDown(turtle.getItemCount() - 1)
+					else
+						turtle.dropDown(turtle.getItemCount())
+					end					
+				elseif (d and d.name == "minecraft:lava_bucket") then
+					turtle.dropDown(1)
+				end
+				slot = slot + 1
+			end
+			
 			refueling = false
 		end
         return true
@@ -229,20 +225,20 @@ end
 		-- Go through all steps so turtles don't collide
 		if not GoToPos(cfg.destroyLoca, true) then return false end
 		DropBlocksByRarity(1, "d")
-		if not GoToPos(cfg.destroyLocb, true) then return false end
+		if not GoToPos(cfg.destroyLocb, false) then return false end
 		DropBlocksByRarity(1, "d")
-		if not GoToPos(cfg.destroyLocc, true) then return false end
+		if not GoToPos(cfg.destroyLocc, false) then return false end
 		DropBlocksByRarity(1, "d")
 
-		if not GoToPos(cfg.rarity2Loca, true) then return false end
+		if not GoToPos(cfg.rarity2Loca, false) then return false end
 		DropBlocksByRarity(2, "d")
-		if not GoToPos(cfg.rarity2Locb, true) then return false end
+		if not GoToPos(cfg.rarity2Locb, false) then return false end
 		DropBlocksByRarity(2, "d")
 		
-		if not GoToPos(cfg.rarity3Loc, true) then return false end
+		if not GoToPos(cfg.rarity3Loc, false) then return false end
 		DropBlocksByRarity(3, "d")
 		
-		if not GoToPos(cfg.rarity4Loc, true) then return false end
+		if not GoToPos(cfg.rarity4Loc, false) then return false end
 		DropBlocksByRarity(4, "d")
         return true
 	end
@@ -745,9 +741,6 @@ end
                 --util.Print("no item in slot 1")
 			elseif (d.name == "minecraft:lava_bucket") then
                 selFuelAmount = 1000
-			elseif (d.name == "minecraft:coal") then
-                --todo
-                selFuelAmount = 5120
 			end
 
 			local isRefuel = false
@@ -762,10 +755,9 @@ end
 			end
 
 			if isRefuel then
-				SendMessage(cfg.port_log, "Refueling w/" .. d.name)
 				turtle.refuel()
 				fuelLevel = turtle.getFuelLevel()
-				SendMessage(cfg.port_log, "New Fuel level:" .. fuelLevel)
+				SendMessage(cfg.port_log, "Refueling.. New level:" .. fuelLevel)
 			end
 			slot = slot+1
 		end
@@ -972,7 +964,7 @@ end
 
                     elseif string.lower(command) == "gohome" then
                         SendMessage(replyChannel, "gohome Received")
-                        AddCommand({func=GoHome, args="incoming_gohome"}, stopQueue)
+                        AddCommand({func=GoHome, args={"incoming_gohome"}}, stopQueue)
 	
                     elseif string.lower(command) == "refuel" then
                         SendMessage(replyChannel, "refuel Received")
