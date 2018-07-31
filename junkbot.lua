@@ -84,16 +84,16 @@ function RunProgram()
 end
 
 function PullItems(aName, aWrapDirection, aCurHeading)
-	local pushDirection
+	local pushHeading
 	if aWrapDirection == "right" then 
-		pushDirection = util.GetNewHeading(aCurHeading, "l")
+		pushHeading = util.GetNewHeading(aCurHeading, "l")
 	elseif aWrapDirection == "front" then 
-		pushDirection = util.GetNewHeading(aCurHeading, "l")
-		pushDirection = util.GetNewHeading(aCurHeading, "l")
+		pushHeading = util.GetNewHeading(aCurHeading, "l")
+		pushHeading = util.GetNewHeading(aCurHeading, "l")
 	elseif aWrapDirection == "left" then 
-		pushDirection = util.GetNewHeading(aCurHeading, "r")
+		pushHeading = util.GetNewHeading(aCurHeading, "r")
 	elseif aWrapDirection == "back" then 
-		pushDirection = aCurHeading
+		pushHeading = aCurHeading
 	end
 
 	local isFound, isFull
@@ -103,7 +103,7 @@ function PullItems(aName, aWrapDirection, aCurHeading)
 	for i=1, #itemList, 1 do
 		local item = itemList[i]
 		if item and item.name == aName then
-			if cont.pushItems(pushDirection, i) > 0 then 
+			if cont.pushItems(GetFullHeading(pushHeading), i) > 0 then 
 				isFound = true 
 			else
 				-- inventory full

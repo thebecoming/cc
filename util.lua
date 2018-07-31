@@ -347,3 +347,17 @@ end
 function CompareLoc(l1, l2)
 	return l1.x == l2.x and l1.y == l2.y and l1.z == l2.z and l1.h == l2.h
 end
+
+function GetFullHeading(h)
+	if h == "n" then
+		return "north"
+	elseif h == "e" then 
+		return "east"
+	elseif h == "s" then 
+		return "south"
+	elseif h == "w" then 
+		return "west"
+	else
+		error("Bad heading in GetPeripheralHeading()")
+	end
+end
