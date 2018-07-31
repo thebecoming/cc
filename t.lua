@@ -270,12 +270,12 @@ end
 		--util.Print("Moving z: " .. tostring(loc.z) .. " to " .. tostring(destLoc.z))
 		while (loc.z ~= destLoc.z) do
 			if loc.z < destLoc.z then
-				if not SetHeading("s") then
+				if not SetHeading("south") then
 					isAbortInstruction = true
 					return false -- breaks for the while loop only
 				end
 			else
-				if not SetHeading("n") then
+				if not SetHeading("north") then
 					isAbortInstruction = true
 					return false -- breaks for the while loop only
 				end
@@ -291,12 +291,12 @@ end
 		--util.Print("Moving X: " .. tostring(loc.x) .. " to " .. tostring(destLoc.x))
 		while (loc.x ~= destLoc.x) do
 			if loc.x < destLoc.x then
-				if not SetHeading("e") then
+				if not SetHeading("east") then
 					isAbortInstruction = true
 					return false -- breaks for the while loop only
 				end
 			else
-				if not SetHeading("w") then
+				if not SetHeading("west") then
 					isAbortInstruction = true
 					return false -- breaks for the while loop only
 				end
@@ -350,13 +350,13 @@ end
 				return false 
 			end
 		end
-		if loc.h == "n" then
+		if loc.h == "north" then
 			loc.z = loc.z - 1
-		elseif loc.h == "e" then
+		elseif loc.h == "east" then
 			loc.x = loc.x + 1
-		elseif loc.h == "s" then
+		elseif loc.h == "south" then
 			loc.z = loc.z + 1
-		elseif loc.h == "w" then
+		elseif loc.h == "west" then
 			loc.x = loc.x - 1
 		else
 			util.Print("ERROR! loc['h'] is wrong")
@@ -370,13 +370,13 @@ end
 		CheckFuelOnMove()
 		local result = turtle.back()
 		if result then
-			if loc.h == "n" then
+			if loc.h == "north" then
 				loc.z = loc.z + 1
-			elseif loc.h == "e" then
+			elseif loc.h == "east" then
 				loc.x = loc.x - 1
-			elseif loc.h == "s" then
+			elseif loc.h == "south" then
 				loc.z = loc.z - 1
-			elseif loc.h == "w" then
+			elseif loc.h == "west" then
 				loc.x = loc.x + 1
 			else
 				util.Print("ERROR! loc['h'] is wrong")
@@ -418,14 +418,14 @@ end
 	function TurnLeft()
 		local result = turtle.turnLeft()
 		if result then
-			if loc.h == "n" then
-				loc.h = "w"
-			elseif loc.h == "e" then
-				loc.h = "n"
-			elseif loc.h == "s" then
-				loc.h = "e"
-			elseif loc.h == "w" then
-				loc.h = "s"
+			if loc.h == "north" then
+				loc.h = "west"
+			elseif loc.h == "east" then
+				loc.h = "north"
+			elseif loc.h == "south" then
+				loc.h = "east"
+			elseif loc.h == "west" then
+				loc.h = "south"
 			end
 			os.sleep()
 		else
@@ -437,14 +437,14 @@ end
 	function TurnRight()
 		local result = turtle.turnRight()
 		if result then
-			if loc.h == "n" then
-				loc.h = "e"
-			elseif loc.h == "e" then
-				loc.h = "s"
-			elseif loc.h == "s" then
-				loc.h = "w"
-			elseif loc.h == "w" then
-				loc.h = "n"
+			if loc.h == "north" then
+				loc.h = "east"
+			elseif loc.h == "east" then
+				loc.h = "south"
+			elseif loc.h == "south" then
+				loc.h = "west"
+			elseif loc.h == "west" then
+				loc.h = "north"
 			end
 			os.sleep()
 		else
@@ -868,13 +868,13 @@ end
 				local x2,y2,z2 = gps.locate(5)
 				if x2 then
 					if x2 > x then
-						h = "w"
+						h = "west"
 					elseif x2 < x then
-						h = "e"
+						h = "east"
 					elseif z2 > z then
-						h = "n"
+						h = "north"
 					else
-						h = "s"
+						h = "south"
 					end
 					isGpsSuccess = true
 				end
@@ -883,13 +883,13 @@ end
 				local x2,y2,z2 = gps.locate(5)
 				if x2 then
 					if x2 > x then
-						h = "e"
+						h = "east"
 					elseif x2 < x then
-						h = "w"
+						h = "west"
 					elseif z2 > z then
-						h = "s"
+						h = "south"
 					else
-						h = "n"
+						h = "north"
 					end
 					isGpsSuccess = true
 				end

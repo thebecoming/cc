@@ -202,25 +202,25 @@ function SetTurtleConfig(cfg)
 	-- Home2 test area
 	if cfg.regionCode == "t" then	
 		cfg.flyCeiling = 87
-		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="north"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="north"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="north"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="north"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="north"}
 		cfg.length = 4
 		cfg.width = 4
 		cfg.depth = 3
 
 		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=228, z=1913, y=82, h="s"}
-			cfg.mineLoc = {x=232, z=1918, y=82, h="n"}
+			cfg.startLoc = {x=228, z=1913, y=82, h="south"}
+			cfg.mineLoc = {x=232, z=1918, y=82, h="north"}
 		elseif cfg.turtleID == 2 then
 			error "not implemented"
 		end
 		
 	-- Home3 stairs
-	elseif cfg.regionCode == "s" then	
-		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block		
+	elseif cfg.regionCode == "south" then	
+		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block		
 		-- plus sign above center block
         cfg.destroyLoc = {x=locBaseCenter.x-1, y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		cfg.destroyLoc.h = util.GetNewHeading(cfg.destroyLoc.h, "r")
@@ -240,8 +240,8 @@ function SetTurtleConfig(cfg)
 		cfg.depth = 3
 
 		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=365, z=2101, y=75, h="n"}
-			cfg.mineLoc = {x=362, z=2098, y=72, h="n"}
+			cfg.startLoc = {x=365, z=2101, y=75, h="north"}
+			cfg.mineLoc = {x=362, z=2098, y=72, h="north"}
 		else
 			error "turleID not configured"
 		end

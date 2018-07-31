@@ -284,17 +284,17 @@ end
 
 function GetNewHeading(aCurHeading, aTurnDirection)
 	if aTurnDirection == "r" then
-		if aCurHeading == "n" then return "e"
-		elseif aCurHeading == "e" then return "s"
-		elseif aCurHeading == "s" then return "w"
-		elseif aCurHeading == "w" then return "n"
+		if aCurHeading == "north" then return "east"
+		elseif aCurHeading == "east" then return "south"
+		elseif aCurHeading == "south" then return "west"
+		elseif aCurHeading == "west" then return "north"
 		else error("GetNewHeading died")
 		end
 	elseif aTurnDirection == "l" then
-		if aCurHeading == "n" then return "w"
-		elseif aCurHeading == "e" then return "n"
-		elseif aCurHeading == "s" then return "e"
-		elseif aCurHeading == "w" then return "s"
+		if aCurHeading == "north" then return "west"
+		elseif aCurHeading == "east" then return "north"
+		elseif aCurHeading == "south" then return "east"
+		elseif aCurHeading == "west" then return "south"
 		else error("GetNewHeading died")
 		end	
 	else error("GetNewHeading died")
@@ -305,31 +305,31 @@ function AddVectorToLoc(aLoc, direction, steps)
 	-- break the reference before handing over
 	local newloc = {x=aLoc["x"],y=aLoc["y"],z=aLoc["z"],h=aLoc["h"]}
 
-	if ((direction == "f" and newloc["h"] == "s")
-		or (direction == "l" and newloc["h"] == "w")
-		or (direction == "b" and newloc["h"] == "n")
-		or (direction == "r" and newloc["h"] == "e"))
+	if ((direction == "f" and newloc["h"] == "south")
+		or (direction == "l" and newloc["h"] == "west")
+		or (direction == "b" and newloc["h"] == "north")
+		or (direction == "r" and newloc["h"] == "east"))
 	then 
 		newloc["z"] = newloc["z"] + steps
 
-	elseif ((direction == "f" and newloc["h"] == "n")
-		or (direction == "l" and newloc["h"] == "e")
-		or (direction == "b" and newloc["h"] == "s")
-		or (direction == "r" and newloc["h"] == "w"))
+	elseif ((direction == "f" and newloc["h"] == "north")
+		or (direction == "l" and newloc["h"] == "east")
+		or (direction == "b" and newloc["h"] == "south")
+		or (direction == "r" and newloc["h"] == "west"))
 	then 
 		newloc["z"] = newloc["z"] - steps
 
-	elseif ((direction == "f" and newloc["h"] == "e")
-		or (direction == "l" and newloc["h"] == "s")
-		or (direction == "b" and newloc["h"] == "w")
-		or (direction == "r" and newloc["h"] == "n"))
+	elseif ((direction == "f" and newloc["h"] == "east")
+		or (direction == "l" and newloc["h"] == "south")
+		or (direction == "b" and newloc["h"] == "west")
+		or (direction == "r" and newloc["h"] == "north"))
 	then 
 		newloc["x"] = newloc["x"] + steps
 
-	elseif ((direction == "f" and newloc["h"] == "w")
-		or (direction == "l" and newloc["h"] == "n")
-		or (direction == "b" and newloc["h"] == "e")
-		or (direction == "r" and newloc["h"] == "s"))
+	elseif ((direction == "f" and newloc["h"] == "west")
+		or (direction == "l" and newloc["h"] == "north")
+		or (direction == "b" and newloc["h"] == "east")
+		or (direction == "r" and newloc["h"] == "south"))
 	then 
 		newloc["x"] = newloc["x"] - steps
 
@@ -348,31 +348,17 @@ function CompareLoc(l1, l2)
 	return l1.x == l2.x and l1.y == l2.y and l1.z == l2.z and l1.h == l2.h
 end
 
-function GetFullHeading(h)
-	if h == "n" then
-		return "north"
-	elseif h == "e" then 
-		return "east"
-	elseif h == "s" then 
-		return "south"
-	elseif h == "w" then 
-		return "west"
-	else
-		error("Bad heading: h in GetPeripheralHeading()")
-	end
-end
-
 function GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
 	local pushDirection
 	if aWrapDirection == "right" then 
-		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
+		pushDirection = util.GetNewHeading(aCurHeading, "l")
 	elseif aWrapDirection == "front" then 
-		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
-		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "l"))
+		pushDirection = util.GetNewHeading(aCurHeading, "l")
+		pushDirection = util.GetNewHeading(aCurHeading, "l")
 	elseif aWrapDirection == "left" then 
-		pushDirection = GetFullHeading(util.GetNewHeading(aCurHeading, "r"))
+		pushDirection = util.GetNewHeading(aCurHeading, "r")
 	elseif aWrapDirection == "back" then 
-		pushDirection = GetFullHeading(aCurHeading)
+		pushDirection = aCurHeading
 	else
 		print("GetDirectionOppositeOfWrap invalid:")
 		print("aWrapDirection:" .. aWrapDirection)

@@ -88,7 +88,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	for i=1, #itemList, 1 do
 		local item = itemList[i]
 		if item and item.name == aName then
-			if cont.pushItems(util.GetFullHeading(pushDirection), i) > 0 then 
+			if cont.pushItems(pushDirection, i) > 0 then 
 				isFound = true 
 			else
 				-- inventory full
@@ -108,7 +108,7 @@ function FuelFurnace(aName, aDropDirection)
 		-- TODO, change amt to distribute evenly
 		local amt = turtle.getItemCount()
 		if data and data.name == aName then
-			if not t.DropDirection(aDropDirection, amt) then return false end
+			if not t.DropDirection(aDropDirection . ".up_side", amt) then return false end
 		end
 		slot = slot + 1
 	end
@@ -201,9 +201,9 @@ function SetTurtleConfig(cfg)
 
 	-- Home3 (need to change this convention...)
 	if cfg.regionCode == "c" then	
-		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
+		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		cfg.flyCeiling = locBaseCenter.y + 3
-		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}		
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="north"}		
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = util.AddVectorToLoc(locBaseCenter, "f", 2)

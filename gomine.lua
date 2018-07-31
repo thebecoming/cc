@@ -259,7 +259,7 @@ function SetTurtleConfig(cfg)
 
 	-- Main shafts
 	if cfg.regionCode == "a" then
-		local locBaseCenter = {x=364, z=2104, y=75, h="w"} -- the space above the center block
+		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		local baseCenterOffset = 4
 		
 		-- plus sign above center block
@@ -341,24 +341,24 @@ function SetTurtleConfig(cfg)
 		-- near side glass
 		-- elseif cfg.turtleID == 5 then
 		-- 	cfg.isResourcePlacer = true
-		-- 	cfg.startLoc = {x=5713, z=2797, y=68, h="w"}
-		-- 	cfg.fillLoc = {x=5683, z=2823, y=63, h="w"}
+		-- 	cfg.startLoc = {x=5713, z=2797, y=68, h="west"}
+		-- 	cfg.fillLoc = {x=5683, z=2823, y=63, h="west"}
 
 		-- -- sand dropper
 		-- elseif cfg.turtleID == 6 then
-		-- 	cfg.startLoc = {x=5711, z=2797, y=68, h="w"}
-		-- 	cfg.fillLoc = {x=5644, z=2824, y=64, h="s"}
+		-- 	cfg.startLoc = {x=5711, z=2797, y=68, h="west"}
+		-- 	cfg.fillLoc = {x=5644, z=2824, y=64, h="south"}
 		-- end
 
-		-- resourceContLoc1 = {x=5719, z=2806, y=67, h="n"}
-		-- resourceContLoc2 = {x=5718, z=2806, y=67, h="n"}
-		-- resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
-		-- resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
+		-- resourceContLoc1 = {x=5719, z=2806, y=67, h="north"}
+		-- resourceContLoc2 = {x=5718, z=2806, y=67, h="north"}
+		-- resourceContLoc3 = {x=5717, z=2806, y=67, h="north"}
+		-- resourceContLoc4 = {x=5716, z=2806, y=67, h="north"}
 		-- cfg.maxResourceCount = 448
 
 		-- if cfg.isResourcePlacer then
 		-- 	cfg.resourceName = "minecraft:glass"
-		-- 	resourceContLoc1 = {x=5715, z=2806, y=67, h="n"}
+		-- 	resourceContLoc1 = {x=5715, z=2806, y=67, h="north"}
 		-- 	if cfg.turtleID == 4 or cfg.turtleID == 5 then
 		-- 		cfg.length = 20
 		-- 	end
@@ -372,49 +372,49 @@ function SetTurtleConfig(cfg)
     elseif cfg.regionCode == "d" then
 		-- Home2
 		cfg.flyCeiling = 108
-		cfg.destroyLoc = {x=202, z=1927, y=83, h="n"}
-		cfg.rarity2Loc = {x=205, z=1927, y=83, h="n"}
-		cfg.rarity3Loc = {x=207, z=1927, y=83, h="n"}
-		cfg.rarity4Loc = {x=209, z=1927, y=83, h="n"}
-		cfg.fuelLoc = {x=211, z=1927, y=83, h="n"}
+		cfg.destroyLoc = {x=202, z=1927, y=83, h="north"}
+		cfg.rarity2Loc = {x=205, z=1927, y=83, h="north"}
+		cfg.rarity3Loc = {x=207, z=1927, y=83, h="north"}
+		cfg.rarity4Loc = {x=209, z=1927, y=83, h="north"}
+		cfg.fuelLoc = {x=211, z=1927, y=83, h="north"}
 
-		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="w"}
-		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="w"}
-		--resourceContLoc3 = {x=5717, z=2806, y=67, h="n"}
-		--resourceContLoc4 = {x=5716, z=2806, y=67, h="n"}
-		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="n"}
+		-- resourceContLoc1 = {x=-1553, z=7602, y=70, h="west"}
+		-- resourceContLoc2 = {x=-1553, z=7600, y=70, h="west"}
+		--resourceContLoc3 = {x=5717, z=2806, y=67, h="north"}
+		--resourceContLoc4 = {x=5716, z=2806, y=67, h="north"}
+		-- cfg.fillLoc = {x=-1559, z=7588, y=72, h="north"}
         -- cfg.resourceName = "minecraft:sand"
         
 		if cfg.turtleID == 1 then
-			cfg.startLoc = {x=207, z=1920, y=83, h="n"}
-			cfg.mineLoc = {x=193, z=1934, y=107, h="e"}
+			cfg.startLoc = {x=207, z=1920, y=83, h="north"}
+			cfg.mineLoc = {x=193, z=1934, y=107, h="east"}
 			cfg.maxRadius = 5 -- ex: 5 = 11 cfg.width (double radius +1)
 			cfg.nextdepth = 1
 			cfg.maxdepth = 255 -- TODO: changing height messes up stair y axis?
 			cfg.isResumeMiningdepth = true
 		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=209, z=1920, y=83, h="n"}
-			cfg.mineLoc = {x=217, z=1934, y=106, h="s"}
+			cfg.startLoc = {x=209, z=1920, y=83, h="north"}
+			cfg.mineLoc = {x=217, z=1934, y=106, h="south"}
 			cfg.maxRadius = 5
 			cfg.nextdepth = 1
 			cfg.maxdepth = 255
 			cfg.isResumeMiningdepth = true
 		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=211, z=1920, y=83, h="n"}
-			cfg.mineLoc = {x=231, z=1934, y=91, h="s"}
+			cfg.startLoc = {x=211, z=1920, y=83, h="north"}
+			cfg.mineLoc = {x=231, z=1934, y=91, h="south"}
 			cfg.maxRadius = 5
 			cfg.nextdepth = 1
 			cfg.maxdepth = 255
 			cfg.isResumeMiningdepth = true
 		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=213, z=1920, y=83, h="n"}
-			cfg.mineLoc = {x=245, z=1934, y=97, h="s"}
+			cfg.startLoc = {x=213, z=1920, y=83, h="north"}
+			cfg.mineLoc = {x=245, z=1934, y=97, h="south"}
 			cfg.maxRadius = 5
 			cfg.nextdepth = 1
 			cfg.maxdepth = 255
 			cfg.isResumeMiningdepth = true
-		-- 	cfg.startLoc = {x=-1557, z=7596, y=70, h="n"}
-		-- 	cfg.mineLoc = {x=-1558, z=7606, y=69, h="e"}
+		-- 	cfg.startLoc = {x=-1557, z=7596, y=70, h="north"}
+		-- 	cfg.mineLoc = {x=-1558, z=7606, y=69, h="east"}
 		-- 	cfg.maxRadius = 8
 		-- 	cfg.nextdepth = 1
 		-- 	cfg.maxdepth = 0
@@ -423,7 +423,7 @@ function SetTurtleConfig(cfg)
 		-- 	cfg.width = 3
 		-- 	cfg.depth = 2
 		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=-1557, z=7594, y=70, h="n"}
+			cfg.startLoc = {x=-1557, z=7594, y=70, h="north"}
 		end
 
 	end
