@@ -3,15 +3,17 @@
 -- Add a tracelog flag to SendMessage, to not send spammy messages that are used for debugging
 -- Move program init logic into util, along with the cfg object creation
 
-local version = "0.06"
+local version = "0.07"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
 local homeLoc, loc, destLoc
 local firstOpenInvSlot
+
 local queue = {}
+local cur_queue_status
+
 local msgHandler
-local unloading = false
 
 local fuelRefillThreshold = 900
 local lowFuelThreshold = 100
@@ -55,10 +57,11 @@ end
 function ProcessQueue()
     while true do
         os.sleep(.1)
-        if util.GetTableSize(queue) > 0 then
+        if #queue > 0 then
             local tbl = table.remove(queue,1)
             local func = tbl.func
-            local args = tbl.args
+			local args = tbl.args
+			cur_queue_status = ""
             if args then
                 parallel.waitForAny(function()
                     tbl.func(table.unpack(args))
@@ -82,7 +85,7 @@ end
 
 function AddCommand(cmdTable, isAbortCurrentCmd)
     if isAbortCurrentCmd then
-		ClearQueue()
+		queue = {}
 		table.insert(queue,cmdTable)
         os.queueEvent("stopEvent")
         os.sleep(1)
@@ -222,7 +225,7 @@ end
 
 	function GoUnloadInventory()
 		SendMessage(cfg.port_log, "Going to unload...")
-		unloading = true
+		cur_queue_status = "unloading"
 		-- Go through all steps so turtles don't collide
 		if not GoToPos(cfg.destroyLoca, true) then return false end
 		DropBlocksByRarity(1, "d")
@@ -241,8 +244,6 @@ end
 		
 		if not GoToPos(cfg.rarity4Loc, true) then return false end
 		DropBlocksByRarity(4, "d")
-
-		unloading = false
         return true
 	end
 
@@ -538,7 +539,7 @@ end
 		if inspectSuccess then
 			-- Check for inventory space
 			if GetIsInventoryFull() and not cfg.isResourcePlacer then
-				if unloading then 
+				if unloading == "unloading" then 
 					if not DropBlocksByRarity(1, "f", 2) then 
 						SendMessage(cfg.port_log, "Unable to dig or clear inventory!")
 						stopReason = "inventory_full"
@@ -965,29 +966,29 @@ end
 
                     elseif string.lower(command) == "stop" then
                         SendMessage(replyChannel, "stop Received")
-                        ClearQueue()
+                        queue = {}
 						os.queueEvent("stopEvent")
 						os.sleep()
 
                     elseif string.lower(command) == "gohome" then
                         SendMessage(replyChannel, "gohome Received")
-                        AddCommand({func=function()
-                            GoHome("incoming_gohome");
-                        end}, stopQueue)
-
+                        AddCommand({func=GoHome, args="incoming_gohome"}, stopQueue)
+	
                     elseif string.lower(command) == "refuel" then
                         SendMessage(replyChannel, "refuel Received")
-                        AddCommand({func=function()
-                                GoRefuel()
-                            end}, stopQueue)
+                        AddCommand({func=GoRefuel}, stopQueue)
 
                     elseif string.lower(command) == "unload" then
-                        SendMessage(replyChannel, "unload Received")
-                        AddCommand({func=function()
-								GoUnloadInventory()
-								GoRefuel() -- why not?
-                            end}, stopQueue)
-
+						SendMessage(replyChannel, "unload Received")
+						if stopQueue then
+							local newQueue = {}
+							table.insert(newQueue,{func=GoUnloadInventory})
+							table.insert(newQueue,{func=GoRefuel})
+							t.SetQueue(newQueue)
+						else
+							AddCommand({func=GoUnloadInventory})
+							AddCommand({func=GoRefuel}) -- why not?
+						end
 
                     -- MANUAL LOCATION COMMANDS
                     -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
