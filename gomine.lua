@@ -23,9 +23,10 @@ local cfg = {
     startLoc = nil,
 	mineLoc = nil,
 	
-    destroyLoca = nil,
-    destroyLocb = nil,
-    destroyLocc = nil,
+    destroyLoc = nil,
+    rarity1Loca = nil,
+    rarity1Locb = nil,
+    rarity1Locc = nil,
     rarity2Loca = nil,
     rarity2Locb = nil,
     rarity3Loc = nil,
@@ -261,21 +262,23 @@ function SetTurtleConfig(cfg)
 	if cfg.regionCode == "a" or cfg.regionCode == "b" then
 		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		local baseCenterOffset = 4
+
+		cfg.destroyLoc = locBaseCenter;
 		
 		-- plus sign above center block
-		cfg.destroyLoca = util.AddVectorToLoc(locBaseCenter, "f", 1)
-		cfg.destroyLoca.h = util.GetNewHeading(cfg.destroyLoca.h, "r")
+		cfg.rarity1Loca = util.AddVectorToLoc(locBaseCenter, "f", 1)
+		cfg.rarity1Loca.h = util.GetNewHeading(cfg.rarity1Loca.h, "r")
 		-- turtles fly over the chests
-		cfg.destroyLoca.y = cfg.destroyLoca.y + 1
+		cfg.rarity1Loca.y = cfg.rarity1Loca.y + 1
 
 		-- top right corner
-		cfg.destroyLocb = util.AddVectorToLoc(cfg.destroyLoca, "f", 1)
-		cfg.destroyLocb.h = util.GetNewHeading(cfg.destroyLocb.h, "r")
+		cfg.rarity1Locb = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
+		cfg.rarity1Locb.h = util.GetNewHeading(cfg.rarity1Locb.h, "r")
 
-		cfg.destroyLocc = util.AddVectorToLoc(cfg.destroyLocb, "f", 1)
+		cfg.rarity1Locc = util.AddVectorToLoc(cfg.rarity1Locb, "f", 1)
 
 		-- bottom right corner
-		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLocc, "f", 1)
+		cfg.rarity2Loca = util.AddVectorToLoc(cfg.rarity1Locc, "f", 1)
 		cfg.rarity2Loca.h = util.GetNewHeading(cfg.rarity2Loca.h, "r")
 
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)

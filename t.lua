@@ -229,23 +229,38 @@ end
 		SendMessage(cfg.port_log, "Going to unload...")
 		cur_queue_status = "unloading"
 		-- Go through all steps so turtles don't collide
-		if not GoToPos(cfg.destroyLoca, true) then return false end
-		DropBlocksByRarity(1, "down")
-		if not GoToPos(cfg.destroyLocb, false) then return false end
-		DropBlocksByRarity(1, "down")
-		if not GoToPos(cfg.destroyLocc, false) then return false end
-		DropBlocksByRarity(1, "down")
-
-		if not GoToPos(cfg.rarity2Loca, false) then return false end
-		DropBlocksByRarity(2, "down")
-		if not GoToPos(cfg.rarity2Locb, false) then return false end
-		DropBlocksByRarity(2, "down")
-		
-		if not GoToPos(cfg.rarity3Loc, false) then return false end
-		DropBlocksByRarity(3, "down")
-		
-		if not GoToPos(cfg.rarity4Loc, false) then return false end
-		DropBlocksByRarity(4, "down")
+		if cfg.destroyLoc then 
+			if not GoToPos(cfg.rarity1Loca, true) then return false end
+			DropBlocksByRarity(1, "down")
+		end
+		if cfg.rarity1Loca then 
+			if not GoToPos(cfg.rarity1Loca, true) then return false end
+			DropBlocksByRarity(1, "down")
+		end
+		if cfg.rarity1Locb then 
+			if not GoToPos(cfg.rarity1Locb, false) then return false end
+			DropBlocksByRarity(1, "down")
+		end
+		if cfg.rarity1Locc then 
+			if not GoToPos(cfg.rarity1Locc, false) then return false end
+			DropBlocksByRarity(1, "down")
+		end
+		if cfg.rarity2Loca then 
+			if not GoToPos(cfg.rarity2Loca, false) then return false end
+			DropBlocksByRarity(2, "down")
+		end
+		if cfg.rarity2Locb then 
+			if not GoToPos(cfg.rarity2Locb, false) then return false end
+			DropBlocksByRarity(2, "down")
+		end
+		if cfg.rarity3Loc then 		
+			if not GoToPos(cfg.rarity3Loc, false) then return false end
+			DropBlocksByRarity(3, "down")
+		end
+		if cfg.rarity4Loc then 		
+			if not GoToPos(cfg.rarity4Loc, false) then return false end
+			DropBlocksByRarity(4, "down")
+		end
         return true
 	end
 
@@ -557,7 +572,7 @@ end
 			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
                 if turtle.getFuelLevel() < (turtle.getFuelLimit() - fuelRefillThreshold) then
                     if data.metadata == 0 and data.state and data.state.level == 0 then
-                        for n=1, cfg.inventorySize do
+					for n=1, cfg.inventorySize do
                             local detail = turtle.getItemDetail(n)
                             if detail and detail.name == "minecraft:bucket" then
                                 turtle.select(n)
@@ -863,37 +878,73 @@ end
 		local x,y,z = gps.locate(5)
 		local h = ""
 		if x then
-			-- GPS does not give heading so we need to find that
+			local rightTurns = 0
+			local x2,y2,z2
 			if turtle.back() then
-				local x2,y2,z2 = gps.locate(5)
-				if x2 then
-					if x2 > x then
-						h = "west"
-					elseif x2 < x then
-						h = "east"
-					elseif z2 > z then
-						h = "north"
-					else
-						h = "south"
-					end
-					isGpsSuccess = true
-				end
-				turtle.forward()
+				x2,y2,z2 = gps.locate(5)
 			elseif turtle.forward() then
-				local x2,y2,z2 = gps.locate(5)
-				if x2 then
-					if x2 > x then
-						h = "east"
-					elseif x2 < x then
-						h = "west"
-					elseif z2 > z then
-						h = "south"
-					else
-						h = "north"
-					end
-					isGpsSuccess = true
+				x2,y2,z2 = gps.locate(5)
+				rightTurns = 2
+			elseif turtle.turnLeft() then
+				if turtle.back() then
+					x2,y2,z2 = gps.locate(5)
+					rightTurns = 1
+				elseif turtle.forward() then
+					x2,y2,z2 = gps.locate(5)
+					rightTurns = 3
 				end
 			end
+
+			-- This calc is based off the heading htat would have come from the back and forward compare
+			if x2 then
+				if x2 > x then
+					h = "west"
+				elseif x2 < x then
+					h = "east"
+				elseif z2 > z then
+					h = "north"
+				else
+					h = "south"
+				end
+				isGpsSuccess = true
+			end
+
+			-- use the rightTurns to translate it to the correct one
+			for i=0, rightTurns, 1 do 
+				h = util.GetNewHeading(h, "r")
+			end
+
+			-- -- GPS does not give heading so we need to find that
+			-- if turtle.back() then
+			-- 	local x2,y2,z2 = gps.locate(5)
+			-- 	if x2 then
+			-- 		if x2 > x then
+			-- 			h = "west"
+			-- 		elseif x2 < x then
+			-- 			h = "east"
+			-- 		elseif z2 > z then
+			-- 			h = "north"
+			-- 		else
+			-- 			h = "south"
+			-- 		end
+			-- 		isGpsSuccess = true
+			-- 	end
+			-- 	turtle.forward()
+			-- elseif turtle.forward() then
+			-- 	local x2,y2,z2 = gps.locate(5)
+			-- 	if x2 then
+			-- 		if x2 > x then
+			-- 			h = "east"
+			-- 		elseif x2 < x then
+			-- 			h = "west"
+			-- 		elseif z2 > z then
+			-- 			h = "south"
+			-- 		else
+			-- 			h = "north"
+			-- 		end
+			-- 		isGpsSuccess = true
+			-- 	end
+			-- end
 		end
 
 		if isGpsSuccess then
