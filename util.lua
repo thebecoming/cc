@@ -127,6 +127,7 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:dye", rarity=3}; blockData[tmpData.uid] = tmpData
 
 	-- These items stay on turtles
 	tmpData = {uid = "minecraft:torch", isDiggable=true}; blockData[tmpData.uid] = tmpData
