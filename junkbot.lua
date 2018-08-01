@@ -119,6 +119,10 @@ end
 function MainLoop()
 	while true do
 		local isStuck
+
+		-- TODO: do stone first, cause that loads into furnace from the top
+		-- Then do coal, but need to move turtle in front of furnace
+		-- Then go underneath furnace to pull result
 		
 		GetItems("minecraft:coal", "right", currentLoc.h) -- r1a
 		if not t.Forward() then isStuck = true end

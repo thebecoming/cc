@@ -2,8 +2,9 @@
 -- Test: is lava really being scooped up?
 -- Make sure getCurrentLocation() issues are fixed
 -- Move program init logic into util, along with the cfg object creation
+-- Allow getLocation() to dig if blocked
 
-local version = "0.08"
+local version = "0.09"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -887,15 +888,14 @@ end
 				x2,y2,z2 = gps.locate(5)
 				if not turtle.back() then return false end
 				rightTurns = 2
-			elseif turtle.turnLeft() then
+			elseif turtle.turnRight() then
 				if turtle.back() then
 					x2,y2,z2 = gps.locate(5)
 					if not turtle.forward() then return false end
-					rightTurns = 1
 				elseif turtle.forward() then
 					x2,y2,z2 = gps.locate(5)
 					if not turtle.back() then return false end
-					rightTurns = 3
+					rightTurns = 2
 				end
 			end
 
@@ -914,41 +914,9 @@ end
 			end
 
 			-- use the rightTurns to translate it to the correct one
-			for i=0, rightTurns, 1 do 
+			for i=1, rightTurns, 1 do 
 				h = util.GetNewHeading(h, "r")
 			end
-
-			-- -- GPS does not give heading so we need to find that
-			-- if turtle.back() then
-			-- 	local x2,y2,z2 = gps.locate(5)
-			-- 	if x2 then
-			-- 		if x2 > x then
-			-- 			h = "west"
-			-- 		elseif x2 < x then
-			-- 			h = "east"
-			-- 		elseif z2 > z then
-			-- 			h = "north"
-			-- 		else
-			-- 			h = "south"
-			-- 		end
-			-- 		isGpsSuccess = true
-			-- 	end
-			-- 	turtle.forward()
-			-- elseif turtle.forward() then
-			-- 	local x2,y2,z2 = gps.locate(5)
-			-- 	if x2 then
-			-- 		if x2 > x then
-			-- 			h = "east"
-			-- 		elseif x2 < x then
-			-- 			h = "west"
-			-- 		elseif z2 > z then
-			-- 			h = "south"
-			-- 		else
-			-- 			h = "north"
-			-- 		end
-			-- 		isGpsSuccess = true
-			-- 	end
-			-- end
 		end
 
 		if isGpsSuccess then
