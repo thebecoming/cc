@@ -113,11 +113,11 @@ function InitBlockData()
 	tmpData = {uid = "chisel:marble2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "chisel:limestone2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "chisel:basalt2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
-	-- computercraft:turtle_expanded
 	tmpData = {uid = "quark:glowcelium", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "quark:glowshroom", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	
 	-- NON BLOCK ITEMS
+	tmpData = {uid = "computercraft:turtle_expanded", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:gold", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:iron", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:coal", rarity=3}; blockData[tmpData.uid] = tmpData
