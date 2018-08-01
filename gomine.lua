@@ -295,7 +295,7 @@ function SetTurtleConfig(cfg)
 		cfg.maxdepth = 255
         cfg.isResumeMiningdepth = true
 
-		local outerRingOffset = baseCenterOffset + (maxRadius * 2) + 4;
+		local outerRingOffset = baseCenterOffset + (cfg.maxRadius * 2) + 4;
         local newMineLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		local newHomeLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
 		if cfg.regionCode == "a" then 
