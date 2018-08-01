@@ -231,7 +231,7 @@ end
 		cur_queue_status = "unloading"
 		-- Go through all steps so turtles don't collide
 		if cfg.destroyLoc then 
-			if not GoToPos(cfg.rarity1Loca, true) then return false end
+			if not GoToPos(cfg.destroyLoc, true) then return false end
 			DropBlocksByRarity(1, "down")
 		end
 		if cfg.rarity1Loca then 
