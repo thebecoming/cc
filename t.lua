@@ -1,9 +1,9 @@
 -- TODO: 
--- Carry a lava bucket and have turtle dig a hole of lava under it and drop junk when full
--- Add a tracelog flag to SendMessage, to not send spammy messages that are used for debugging
+-- Test: is lava really being scooped up?
+-- Make sure getCurrentLocation() issues are fixed
 -- Move program init logic into util, along with the cfg object creation
 
-local version = "0.07"
+local version = "0.08"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -882,15 +882,19 @@ end
 			local x2,y2,z2
 			if turtle.back() then
 				x2,y2,z2 = gps.locate(5)
+				if not turtle.forward() then return false end
 			elseif turtle.forward() then
 				x2,y2,z2 = gps.locate(5)
+				if not turtle.back() then return false end
 				rightTurns = 2
 			elseif turtle.turnLeft() then
 				if turtle.back() then
 					x2,y2,z2 = gps.locate(5)
+					if not turtle.forward() then return false end
 					rightTurns = 1
 				elseif turtle.forward() then
 					x2,y2,z2 = gps.locate(5)
+					if not turtle.back() then return false end
 					rightTurns = 3
 				end
 			end
