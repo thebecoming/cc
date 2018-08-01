@@ -258,7 +258,7 @@ function SetTurtleConfig(cfg)
     end
 
 	-- Main shafts
-	if cfg.regionCode == "a" then
+	if cfg.regionCode == "a" or cfg.regionCode == "b" then
 		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		local baseCenterOffset = 4
 		
@@ -290,53 +290,73 @@ function SetTurtleConfig(cfg)
 		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc,"f", 1)
 
 		cfg.flyCeiling = locBaseCenter.y + 3
-		-- cfg.maxRadius = 2 -- this is 6 inner (rad*2) + 2, which is 8 wide including stairs
-		cfg.maxRadius = 10 -- this is 8 inner (rad*2) + 2, which is 10 wide including stairs
+		cfg.maxRadius = 10 -- this is 22 inner ((rad*2) + 2). Add 2 more for stairs
 		cfg.nextdepth = 1
 		cfg.maxdepth = 255
         cfg.isResumeMiningdepth = true
 
-		-- mine 1
+		local outerRingOffset = baseCenterOffset + (maxRadius * 2) + 4;
         local newMineLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-        local newHomeLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
-		if cfg.turtleID == 1 then
+		local newHomeLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
+		if cfg.regionCode == "a" then 
+			-- Adjust the heading for each quadrang
+			if cfg.turtleID == 2 then
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			elseif cfg.turtleID == 3 then
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+			elseif cfg.turtleID == 4 then
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
+			end
+			-- Heading is set to quadrant.. everthing else is the same
 			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
 			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
 			newHomeLoc.h = newMineLoc.h
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
+			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
 			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+		
+		elseif cfg.regionCode == "b" then
+			-- 3 turtles per quadrant
+			if (cfg.turtleID / 3) <= 1 then
+				-- quadrant 1
+			elseif (cfg.turtleID / 3) <= 2 then
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+				-- quadrant 2
+			elseif (cfg.turtleID / 3) <= 3 then
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+				-- quadrant 3
+			else
+				-- quadrant 4
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
+			end
 
-		-- mine 2
-		elseif cfg.turtleID == 2 then
-			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
-			newHomeLoc.h = newMineLoc.h
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+			-- for the outer layer, each of the 3 turtles are offset for the 3 corners
+			if (cfg.turtleID % 3) == 1 then
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "f", outerRingOffset)
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
+				newHomeLoc.h = newMineLoc.h
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 2)
 
-		-- mine 3
-		elseif cfg.turtleID == 3 then
-			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
-			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
-			newHomeLoc.h = newMineLoc.h
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
+			elseif (cfg.turtleID % 3) == 2 then
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "f", outerRingOffset)
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", outerRingOffset)
+				newHomeLoc.h = newMineLoc.h
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 1)
 
-		-- far side glass
-		elseif cfg.turtleID == 4 then
-			newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
-			newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
-			newHomeLoc.h = newMineLoc.h
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 2)
-			newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 3)
-
+			elseif (cfg.turtleID % 3) == 0 then
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "f", baseCenterOffset)
+				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", outerRingOffset)
+				newHomeLoc.h = newMineLoc.h
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
+				--newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 1)
+			end
 		end
+
         cfg.mineLoc = newMineLoc
-        cfg.startLoc = newHomeLoc
+		cfg.startLoc = newHomeLoc
 
 		-- near side glass
 		-- elseif cfg.turtleID == 5 then
