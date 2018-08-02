@@ -977,22 +977,7 @@ end
 				end
 
                 if isProcessMessage then
-                    if string.lower(command) == "pullGomine" then
-						shell.run("delete pullGomine")
-						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullGomine.lua pullGomine")
-						shell.run("pullGomine")
-
-					elseif string.lower(command) == "pullJunkbot" then
-						shell.run("delete pullJunkbot")
-						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullJunkbot.lua pullJunkbot")
-						shell.run("pullJunkbot")
-
-					elseif string.lower(command) == "pullJunkbot" then
-						shell.run("delete pullDigline")
-						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullDigline.lua pullDigline")
-						shell.run("pullDigline")
-
-                    elseif string.lower(command) == "locate" or string.lower(command) == "l" then
+					if string.lower(command) == "locate" or string.lower(command) == "l" then
 						local x,y,z = gps.locate(5)
 						if x then
 							modem.transmit(replyChannel, cfg.port_turtleCmd,

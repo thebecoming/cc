@@ -15,9 +15,7 @@ function InitProgram()
 
     shell.run("delete startup")
     shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/startJunkbot.lua startup")
-        
-    shell.run("reboot")
-    end
-    
-    InitProgram()
-    
+
+end
+
+InitProgram()
