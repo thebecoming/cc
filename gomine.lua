@@ -27,8 +27,8 @@ local cfg = {
     rarity1Loca = nil,
     rarity1Locb = nil,
     rarity1Locc = nil,
-    rarity2Loca = nil,
     rarity2Locb = nil,
+    rarity2Locc = nil,
     rarity3Loc = nil,
     rarity4Loc = nil,
 	fuelLoc = nil,
@@ -95,7 +95,7 @@ function InitProgram()
         return false
     end
 
-    t.StartTurtleRun();
+	t.StartTurtleRun();
 	t.SendMessage(cfg.port_log, "program END")
 end
 
@@ -252,11 +252,10 @@ function BeginMining()
 end
 
 function SetTurtleConfig(cfg)
-    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2))
     if tonumber(numSeg) ~= nil then
         cfg.turtleID = tonumber(numSeg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
-        cfg.regionCode = string.sub(os.getComputerLabel(), 2)
 	end
 	
 	-- Main shafts
@@ -273,19 +272,19 @@ function SetTurtleConfig(cfg)
 		cfg.rarity1Loca.y = cfg.rarity1Loca.y + 1
 
 		-- top right corner
-		cfg.rarity1Locb = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
+		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
 		cfg.rarity1Locb.h = util.GetNewHeading(cfg.rarity1Locb.h, "r")
 
-		cfg.rarity1Locc = util.AddVectorToLoc(cfg.rarity1Locb, "f", 1)
+		cfg.rarity2Loca = util.AddVectorToLoc(cfg.rarity1Locb, "f", 1)
 
 		-- bottom right corner
-		cfg.rarity2Loca = util.AddVectorToLoc(cfg.rarity1Locc, "f", 1)
-		cfg.rarity2Loca.h = util.GetNewHeading(cfg.rarity2Loca.h, "r")
-
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
+		cfg.rarity2Locb.h = util.GetNewHeading(cfg.rarity2Locb.h, "r")
+
+		cfg.rarity2Locc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
 
 		-- bottom left corner
-		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
 		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
 
 		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)
