@@ -272,7 +272,7 @@ function SetTurtleConfig(cfg)
 		cfg.rarity1Loca.y = cfg.rarity1Loca.y + 1
 
 		-- top right corner
-		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
+		cfg.rarity1Locb = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
 		cfg.rarity1Locb.h = util.GetNewHeading(cfg.rarity1Locb.h, "r")
 
 		cfg.rarity2Loca = util.AddVectorToLoc(cfg.rarity1Locb, "f", 1)
