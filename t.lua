@@ -4,11 +4,6 @@
 -- Move program init logic into util, along with the cfg object creation
 -- Allow getLocation() to dig if blocked
 
--- TEST: Allow id above 10
--- Command shortcts
--- Allow to boot up with full inventory
--- auto pull from github
-
 
 local version = "0.10"
 local modem, util, cfg

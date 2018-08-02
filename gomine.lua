@@ -1,4 +1,4 @@
-local version = "2.09"
+local version = "2.10"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -264,7 +264,7 @@ function SetTurtleConfig(cfg)
 		local baseCenterOffset = 4
 
 		cfg.destroyLoc = locBaseCenter;
-		cfg.destroyLoc.z = cfg.destroyLoc.z + 1;
+		cfg.destroyLoc.y = cfg.destroyLoc.y + 1;
 		
 		-- plus sign above center block
 		cfg.rarity1Loca = util.AddVectorToLoc(locBaseCenter, "f", 1)
