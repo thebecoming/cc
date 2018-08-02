@@ -256,19 +256,20 @@ function SetTurtleConfig(cfg)
     if tonumber(numSeg) ~= nil then
         cfg.turtleID = tonumber(numSeg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
-    end
-
+        cfg.regionCode = string.sub(os.getComputerLabel(), 2)
+	end
+	
 	-- Main shafts
 	if cfg.regionCode == "a" or cfg.regionCode == "b" then
 		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		local baseCenterOffset = 4
 
 		cfg.destroyLoc = locBaseCenter;
+		cfg.destroyLoc.z = cfg.destroyLoc.z + 1;
 		
 		-- plus sign above center block
 		cfg.rarity1Loca = util.AddVectorToLoc(locBaseCenter, "f", 1)
 		cfg.rarity1Loca.h = util.GetNewHeading(cfg.rarity1Loca.h, "r")
-		-- turtles fly over the chests
 		cfg.rarity1Loca.y = cfg.rarity1Loca.y + 1
 
 		-- top right corner
@@ -326,9 +327,9 @@ function SetTurtleConfig(cfg)
 				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
 				-- quadrant 2
 			elseif (cfg.turtleID / 3) <= 3 then
-				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
-				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
 				-- quadrant 3
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
+				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "r")
 			else
 				-- quadrant 4
 				newMineLoc.h = util.GetNewHeading(newMineLoc.h, "l")
@@ -340,7 +341,7 @@ function SetTurtleConfig(cfg)
 				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
 				newHomeLoc.h = newMineLoc.h
 				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
-				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 2)
+				--newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 0)
 
 			elseif (cfg.turtleID % 3) == 2 then
 				newMineLoc = util.AddVectorToLoc(newMineLoc, "f", outerRingOffset)
@@ -354,7 +355,7 @@ function SetTurtleConfig(cfg)
 				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", outerRingOffset)
 				newHomeLoc.h = newMineLoc.h
 				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
-				--newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 1)
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 2)
 			end
 		end
 

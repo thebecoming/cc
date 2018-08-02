@@ -22,6 +22,7 @@ function InitProgram()
     -- shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/placeblocks.lua placeblocks")
     -- shell.run("delete seafill")
     -- shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/seafill.lua seafill")
+    shell.run("reboot")
         
     end
     

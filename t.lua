@@ -4,7 +4,13 @@
 -- Move program init logic into util, along with the cfg object creation
 -- Allow getLocation() to dig if blocked
 
-local version = "0.09"
+-- TEST: Allow id above 10
+-- Command shortcts
+-- Allow to boot up with full inventory
+-- auto pull from github
+
+
+local version = "0.10"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -45,7 +51,6 @@ function InitTurtle(aCurLoc, aMessageHander, aLowFuelCallback)
 	firstOpenInvSlot = GetFirstOpenInvSlot()
     if firstOpenInvSlot == 0 then
         SendMessage(cfg.port_log, "Inventory is full!")
-        return false
 	end
 
 	return true
@@ -235,7 +240,7 @@ end
 			DropBlocksByRarity(1, "down")
 		end
 		if cfg.rarity1Loca then 
-			if not GoToPos(cfg.rarity1Loca, true) then return false end
+			if not GoToPos(cfg.rarity1Loca, false) then return false end
 			DropBlocksByRarity(1, "down")
 		end
 		if cfg.rarity1Locb then 
@@ -969,10 +974,25 @@ end
 							stopQueue = false
 						end
 					end
-                end
+				end
 
                 if isProcessMessage then
-                    if string.lower(command) == "locate" then
+                    if string.lower(command) == "pullGomine" then
+						shell.run("delete pullGomine")
+						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullGomine.lua pullGomine")
+						shell.run("pullGomine")
+
+					elseif string.lower(command) == "pullJunkbot" then
+						shell.run("delete pullJunkbot")
+						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullJunkbot.lua pullJunkbot")
+						shell.run("pullJunkbot")
+
+					elseif string.lower(command) == "pullJunkbot" then
+						shell.run("delete pullDigline")
+						shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/pullDigline.lua pullDigline")
+						shell.run("pullDigline")
+
+                    elseif string.lower(command) == "locate" or string.lower(command) == "l" then
 						local x,y,z = gps.locate(5)
 						if x then
 							modem.transmit(replyChannel, cfg.port_turtleCmd,
@@ -982,38 +1002,38 @@ end
 								os.getComputerLabel() .. " L x:" .. tostring(loc.x) .. " z:" .. tostring(loc.z) .. " y:" .. tostring(loc.y) .. " h:" .. loc.h)
 						end
 
-                    elseif string.lower(command) == "ping" then
+                    elseif string.lower(command) == "ping" or string.lower(command) == "p" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))
 
                     elseif string.lower(command) == "names" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel())
 
-					elseif string.lower(command) == "invcount" then
+					elseif string.lower(command) == "invcount" or string.lower(command) == "inv" then
 						local count = 0
 						for n=1,cfg.inventorySize do
 							if turtle.getItemCount(n) > 0 then count = count + 1 end
 						end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. "Free Space:" .. tostring(cfg.inventorySize - count))
 
-                    elseif string.lower(command) == "getfuel" then
+                    elseif string.lower(command) == "getfuel" or string.lower(command) == "gf" then
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
                         modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
 
-                    elseif string.lower(command) == "stop" then
+                    elseif string.lower(command) == "stop" or string.lower(command) == "s" then
                         SendMessage(replyChannel, "stop Received")
                         queue = {}
 						os.queueEvent("stopEvent")
 						os.sleep()
 
-                    elseif string.lower(command) == "gohome" then
+                    elseif string.lower(command) == "gohome" or string.lower(command) == "g" then
                         SendMessage(replyChannel, "gohome Received")
                         AddCommand({func=GoHome, args={"incoming_gohome"}}, stopQueue)
 	
-                    elseif string.lower(command) == "refuel" then
+                    elseif string.lower(command) == "refuel" or string.lower(command) == "r" then
                         SendMessage(replyChannel, "refuel Received")
                         AddCommand({func=GoRefuel}, stopQueue)
 
-                    elseif string.lower(command) == "unload" then
+                    elseif string.lower(command) == "unload" or string.lower(command) == "u" then
 						SendMessage(replyChannel, "unload Received")
 						if stopQueue then
 							local newQueue = {}
