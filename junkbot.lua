@@ -1,4 +1,4 @@
-local version = "0.05"
+local version = "0.06"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -173,17 +173,18 @@ function MainLoop()
 					lastStepsPerSide = lastStepsPerSide - 1
 				end
 
-				-- position is midway through the side
 				local sideStep = p.stepsPerSide / 2
 				for i2=1, 4, 1 do
+					local sideStep = p.stepsPerSide / 2
 					for i=1, p.stepsPerSide, 1 do
-						local mod = (i + (p.stepsPerSide / 2) + 2) % 4
-						if mod == 3 then
+						local mod = sideStep % p.stepsPerSide
+						if mod == 0 then
 							if not t.TurnRight() then isStuck = true end
 						else
 							p.loopActionFunc()
 						end
 						if not t.Forward() then isStuck = true end
+						sideStep = sideStep + 1
 					end
 				end
 				p = table.remove(pathQueue,1)
