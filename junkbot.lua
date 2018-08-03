@@ -140,13 +140,11 @@ function MainLoop()
 			end,
 		})
 
-		
-		local lastStepsPerSide = pathQueue[0].stepsPerSide
-		local lastDepth = pathQueue[0].depth
-
 		while true do
 			p = table.remove(pathQueue,1)
 			if p then 
+				if lastStepsPerSide then lastStepsPerSide = p.stepsPerSide end
+				if lastDepth then lastDepth = p.depth end
 				-- out to outer ring position
 				if p.stepsPerSide > lastStepsPerSide then
 					for i = lastStepsPerSide, p.stepsPerSide, 1 do 
