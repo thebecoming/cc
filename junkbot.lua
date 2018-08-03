@@ -1,4 +1,4 @@
-local version = "0.12"
+local version = "0.13"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -123,14 +123,22 @@ function MainLoop()
 		table.insert(pathQueue,{
 			stepsPerSide = 6,
 			depth = 1,
-			startFunc = function () 				
-				GetItems("minecraft:coal", "left", currentLoc.h)
+			startFunc = function () 	
+				if not t.TurnLeft() then isStuck = true end
+				if not t.TurnLeft() then isStuck = true end
+				GetItems("minecraft:coal", "right", currentLoc.h)
+				if not t.TurnLeft() then isStuck = true end
+				if not t.TurnLeft() then isStuck = true end
 			end,
 			loopActionFunc = function () 				
 				PutItems("minecraft:coal", "right", currentLoc.h, 2)
 			end,
 			endFunc = function () 				
-				PutItems("minecraft:coal", "left", currentLoc.h)
+				if not t.TurnLeft() then isStuck = true end
+				if not t.TurnLeft() then isStuck = true end
+				PutItems("minecraft:coal", "right", currentLoc.h)
+				if not t.TurnLeft() then isStuck = true end
+				if not t.TurnLeft() then isStuck = true end
 			end,
 		})
 
