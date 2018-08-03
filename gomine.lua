@@ -339,7 +339,7 @@ function SetTurtleConfig(cfg)
 				newMineLoc = util.AddVectorToLoc(newMineLoc, "r", baseCenterOffset)
 				newHomeLoc.h = newMineLoc.h
 				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "f", 3)
-				--newHomeLoc = util.AddVectorToLoc(newHomeLoc, "r", 0)
+				newHomeLoc = util.AddVectorToLoc(newHomeLoc, "l", 1) -- leave room for worker bot
 
 			elseif (cfg.turtleID % 3) == 2 then
 				newMineLoc = util.AddVectorToLoc(newMineLoc, "f", outerRingOffset)
