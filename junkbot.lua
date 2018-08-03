@@ -123,8 +123,14 @@ function MainLoop()
 		table.insert(pathQueue,{
 			stepsPerSide = 6,
 			depth = 1,
+			startFunc = function () 				
+				GetItems("minecraft:coal", "left", currentLoc.h)
+			end,
 			loopActionFunc = function () 				
 				PutItems("minecraft:coal", "right", currentLoc.h, 2)
+			end,
+			endFunc = function () 				
+				PutItems("minecraft:coal", "left", currentLoc.h)
 			end,
 		})
 
