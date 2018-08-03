@@ -80,6 +80,128 @@ function RunProgram()
 	t.AddCommand({func=GoHome, args={"Gohome from RunProgram: " .. stopReason}}, false)
 end
 
+
+function MainLoop()
+	while true do
+		local isStuck
+		local pathQueue = {}
+
+		-- Get clay
+		table.insert(pathQueue,{
+			stepsPerSide = 4,
+			depth = 0,
+			startFunc = function() 
+				--DropAll("", "right") 
+				PutItems("", "right", currentLoc.h)
+			end,
+			loopActionFunc = function () 
+				GetItems("minecraft:clay_ball", "right", currentLoc.h)
+			end,
+		})
+
+		-- place clay
+		table.insert(pathQueue,{
+			stepsPerSide = 4,
+			depth = 0,
+			loopActionFunc = function () 
+				--DropAll("minecraft:clay_ball","down")
+				PutItems("minecraft:clay_ball", "down", currentLoc.h)
+			end,
+			endFunc = function() 
+				--DropAll("minecraft:clay_ball", "right") 
+				PutItems("minecraft:clay_ball", "right", currentLoc.h)
+			end,
+		})
+
+		-- Get Coal
+		table.insert(pathQueue,{
+			stepsPerSide = 4,
+			depth = 0,
+			loopActionFunc = function () 
+				GetItems("minecraft:coal", "right", currentLoc.h)
+			end,
+		})
+
+		-- Place Coal
+		table.insert(pathQueue,{
+			stepsPerSide = 5,
+			depth = 1,
+			loopActionFunc = function () 				
+				PutItems("minecraft:coal", "right", currentLoc.h)
+			end,
+		})
+
+		-- Gather bricks
+		table.insert(pathQueue,{
+			stepsPerSide = 5,
+			depth = 1,
+			loopActionFunc = function () 				
+				GetItems("minecraft:brick", "right", currentLoc.h)
+			end,
+		})
+
+		
+		local lastStepsPerSide = pathQueue[0].stepsPerSide
+		local lastDepth = pathQueue[0].depth
+
+		while true do
+			p = table.remove(pathQueue,1)
+			if p then 
+				-- out to outer ring position
+				if p.stepsPerSide > lastStepsPerSide then
+					for i = lastStepsPerSide, p.stepsPerSide, 1 do 
+						if not t.TurnLeft() then isStuck = true end
+						if not t.Forward() then isStuck = true end
+						if not t.TurnRight() then isStuck = true end
+					end
+				end
+
+				-- move to the correct depth
+				if(p.depth < lastDepth) then
+					for i = p.depth, lastDepth, 1 do 
+						if not t.Up() then isStuck = true end
+					end
+				elseif p.depth > lastDepth then
+					for i = lastDepth, p.depth, 1 do 
+						if not t.Down() then isStuck = true end
+					end
+				end
+
+				-- in from outer ring position
+				if(p.stepsPerSide < lastStepsPerSide) then
+					for i = p.stepsPerSide, lastStepsPerSide, 1 do 
+						if not t.TurnRight() then isStuck = true end
+						if not t.Forward() then isStuck = true end
+						if not t.TurnLeft() then isStuck = true end
+					end
+				end
+				lastStepsPerSide = p.stepsPerSide
+				lastDepth = p.depth
+
+				-- position is midway through the side
+				local sideStep = p.stepsPerSide / 2
+				for i2=1, 4, 1 do
+					for i=1, p.stepsPerSide, 1 do
+						local mod = (i + (p.stepsPerSide / 2)) % 4
+						if mod == 4 then
+							if not t.TurnRight() then isStuck = true end
+						else
+							p.loopActionFunc()
+						end
+						if not t.Forward() then isStuck = true end
+					end
+				end
+				p = table.remove(pathQueue,1)
+			else
+				break
+			end
+			os.sleep()
+		end
+		os.sleep(10)
+	end
+	return true
+end
+
 function GetItems(aName, aWrapDirection, aCurHeading)
 	local isFound
 	local pushDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
@@ -99,156 +221,40 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	return isFound
 end
 
-function DropAll(aName, aDropDirection)
-	local slot = 1
-	while slot <= cfg.inventorySize do
+function PutItems(aName, aWrapDirection, aCurHeading)
+	local isFound
+	local pullDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
+	local cont = peripheral.wrap(aWrapDirection)
+	local itemList = cont.list()
+
+	-- for i=1, #itemList, 1 do
+	for slot=1, cfg.inventorySize do
 		turtle.select(slot)
 		local data = turtle.getItemDetail()
-		-- TODO, change amt to distribute evenly
-		local amt = turtle.getItemCount()
-		if data and data.name == aName then
-			if not t.DropDirection(aDropDirection, amt) then return false end
-		end
-		slot = slot + 1
-	end
-	return true
-end
-
-
-function MainLoop()
-	while true do
-		local isStuck
-
-		-- TODO: do stone first, cause that loads into furnace from the top
-		-- Then do coal, but need to move turtle in front of furnace
-		-- Then go underneath furnace to pull result
-
-		-- minecraft:coal
-
-		-- TODO, refactor this so it uses the queue, 
-		-- local pathQueue = {}
-		-- table.insert(pathQueue,{
-		-- 	name = "minecraft:clay_ball",
-		-- 	dropDir = "right",
-		-- 	pathOffset = 2,
-		-- 	depth = 0
-		-- })
-		-- table.insert(pathQueue,{
-		-- 	name = "minecraft:coal",
-		-- 	dropDir = "right",
-		-- 	pathOffset = 3,
-		-- 	depth = 1
-		-- })
-		-- local lastOffset
-		-- local lastDepth
-
-		-- while true do
-		-- 	p = table.remove(pathQueue,1)
-		-- 	if p then 
-		-- 		if p.depth > lastDepth then
-		-- 			if not t.TurnRight() then isStuck = true end
-		-- 			if not t.Forward() then isStuck = true end
-		-- 			if not t.TurnLeft() then isStuck = true end
-		-- 		elseif p.depth < lastDepth then
-		-- 			if not t.TurnLeft() then isStuck = true end
-		-- 			if not t.Forward() then isStuck = true end
-		-- 			if not t.TurnRight() then isStuck = true end
-		-- 		end
-		-- 		GetItems(p.name, p.dropDir, currentLoc.h) -- r1a
-		-- 		if not t.Forward() then isStuck = true end
-		-- 		GetItems(p.name, p.dropDir, currentLoc.h) -- r1b
-		-- 		if not t.Forward() then isStuck = true end
-		-- 		if not t.TurnRight() then isStuck = true end
-		-- 		lastDepth = p.depth
-		-- 		p = table.remove(pathQueue,1)
-		-- 	else
-		-- 		break
-		-- 	end
-		-- 	os.sleep()
-		-- end
-		
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1a
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1b
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1c
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r2a	
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r2b
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r3	
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r4
-		if not t.Forward() then isStuck = true end -- front of fuel depot		
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		-- back at home
-
-		local hasclay_ball
-		for slot = 1, cfg.inventorySize, 1 do
-			turtle.select(slot)
-			local d = turtle.getItemDetail()
-			if (d and d.name == "minecraft:clay_ball") then
-				hasclay_ball = true
+		local item = itemList[i]
+		if item and (aName == "" or item.name == aName) then
+			if cont.pullItems(pullDirection, i) > 0 then 
+				isFound = true 
+			else
+				-- inventory full
 				break
 			end
 		end
-		
-		if hasclay_ball then
-			-- start the loop over but this time load the clay
-			DropAll("minecraft:clay_ball","down") -- r1a
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r1b
-			if not t.Forward() then isStuck = true end
-			if not t.TurnRight() then isStuck = true end
+	end
+	return isFound
+end
 
-			if not t.Forward() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r1c
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r2a	
-			if not t.Forward() then isStuck = true end
-			if not t.TurnRight() then isStuck = true end
-
-			if not t.Forward() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r2b
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r3	
-			if not t.Forward() then isStuck = true end
-			if not t.TurnRight() then isStuck = true end
-
-			if not t.Forward() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			DropAll("minecraft:clay_ball","down") -- r4
-			if not t.Forward() then isStuck = true end -- front of fuel depot		
-			if not t.Forward() then isStuck = true end
-			if not t.TurnRight() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			-- back at home
+function DropAll(aName, aDropDirection)
+	for slot=1, cfg.inventorySize, 1 do
+		turtle.select(slot)
+		local data = turtle.getItemDetail()
+		local amt = turtle.getItemCount()
+		if data and (aName == "" or data.name == aName) then
+			if not t.DropDirection(aDropDirection, amt) then return false end
 		end
-		
-		os.sleep(10)
 	end
 	return true
 end
-
 
 function SetTurtleConfig(cfg)
     local numSeg = tonumber(string.sub(os.getComputerLabel(), 2))

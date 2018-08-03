@@ -9,7 +9,6 @@
 -- Allow getLocation() to dig if blocked
 -- create a queue of turtles based on fuel to go refuel
 -- create a queue of turtles based on inventory to unload
--- create a queue of turtles for running gomine
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
@@ -537,7 +536,7 @@ end
 	end
 
 	function DropDirection(aDirection, aCount)
-		if aDirection == "front" then 
+		if aDirection == "forward" then 
 			if aCount then return turtle.drop(aCount) else return turtle.drop() end
 		elseif aDirection == "up" then 
 			if aCount then return turtle.dropUp(aCount) else return turtle.dropUp() end
