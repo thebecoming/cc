@@ -1035,7 +1035,7 @@ end
 						modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
 
 					elseif string.lower(command) == "lowfuel" or string.lower(command) == "lf" then
-						if (turtle.getFuelLevel() - 8000) then 
+						if (turtle.getFuelLevel() < 8000) then 
 							local reply = os.getComputerLabel() .. " LowFuel:" .. tostring(turtle.getFuelLevel())
 							modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
 						end
