@@ -1,10 +1,7 @@
 -- TODO: 
 -- Test: is lava really being scooped up?
--- Test: GPS coord check
--- Test: Deploy
--- Test: LowFuel call
+-- Fix: GPS coord check
 
--- Make sure getCurrentLocation() issues are fixed
 -- Move program init logic into util, along with the cfg object creation
 -- Allow getLocation() to dig if blocked
 -- create a queue of turtles based on fuel to go refuel
@@ -12,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.11"
+local version = "0.12"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""

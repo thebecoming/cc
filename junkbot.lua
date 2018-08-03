@@ -1,4 +1,4 @@
-local version = "0.04"
+local version = "0.05"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -143,45 +143,42 @@ function MainLoop()
 		while true do
 			p = table.remove(pathQueue,1)
 			if p then 
-				if lastStepsPerSide then lastStepsPerSide = p.stepsPerSide end
-				if lastDepth then lastDepth = p.depth end
+				if not lastStepsPerSide then lastStepsPerSide = p.stepsPerSide end
+				if not lastDepth then lastDepth = p.depth end
+
 				-- out to outer ring position
-				if p.stepsPerSide > lastStepsPerSide then
-					for i = lastStepsPerSide, p.stepsPerSide, 1 do 
-						if not t.TurnLeft() then isStuck = true end
-						if not t.Forward() then isStuck = true end
-						if not t.TurnRight() then isStuck = true end
-					end
+				while p.stepsPerSide > lastStepsPerSide do
+					if not t.TurnLeft() then isStuck = true end
+					if not t.Forward() then isStuck = true end
+					if not t.TurnRight() then isStuck = true end
+					lastStepsPerSide = lastStepsPerSide + 1
 				end
 
 				-- move to the correct depth
-				if(p.depth < lastDepth) then
-					for i = p.depth, lastDepth, 1 do 
-						if not t.Up() then isStuck = true end
-					end
-				elseif p.depth > lastDepth then
-					for i = lastDepth, p.depth, 1 do 
-						if not t.Down() then isStuck = true end
-					end
+				while p.depth < lastDepth do
+					if not t.Up() then isStuck = true end
+					lastDepth = lastDepth - 1
+				end
+
+				while p.depth > lastDepth do
+					if not t.Down() then isStuck = true end
+					lastDepth = lastDepth + 1
 				end
 
 				-- in from outer ring position
-				if(p.stepsPerSide < lastStepsPerSide) then
-					for i = p.stepsPerSide, lastStepsPerSide, 1 do 
-						if not t.TurnRight() then isStuck = true end
-						if not t.Forward() then isStuck = true end
-						if not t.TurnLeft() then isStuck = true end
-					end
+				while p.stepsPerSide < lastStepsPerSide do 
+					if not t.TurnRight() then isStuck = true end
+					if not t.Forward() then isStuck = true end
+					if not t.TurnLeft() then isStuck = true end
+					lastStepsPerSide = lastStepsPerSide - 1
 				end
-				lastStepsPerSide = p.stepsPerSide
-				lastDepth = p.depth
 
 				-- position is midway through the side
 				local sideStep = p.stepsPerSide / 2
 				for i2=1, 4, 1 do
 					for i=1, p.stepsPerSide, 1 do
-						local mod = (i + (p.stepsPerSide / 2)) % 4
-						if mod == 4 then
+						local mod = (i + (p.stepsPerSide / 2) + 2) % 4
+						if mod == 3 then
 							if not t.TurnRight() then isStuck = true end
 						else
 							p.loopActionFunc()
