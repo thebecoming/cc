@@ -1,4 +1,4 @@
-local version = "0.10"
+local version = "0.11"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -180,7 +180,7 @@ function MainLoop()
 					lastStepsPerSide = lastStepsPerSide - 2
 				end
 
-				if loopActionFunc then
+				if p.loopActionFunc then
 					local sideStep = p.stepsPerSide / 2
 					for i2=1, 4, 1 do
 						local sideStep = p.stepsPerSide / 2
@@ -226,7 +226,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	end
 	return isFound
 end
-
+-- west 1 64 2
 function PutItems(aName, aWrapDirection, aCurHeading, aPutSlot, aCount)
 	local isFound
 	local pullDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
@@ -237,15 +237,20 @@ function PutItems(aName, aWrapDirection, aCurHeading, aPutSlot, aCount)
 		turtle.select(i)
 		local data = turtle.getItemDetail()
 		if data and (aName == "" or data.name == aName) then
-			local ct = 64
-			if aPutSlot and aCount then ct = aCount end
-			if aPutSlot and cont.pullItems(pullDirection, i, ct, aPutSlot) > 0 then
-				isFound = true 
-			elseif cont.pullItems(pullDirection, i) > 0 then 
-				isFound = true 
+			if aPutSlot then
+				local ct = 64
+				if aCount then ct = aCount end
+				if cont.pullItems(pullDirection, i, ct, aPutSlot) > 0 then
+					isFound = true 
+				else
+					break -- inventory full
+				end
 			else
-				-- inventory full
-				break
+				if cont.pullItems(pullDirection, i) > 0 then 
+					isFound = true 
+				else
+					break -- inventory full
+				end
 			end
 		end
 	end
