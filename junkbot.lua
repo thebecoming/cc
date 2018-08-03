@@ -1,4 +1,4 @@
-local version = "0.07"
+local version = "0.08"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -105,11 +105,11 @@ function MainLoop()
 			depth = 0,
 			loopActionFunc = function () 
 				--DropAll("minecraft:clay_ball","down")
-				PutItems("minecraft:clay_ball", "down", currentLoc.h)
+				PutItems("minecraft:clay_ball", "bottom", currentLoc.h)
 			end,
 			endFunc = function() 
 				--DropAll("minecraft:clay_ball", "right") 
-				PutItems("minecraft:clay_ball", "right", currentLoc.h)
+				PutItems("minecraft:clay_ball", "bottom", currentLoc.h)
 			end,
 		})
 
@@ -124,7 +124,7 @@ function MainLoop()
 
 		-- Place Coal
 		table.insert(pathQueue,{
-			stepsPerSide = 5,
+			stepsPerSide = 6,
 			depth = 1,
 			loopActionFunc = function () 				
 				PutItems("minecraft:coal", "right", currentLoc.h)
@@ -133,7 +133,7 @@ function MainLoop()
 
 		-- Gather bricks
 		table.insert(pathQueue,{
-			stepsPerSide = 5,
+			stepsPerSide = 6,
 			depth = 1,
 			loopActionFunc = function () 				
 				GetItems("minecraft:brick", "right", currentLoc.h)
@@ -151,7 +151,7 @@ function MainLoop()
 					if not t.TurnLeft() then isStuck = true end
 					if not t.Forward() then isStuck = true end
 					if not t.TurnRight() then isStuck = true end
-					lastStepsPerSide = lastStepsPerSide + 1
+					lastStepsPerSide = lastStepsPerSide + 2
 				end
 
 				-- move to the correct depth
@@ -170,7 +170,7 @@ function MainLoop()
 					if not t.TurnRight() then isStuck = true end
 					if not t.Forward() then isStuck = true end
 					if not t.TurnLeft() then isStuck = true end
-					lastStepsPerSide = lastStepsPerSide - 1
+					lastStepsPerSide = lastStepsPerSide - 2
 				end
 
 				local sideStep = p.stepsPerSide / 2
@@ -224,8 +224,8 @@ function PutItems(aName, aWrapDirection, aCurHeading)
 	local cont = peripheral.wrap(aWrapDirection)
 	local itemList = cont.list()
 
-	for slot=1, cfg.inventorySize do
-		turtle.select(slot)
+	for i=1, cfg.inventorySize do
+		turtle.select(i)
 		local data = turtle.getItemDetail()
 		if data and (aName == "" or data.name == aName) then
 			if cont.pullItems(pullDirection, i) > 0 then 
@@ -240,8 +240,8 @@ function PutItems(aName, aWrapDirection, aCurHeading)
 end
 
 function DropAll(aName, aDropDirection)
-	for slot=1, cfg.inventorySize, 1 do
-		turtle.select(slot)
+	for i=1, cfg.inventorySize, 1 do
+		turtle.select(i)
 		local data = turtle.getItemDetail()
 		local amt = turtle.getItemCount()
 		if data and (aName == "" or data.name == aName) then
