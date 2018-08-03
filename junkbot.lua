@@ -1,4 +1,4 @@
-local version = "0.09"
+local version = "0.10"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -137,6 +137,16 @@ function MainLoop()
 			end,
 		})
 
+		-- Store bricks
+		table.insert(pathQueue,{
+			stepsPerSide = 4,
+			depth = 0,
+			endFunc = function () 				
+				PutItems("minecraft:brick", "right", currentLoc.h)
+			end,
+		})
+
+		local lastStepsPerSide, lastDepth
 		while true do
 			local p = table.remove(pathQueue,1)
 			if p then 
@@ -170,20 +180,22 @@ function MainLoop()
 					lastStepsPerSide = lastStepsPerSide - 2
 				end
 
-				local sideStep = p.stepsPerSide / 2
-				for i2=1, 4, 1 do
+				if loopActionFunc then
 					local sideStep = p.stepsPerSide / 2
-					for i=1, p.stepsPerSide, 1 do
-						local mod = sideStep % p.stepsPerSide
-						if mod == 0 then
-							if not t.TurnRight() then isStuck = true end
-						else
-							if p.startFunc then p.startFunc() end
-							if p.loopActionFunc then p.loopActionFunc() end
-							if p.endFunc then p.endFunc() end
+					for i2=1, 4, 1 do
+						local sideStep = p.stepsPerSide / 2
+						for i=1, p.stepsPerSide, 1 do
+							local mod = sideStep % p.stepsPerSide
+							if mod == 0 then
+								if not t.TurnRight() then isStuck = true end
+							else
+								if p.startFunc then p.startFunc() end
+								if p.loopActionFunc then p.loopActionFunc() end
+								if p.endFunc then p.endFunc() end
+							end
+							if not t.Forward() then isStuck = true end
+							sideStep = sideStep + 1
 						end
-						if not t.Forward() then isStuck = true end
-						sideStep = sideStep + 1
 					end
 				end
 			else
@@ -226,8 +238,8 @@ function PutItems(aName, aWrapDirection, aCurHeading, aPutSlot, aCount)
 		local data = turtle.getItemDetail()
 		if data and (aName == "" or data.name == aName) then
 			local ct = 64
-			if aCount then ct = aCount end
-			if aPutSlot and cont.pullItems(pullDirection, i, aPutSlot, ct) > 0 then
+			if aPutSlot and aCount then ct = aCount end
+			if aPutSlot and cont.pullItems(pullDirection, i, ct, aPutSlot) > 0 then
 				isFound = true 
 			elseif cont.pullItems(pullDirection, i) > 0 then 
 				isFound = true 
