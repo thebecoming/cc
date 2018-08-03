@@ -1,4 +1,4 @@
-local version = "0.08"
+local version = "0.09"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -91,7 +91,6 @@ function MainLoop()
 			stepsPerSide = 4,
 			depth = 0,
 			startFunc = function() 
-				--DropAll("", "right") 
 				PutItems("", "right", currentLoc.h)
 			end,
 			loopActionFunc = function () 
@@ -104,12 +103,10 @@ function MainLoop()
 			stepsPerSide = 4,
 			depth = 0,
 			loopActionFunc = function () 
-				--DropAll("minecraft:clay_ball","down")
-				PutItems("minecraft:clay_ball", "bottom", currentLoc.h)
+				PutItems("minecraft:clay_ball", "bottom", currentLoc.h, 1)
 			end,
 			endFunc = function() 
-				--DropAll("minecraft:clay_ball", "right") 
-				PutItems("minecraft:clay_ball", "bottom", currentLoc.h)
+				PutItems("minecraft:clay_ball", "right", currentLoc.h)
 			end,
 		})
 
@@ -127,7 +124,7 @@ function MainLoop()
 			stepsPerSide = 6,
 			depth = 1,
 			loopActionFunc = function () 				
-				PutItems("minecraft:coal", "right", currentLoc.h)
+				PutItems("minecraft:coal", "right", currentLoc.h, 2)
 			end,
 		})
 
@@ -218,7 +215,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	return isFound
 end
 
-function PutItems(aName, aWrapDirection, aCurHeading)
+function PutItems(aName, aWrapDirection, aCurHeading, aPutSlot, aCount)
 	local isFound
 	local pullDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
 	local cont = peripheral.wrap(aWrapDirection)
@@ -228,7 +225,11 @@ function PutItems(aName, aWrapDirection, aCurHeading)
 		turtle.select(i)
 		local data = turtle.getItemDetail()
 		if data and (aName == "" or data.name == aName) then
-			if cont.pullItems(pullDirection, i) > 0 then 
+			local ct = 64
+			if aCount then ct = aCount end
+			if aPutSlot and cont.pullItems(pullDirection, i, aPutSlot, ct) > 0 then
+				isFound = true 
+			elseif cont.pullItems(pullDirection, i) > 0 then 
 				isFound = true 
 			else
 				-- inventory full
