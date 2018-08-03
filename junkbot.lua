@@ -1,4 +1,4 @@
-local version = "0.11"
+local version = "0.12"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -180,6 +180,7 @@ function MainLoop()
 					lastStepsPerSide = lastStepsPerSide - 2
 				end
 
+				if p.startFunc then p.startFunc() end
 				if p.loopActionFunc then
 					local sideStep = p.stepsPerSide / 2
 					for i2=1, 4, 1 do
@@ -189,15 +190,14 @@ function MainLoop()
 							if mod == 0 then
 								if not t.TurnRight() then isStuck = true end
 							else
-								if p.startFunc then p.startFunc() end
 								if p.loopActionFunc then p.loopActionFunc() end
-								if p.endFunc then p.endFunc() end
 							end
 							if not t.Forward() then isStuck = true end
 							sideStep = sideStep + 1
 						end
 					end
 				end
+				if p.endFunc then p.endFunc() end
 			else
 				break
 			end
