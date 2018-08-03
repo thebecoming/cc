@@ -1,4 +1,4 @@
-local version = "0.06"
+local version = "0.07"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -141,7 +141,7 @@ function MainLoop()
 		})
 
 		while true do
-			p = table.remove(pathQueue,1)
+			local p = table.remove(pathQueue,1)
 			if p then 
 				if not lastStepsPerSide then lastStepsPerSide = p.stepsPerSide end
 				if not lastDepth then lastDepth = p.depth end
@@ -181,13 +181,14 @@ function MainLoop()
 						if mod == 0 then
 							if not t.TurnRight() then isStuck = true end
 						else
-							p.loopActionFunc()
+							if p.startFunc then p.startFunc() end
+							if p.loopActionFunc then p.loopActionFunc() end
+							if p.endFunc then p.endFunc() end
 						end
 						if not t.Forward() then isStuck = true end
 						sideStep = sideStep + 1
 					end
 				end
-				p = table.remove(pathQueue,1)
 			else
 				break
 			end
@@ -223,12 +224,10 @@ function PutItems(aName, aWrapDirection, aCurHeading)
 	local cont = peripheral.wrap(aWrapDirection)
 	local itemList = cont.list()
 
-	-- for i=1, #itemList, 1 do
 	for slot=1, cfg.inventorySize do
 		turtle.select(slot)
 		local data = turtle.getItemDetail()
-		local item = itemList[i]
-		if item and (aName == "" or item.name == aName) then
+		if data and (aName == "" or data.name == aName) then
 			if cont.pullItems(pullDirection, i) > 0 then 
 				isFound = true 
 			else

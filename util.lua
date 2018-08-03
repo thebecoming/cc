@@ -361,6 +361,10 @@ function GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
 		pushDirection = util.GetNewHeading(aCurHeading, "r")
 	elseif aWrapDirection == "back" then 
 		pushDirection = aCurHeading
+	elseif aWrapDirection == "up" then 
+		pushDirection = "down"
+	elseif aWrapDirection == "down" then 
+		pushDirection = "up"
 	else
 		print("GetDirectionOppositeOfWrap invalid:")
 		print("aWrapDirection:" .. aWrapDirection)
