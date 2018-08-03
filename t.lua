@@ -1,11 +1,19 @@
 -- TODO: 
 -- Test: is lava really being scooped up?
+-- Test: GPS coord check
+-- Test: Deploy
+-- Test: LowFuel call
+
 -- Make sure getCurrentLocation() issues are fixed
 -- Move program init logic into util, along with the cfg object creation
 -- Allow getLocation() to dig if blocked
+-- create a queue of turtles based on fuel to go refuel
+-- create a queue of turtles based on inventory to unload
+-- create a queue of turtles for running gomine
+-- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.10"
+local version = "0.11"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -57,12 +65,13 @@ end
 
 function ProcessQueue()
     while true do
-        os.sleep(.1)
+        os.sleep(0.4)
         if #queue > 0 then
             local tbl = table.remove(queue,1)
             local func = tbl.func
 			local args = tbl.args
 			cur_queue_status = ""
+			ValidatePosition()
             if args then
                 parallel.waitForAny(function()
                     tbl.func(table.unpack(args))
@@ -414,7 +423,7 @@ end
 	end
 
 	function Up()
-			CheckFuelOnMove()
+		CheckFuelOnMove()
 		local result = turtle.up()
 		if result then
 			loc.y = loc.y + 1
@@ -798,12 +807,30 @@ end
 		end
 	end
 
+	local moveGpsCheckCounter = 0
 	function ProcessMovementChange()
 		if turtle.getFuelLevel() == 0 then
 			stopReason = "out_of_fuel"
 			return false
 		end
+		-- double check gps coords every so often		
+		if moveGpsCheckCounter == 10 then
+			ValidatePosition()
+			moveGpsCheckCounter = 0
+		else
+			moveGpsCheckCounter = moveGpsCheckCounter + 1
+		end
 		return true
+	end
+
+	function ValidatePosition()
+		local x,y,z = gps.locate(5)
+		if x and (loc.x ~= x or loc.y ~= y or loc.z ~= z) then
+			util.Print("Bad coords.. restting via gps")
+			loc.x = x
+			loc.y = y
+			loc.z = z
+		end
 	end
 
 	function PrintDigResult(data, blockData)
@@ -1005,7 +1032,13 @@ end
 
                     elseif string.lower(command) == "getfuel" or string.lower(command) == "gf" then
                         local reply = os.getComputerLabel() .. " Fuel:" .. tostring(turtle.getFuelLevel())
-                        modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
+						modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
+
+					elseif string.lower(command) == "lowfuel" or string.lower(command) == "lf" then
+						if (turtle.getFuelLevel() - 8000) then 
+							local reply = os.getComputerLabel() .. " LowFuel:" .. tostring(turtle.getFuelLevel())
+							modem.transmit(replyChannel, cfg.port_turtleCmd, reply)
+						end
 
                     elseif string.lower(command) == "stop" or string.lower(command) == "s" then
                         SendMessage(replyChannel, "stop Received")
@@ -1017,7 +1050,7 @@ end
                         SendMessage(replyChannel, "gohome Received")
                         AddCommand({func=GoHome, args={"incoming_gohome"}}, stopQueue)
 	
-                    elseif string.lower(command) == "refuel" or string.lower(command) == "r" then
+                    elseif string.lower(command) == "refuel" or string.lower(command) == "rf" then
                         SendMessage(replyChannel, "refuel Received")
                         AddCommand({func=GoRefuel}, stopQueue)
 

@@ -452,9 +452,19 @@ function SetTurtleConfig(cfg)
 end
 
 function IncomingMessageHandler(command, stopQueue)
-	if string.lower(command) == "run" then
+	if string.lower(command) == "run" or string.lower(command) == "r" then
 		stopReason = ""
         t.AddCommand({func=RunProgram}, stopQueue)
+	elseif string.lower(command) == "deploy" then
+		stopReason = ""
+		if(cfg.turtleID % 3 == 1) then 
+			-- go imediately
+		elseif(cfg.turtleID % 3 == 2) then 
+			os.sleep(4)
+		else
+			os.sleep(8)
+		end
+		t.AddCommand({func=RunProgram}, stopQueue)
 	end
 end
 

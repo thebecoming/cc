@@ -220,7 +220,7 @@ function PlaceStair()
 end
 
 function SetTurtleConfig(cfg)
-    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2))
     if tonumber(numSeg) ~= nil then
         cfg.turtleID = tonumber(numSeg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)

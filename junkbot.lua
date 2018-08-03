@@ -99,8 +99,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	return isFound
 end
 
-function FuelFurnace(aName, aDropDirection)
-	-- push the coal into the furnaces
+function DropAll(aName, aDropDirection)
 	local slot = 1
 	while slot <= cfg.inventorySize do
 		turtle.select(slot)
@@ -123,32 +122,76 @@ function MainLoop()
 		-- TODO: do stone first, cause that loads into furnace from the top
 		-- Then do coal, but need to move turtle in front of furnace
 		-- Then go underneath furnace to pull result
+
+		-- minecraft:coal
+
+		-- TODO, refactor this so it uses the queue, 
+		-- local pathQueue = {}
+		-- table.insert(pathQueue,{
+		-- 	name = "minecraft:clay_ball",
+		-- 	dropDir = "right",
+		-- 	pathOffset = 2,
+		-- 	depth = 0
+		-- })
+		-- table.insert(pathQueue,{
+		-- 	name = "minecraft:coal",
+		-- 	dropDir = "right",
+		-- 	pathOffset = 3,
+		-- 	depth = 1
+		-- })
+		-- local lastOffset
+		-- local lastDepth
+
+		-- while true do
+		-- 	p = table.remove(pathQueue,1)
+		-- 	if p then 
+		-- 		if p.depth > lastDepth then
+		-- 			if not t.TurnRight() then isStuck = true end
+		-- 			if not t.Forward() then isStuck = true end
+		-- 			if not t.TurnLeft() then isStuck = true end
+		-- 		elseif p.depth < lastDepth then
+		-- 			if not t.TurnLeft() then isStuck = true end
+		-- 			if not t.Forward() then isStuck = true end
+		-- 			if not t.TurnRight() then isStuck = true end
+		-- 		end
+		-- 		GetItems(p.name, p.dropDir, currentLoc.h) -- r1a
+		-- 		if not t.Forward() then isStuck = true end
+		-- 		GetItems(p.name, p.dropDir, currentLoc.h) -- r1b
+		-- 		if not t.Forward() then isStuck = true end
+		-- 		if not t.TurnRight() then isStuck = true end
+		-- 		lastDepth = p.depth
+		-- 		p = table.remove(pathQueue,1)
+		-- 	else
+		-- 		break
+		-- 	end
+		-- 	os.sleep()
+		-- end
 		
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r1a
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1a
 		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r1b
-		if not t.Forward() then isStuck = true end
-		if not t.TurnRight() then isStuck = true end
-
-		if not t.Forward() then isStuck = true end
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r1c
-		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r2a	
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1b
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 
 		if not t.Forward() then isStuck = true end
 		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r2b
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r1c
 		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r3	
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r2a	
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
 
 		if not t.Forward() then isStuck = true end
 		if not t.Forward() then isStuck = true end
-		GetItems("minecraft:coal", "right", currentLoc.h) -- r4
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r2b
+		if not t.Forward() then isStuck = true end
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r3	
+		if not t.Forward() then isStuck = true end
+		if not t.TurnRight() then isStuck = true end
+
+		if not t.Forward() then isStuck = true end
+		if not t.Forward() then isStuck = true end
+		GetItems("minecraft:clay_ball", "right", currentLoc.h) -- r4
 		if not t.Forward() then isStuck = true end -- front of fuel depot		
 		if not t.Forward() then isStuck = true end
 		if not t.TurnRight() then isStuck = true end
@@ -156,43 +199,43 @@ function MainLoop()
 		if not t.Forward() then isStuck = true end
 		-- back at home
 
-		local hasCoal
+		local hasclay_ball
 		for slot = 1, cfg.inventorySize, 1 do
 			turtle.select(slot)
 			local d = turtle.getItemDetail()
-			if (d and d.name == "minecraft:coal") then
-				hasCoal = true
+			if (d and d.name == "minecraft:clay_ball") then
+				hasclay_ball = true
 				break
 			end
 		end
 		
-		if hasCoal then
-			-- start the loop over but this time dump the coal
-			FuelFurnace("minecraft:coal","down") -- r1a
+		if hasclay_ball then
+			-- start the loop over but this time load the clay
+			DropAll("minecraft:clay_ball","down") -- r1a
 			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r1b
-			if not t.Forward() then isStuck = true end
-			if not t.TurnRight() then isStuck = true end
-
-			if not t.Forward() then isStuck = true end
-			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r1c
-			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r2a	
+			DropAll("minecraft:clay_ball","down") -- r1b
 			if not t.Forward() then isStuck = true end
 			if not t.TurnRight() then isStuck = true end
 
 			if not t.Forward() then isStuck = true end
 			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r2b
+			DropAll("minecraft:clay_ball","down") -- r1c
 			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r3	
+			DropAll("minecraft:clay_ball","down") -- r2a	
 			if not t.Forward() then isStuck = true end
 			if not t.TurnRight() then isStuck = true end
 
 			if not t.Forward() then isStuck = true end
 			if not t.Forward() then isStuck = true end
-			FuelFurnace("minecraft:coal","down") -- r4
+			DropAll("minecraft:clay_ball","down") -- r2b
+			if not t.Forward() then isStuck = true end
+			DropAll("minecraft:clay_ball","down") -- r3	
+			if not t.Forward() then isStuck = true end
+			if not t.TurnRight() then isStuck = true end
+
+			if not t.Forward() then isStuck = true end
+			if not t.Forward() then isStuck = true end
+			DropAll("minecraft:clay_ball","down") -- r4
 			if not t.Forward() then isStuck = true end -- front of fuel depot		
 			if not t.Forward() then isStuck = true end
 			if not t.TurnRight() then isStuck = true end
@@ -208,7 +251,7 @@ end
 
 
 function SetTurtleConfig(cfg)
-    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2, 2))
+    local numSeg = tonumber(string.sub(os.getComputerLabel(), 2))
     if tonumber(numSeg) ~= nil then
         cfg.turtleID = tonumber(numSeg)
         cfg.regionCode = string.sub(os.getComputerLabel(), 1, 1)
