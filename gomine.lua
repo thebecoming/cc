@@ -77,8 +77,8 @@ function InitProgram()
         t.SetHomeLocation(cfg.startLoc)
         currentLoc = t.GetCurrentLocation()		
         if not currentLoc then 
-            util.Print("failure in t.GetCurrentLocation with startloc")
-            return false
+			util.Print("Unable to get position!")
+			t.BroadcastFailurePos()
         end
     else
         currentLoc = t.GetCurrentLocation()

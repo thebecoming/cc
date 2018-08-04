@@ -9,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.12"
+local version = "0.13"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -969,6 +969,20 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
 -- COMMUNICATION
 -- ~~~~~~~~~~~~~~~~~~~~~~~~
+	function BroadcastFailurePos()
+		while true do 
+			local x,y,z = gps.locate(5)
+			if x then
+				modem.transmit(cfg.port_log, cfg.port_turtleCmd,
+					os.getComputerLabel() .. " FailPos x:" .. tostring(x) .. " z:" .. tostring(z) .. " y:" .. tostring(y))
+			else
+				modem.transmit(cfg.port_log, cfg.port_turtleCmd,
+					os.getComputerLabel() .. " Failed. Unable to get pos")
+			end
+			os.sleep(5)
+		end
+	end
+	
     function SendMessage(port, msg)
         print(msg)
         modem.transmit(port, cfg.port_turtleCmd, os.getComputerLabel() .. " " .. msg)
@@ -1011,7 +1025,7 @@ end
 						else
 							modem.transmit(replyChannel, cfg.port_turtleCmd,
 								os.getComputerLabel() .. " L x:" .. tostring(loc.x) .. " z:" .. tostring(loc.z) .. " y:" .. tostring(loc.y) .. " h:" .. loc.h)
-						end
+							end
 
                     elseif string.lower(command) == "ping" or string.lower(command) == "p" then
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. ": Dist " .. tostring(senderDistance))

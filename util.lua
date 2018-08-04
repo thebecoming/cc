@@ -110,11 +110,13 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:farmland", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:log", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 
-	tmpData = {uid = "chisel:marble2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "chisel:limestone2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "chisel:marble2", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "chisel:limestone2", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "chisel:basalt2", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "quark:glowcelium", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "quark:glowshroom", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "quark:glowcelium", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "quark:glowshroom", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "quark:crystal", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "quark:crystal", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	
 	-- NON BLOCK ITEMS
 	tmpData = {uid = "computercraft:turtle_expanded", rarity=3}; blockData[tmpData.uid] = tmpData
