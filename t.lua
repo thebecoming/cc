@@ -823,9 +823,12 @@ end
 		local x,y,z = gps.locate(5)
 		if x and (loc.x ~= x or loc.y ~= y or loc.z ~= z) then
 			util.Print("Bad coords.. restting via gps")
-			loc.x = x
-			loc.y = y
-			loc.z = z
+			local newLoc = GetCurrentLocation()
+			loc.x = newLoc.x
+			loc.y = newLoc.y
+			loc.z = newLoc.z
+			loc.h = newLoc.h
+			util.Print("New Loc: x:" .. tostring(loc.x) .. " y:" .. tostring(loc.y) .. " z:" .. tostring(loc.z) .. " h:" .. loc.h)
 		end
 	end
 

@@ -1,4 +1,4 @@
-local version = "0.04"
+local version = "0.05"
 local modem
 local monitor = nil
 	
@@ -35,7 +35,7 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:flowing_lava", isDiggable=false, rarity=1, isLiquid=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:lava", isDiggable=true, rarity=1, isLiquid=true}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:sand", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:gravel", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData	
+	tmpData = {uid = "minecraft:gravel", isDiggable=true, rarity=1}; blockData[tmpData.uid] = tmpData	
 	tmpData = {uid = "minecraft:gold_ore", isDiggable=true, rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:iron_ore", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:coal_ore", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData	
@@ -116,21 +116,22 @@ function InitBlockData()
 	tmpData = {uid = "quark:glowcelium", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "quark:glowshroom", isDiggable=true, rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "quark:crystal", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "quark:crystal", isDiggable=true, rarity=3}; blockData[tmpData.uid] = tmpData
 	
 	-- NON BLOCK ITEMS
 	tmpData = {uid = "computercraft:turtle_expanded", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:gold", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:iron", rarity=3}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:coal", rarity=3}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:coal", rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:redstone", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:emerald", rarity=4}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:quartz", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:diamond", rarity=4}; blockData[tmpData.uid] = tmpData
-	tmpData = {uid = "minecraft:flint", rarity=3}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:flint", rarity=1}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:clay_ball", rarity=2}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:dye", rarity=3}; blockData[tmpData.uid] = tmpData
 	tmpData = {uid = "minecraft:wheat_seeds", rarity=1}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:bone", rarity=2}; blockData[tmpData.uid] = tmpData
+	tmpData = {uid = "minecraft:arrow", rarity=2}; blockData[tmpData.uid] = tmpData
 
 	-- These items stay on turtles
 	tmpData = {uid = "minecraft:torch", isDiggable=true}; blockData[tmpData.uid] = tmpData
