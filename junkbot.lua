@@ -5,6 +5,7 @@ os.loadAPI("t")
 local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local modem
+local loopSeconds = 300
 
 
 local cfg = {
@@ -217,7 +218,7 @@ function MainLoop()
 			end
 			os.sleep()
 		end
-		os.sleep(10)
+		os.sleep(loopSeconds)
 	end
 	return true
 end

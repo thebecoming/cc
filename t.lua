@@ -583,15 +583,16 @@ end
 			end
 
 			-- if flowing lava found, pick it up and try to refuel
-			if data.name == "minecraft:water" or data.name == "minecraft:lava" or data.name == "minecraft:flowing_water" or data.name == "minecraft:flowing_lava" then
+			if data.name == "minecraft:lava" or data.name == "minecraft:flowing_lava" then
                 if turtle.getFuelLevel() < (turtle.getFuelLimit() - fuelRefillThreshold) then
                     if data.metadata == 0 and data.state and data.state.level == 0 then
-					for n=1, cfg.inventorySize do
+						for n=1, cfg.inventorySize do
                             local detail = turtle.getItemDetail(n)
                             if detail and detail.name == "minecraft:bucket" then
                                 turtle.select(n)
                                 turtle.place()
-                                turtle.refuel()
+								turtle.refuel()
+								break
                             end
                         end
                     end
