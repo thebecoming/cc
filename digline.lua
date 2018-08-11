@@ -1,4 +1,4 @@
-local version = "0.10"
+local version = "0.11"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -14,7 +14,7 @@ local cfg = {
     -- turtle base.. don't change
     inventorySize = 16,
     port_log = 969,
-    port_turtleCmd = 967,
+	port_turtleCmd = 967,
 
     turtleID = nil,
     regionCode = nil,
@@ -55,7 +55,8 @@ function InitProgram()
 	print("Util v" .. util.GetVersion())
 	print("t v" .. t.GetVersion())
 
-    util.InitUtil()
+	util.InitUtil()
+	util.SetRarity("minecraft:sand", 2)
 	SetTurtleConfig(cfg)		
 
 	-- Init peripherals

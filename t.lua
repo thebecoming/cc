@@ -376,7 +376,7 @@ end
 		local n = 0
 		while not turtle.forward() do			
 			turtle.attack()
-			os.sleep()
+			os.sleep(0.2)
 			n = n + 1
 			if n == 20 then 
 				SendMessage(cfg.port_log, "I can't move forward!")

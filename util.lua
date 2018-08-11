@@ -185,6 +185,10 @@ function InitBlockData()
 	tmpData = {uid = "minecraft:villager", isMob=true}; blockData[tmpData.uid] = tmpData
 end
 
+function SetRarity(id, rarity)
+	blockData[id].rarity = rarity
+end
+
 function GetBlockUID(data)
 	return data.name
 	-- if data.metadata then
