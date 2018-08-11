@@ -267,6 +267,10 @@ end
 			if not GoToPos(cfg.rarity2Locd, false) then return false end
 			DropBlocksByRarity(2, "down")
 		end
+		if cfg.rarity2Locd then 
+			if not GoToPos(cfg.rarity2Locd, false) then return false end
+			DropBlocksByRarity(2, "down")
+		end
 		if cfg.rarity3Loc then 		
 			if not GoToPos(cfg.rarity3Loc, false) then return false end
 			DropBlocksByRarity(3, "down")
