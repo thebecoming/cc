@@ -242,7 +242,7 @@ function SetTurtleConfig(cfg)
 		cfg.width = 20
 		cfg.depth = 10
 
-		local t1_startloc = {x=686, z=2255, y=locBaseCenter.y, h="north"}
+		local t1_startloc = {x=684, z=2257, y=locBaseCenter.y, h="north"}
 		local t1_mineloc = {x=675, z=2250, y=locBaseCenter.y, h="north"}
 
 		if cfg.turtleID == 1 then
