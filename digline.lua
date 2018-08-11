@@ -1,4 +1,4 @@
-local version = "0.11"
+local version = "0.12"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -246,23 +246,23 @@ function SetTurtleConfig(cfg)
 		local t1_mineloc = {x=675, z=2250, y=locBaseCenter.y, h="north"}
 
 		if cfg.turtleID == 1 then
-			cfg.startLoc = t1_startloc
+			cfg.startLoc = t1_startloc 
 			cfg.mineLoc = t1_mineloc
 		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z + 1, y=t1_startloc.y, t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
 		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y, t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
 		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z + 1, y=t1_startloc.y, t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
 		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=t1_startloc.x + 6, z=t1_startloc.z, y=t1_startloc.y, t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 6, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
 		elseif cfg.turtleID == 6 then
-			cfg.startLoc = {x=t1_startloc.x + 7, z=t1_startloc.z + 1, y=t1_startloc.y, t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 7, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
 		end
 	end
 end
