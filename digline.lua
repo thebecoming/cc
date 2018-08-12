@@ -1,4 +1,4 @@
-local version = "0.15"
+local version = "0.16"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -267,12 +267,12 @@ function SetTurtleConfig(cfg)
 		elseif cfg.turtleID == 8 then
 			cfg.startLoc = {x=t6_startloc.x + 2, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
 			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 2) -- i_dr_delicios portal evasion..
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
 		elseif cfg.turtleID == 9 then
 			cfg.startLoc = {x=t6_startloc.x + 3, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
 			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 2) -- i_dr_delicios portal evasion..
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width)
 		elseif cfg.turtleID == 10 then
 			cfg.startLoc = {x=t6_startloc.x + 4, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
