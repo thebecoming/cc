@@ -1,4 +1,4 @@
-local version = "0.13"
+local version = "0.14"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -6,7 +6,10 @@ local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local modem
 local loopSeconds = 300
-
+-- local burnItem = "minecraft:clay_ball"
+local burnItem = "minecraft:sand"
+--local burnResult = "minecraft:brick"
+local burnResult = "minecraft:glass"
 
 local cfg = {
     -- turtle base.. don't change
@@ -81,13 +84,12 @@ function RunProgram()
 	t.AddCommand({func=GoHome, args={"Gohome from RunProgram: " .. stopReason}}, false)
 end
 
-
 function MainLoop()
 	while true do
 		local isStuck
 		local pathQueue = {}
 
-		-- Get clay
+		-- Get burn item
 		table.insert(pathQueue,{
 			stepsPerSide = 4,
 			depth = 0,
@@ -95,19 +97,19 @@ function MainLoop()
 				PutItems("", "right", currentLoc.h)
 			end,
 			loopActionFunc = function () 
-				GetItems("minecraft:clay_ball", "right", currentLoc.h)
+				GetItems(burnItem, "right", currentLoc.h)
 			end,
 		})
 
-		-- place clay
+		-- place burn item
 		table.insert(pathQueue,{
 			stepsPerSide = 4,
 			depth = 0,
 			loopActionFunc = function () 
-				PutItems("minecraft:clay_ball", "bottom", currentLoc.h, 1)
+				PutItems(burnItem, "bottom", currentLoc.h, 1)
 			end,
 			endFunc = function() 
-				PutItems("minecraft:clay_ball", "right", currentLoc.h)
+				PutItems(burnItem, "right", currentLoc.h)
 			end,
 		})
 
@@ -143,21 +145,21 @@ function MainLoop()
 			end,
 		})
 
-		-- Gather bricks
+		-- Gather result
 		table.insert(pathQueue,{
 			stepsPerSide = 6,
 			depth = 1,
 			loopActionFunc = function () 				
-				GetItems("minecraft:brick", "right", currentLoc.h)
+				GetItems(burnResult, "right", currentLoc.h)
 			end,
 		})
 
-		-- Store bricks
+		-- Store result
 		table.insert(pathQueue,{
 			stepsPerSide = 4,
 			depth = 0,
 			endFunc = function () 				
-				PutItems("minecraft:brick", "right", currentLoc.h)
+				PutItems(burnResult, "right", currentLoc.h)
 			end,
 		})
 
@@ -241,7 +243,7 @@ function GetItems(aName, aWrapDirection, aCurHeading)
 	end
 	return isFound
 end
--- west 1 64 2
+
 function PutItems(aName, aWrapDirection, aCurHeading, aPutSlot, aCount)
 	local isFound
 	local pullDirection = util.GetDirectionOppositeOfWrap(aWrapDirection, aCurHeading)
@@ -296,6 +298,19 @@ function SetTurtleConfig(cfg)
 		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		cfg.flyCeiling = locBaseCenter.y + 3
 		cfg.fuelLoc = {x=211, z=1927, y=83, h="north"}		
+
+		if cfg.turtleID == 1 then
+			cfg.startLoc = util.AddVectorToLoc(locBaseCenter, "f", 2)
+			cfg.startLoc.h = util.GetNewHeading(cfg.startLoc.h, "r")
+		elseif cfg.turtleID == 2 then
+			error "not implemented"
+		end
+
+	-- Sand location
+	elseif cfg.regionCode == "z" then	
+		local locBaseCenter = {x=688, z=2260, y=66, h="north"} -- the space above the center block
+		cfg.flyCeiling = locBaseCenter.y + 3
+		cfg.fuelLoc = {x=267, z=2259, y=66, h="north"}		
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = util.AddVectorToLoc(locBaseCenter, "f", 2)

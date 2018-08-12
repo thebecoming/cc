@@ -1,4 +1,4 @@
-local version = "0.12"
+local version = "0.13"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -125,7 +125,7 @@ function RunProgram()
         t.AddCommand({func=RunProgram}, true)
 	else
 		t.AddCommand({func=function()
-			t.GoHome("Gohome from RunProgram: " .. stopReason);
+		t.GoHome("Gohome from RunProgram: " .. stopReason);
 		end}, false)
 	end
 end
@@ -244,6 +244,7 @@ function SetTurtleConfig(cfg)
 
 		local t1_startloc = {x=684, z=2253, y=locBaseCenter.y, h="north"}
 		local t1_mineloc = {x=675, z=2250, y=locBaseCenter.y, h="north"}
+		local t6_mineloc = {x=754, z=2259, y=locBaseCenter.y, h="south"}
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = t1_startloc 
@@ -260,9 +261,23 @@ function SetTurtleConfig(cfg)
 		elseif cfg.turtleID == 5 then
 			cfg.startLoc = {x=t1_startloc.x + 6, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
 			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+
+		-- side is flipped
 		elseif cfg.turtleID == 6 then
 			cfg.startLoc = {x=t1_startloc.x + 7, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+			cfg.mineLoc = t6_mineloc
+		elseif cfg.turtleID == 7 then
+			cfg.startLoc = {x=t1_startloc.x + 9, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 1) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+		elseif cfg.turtleID == 8 then
+			cfg.startLoc = {x=t1_startloc.x + 10, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 1) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+		elseif cfg.turtleID == 9 then
+			cfg.startLoc = {x=t1_startloc.x + 12, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 1) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+		elseif cfg.turtleID == 10 then
+			cfg.startLoc = {x=t1_startloc.x + 13, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 1) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
 		end
 	end
 end
