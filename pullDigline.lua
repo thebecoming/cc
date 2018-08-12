@@ -1,6 +1,6 @@
 function InitProgram()
     -- wget https://raw.githubusercontent.com/thebecoming/cc/master/pullDigline.lua pullDigline
-    
+
     shell.run("delete edit")
     shell.run("wget https://raw.githubusercontent.com/thebecoming/cc/master/edit.lua edit")
     os.sleep(0.5)
