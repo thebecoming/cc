@@ -208,15 +208,15 @@ function SetTurtleConfig(cfg)
 	-- Main shafts
 	if cfg.regionCode == "s" then
 		if cfg.turtleID == 1 or cfg.turtleID == 2 or cfg.turtleID == 3 or cfg.turtleID == 4 or cfg.turtleID == 5 then
-			cfg.destroyLoc = {x=688, z=2260, y=67, h="east"};
+			cfg.destroyLoc = {x=799, z=2305, y=65, h="east"};
 		else
-			cfg.destroyLoc = {x=688, z=2260, y=67, h="east"} 
+			cfg.destroyLoc = {x=799, z=2306, y=65, h="east"} 
 		end		
 		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
 		cfg.rarity2Locc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
 		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
-		cfg.rarity4Loc = {x=cfg.rarity3Loc.x, z=cfg.rarity3Loc.z, y=cfg.rarity3Loc.y, h=cfg.rarity3Loc.h};
+		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
 		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc, "f", 1)
 
 		cfg.flyCeiling = cfg.destroyLoc.y + 2
