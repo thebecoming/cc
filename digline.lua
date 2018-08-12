@@ -1,4 +1,4 @@
-local version = "0.13"
+local version = "0.14"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -207,77 +207,78 @@ function SetTurtleConfig(cfg)
 	
 	-- Main shafts
 	if cfg.regionCode == "s" then
-		local locBaseCenter = {x=688, z=2260, y=66, h="north"} -- the space above the center block
-
-		cfg.destroyLoc = {x=locBaseCenter.x, z=locBaseCenter.z, y=locBaseCenter.y + 1, h=locBaseCenter.h};
-		
-		-- plus sign above center block
-		cfg.rarity1Loca = util.AddVectorToLoc(locBaseCenter, "f", 1)
-		cfg.rarity1Loca.h = util.GetNewHeading(cfg.rarity1Loca.h, "r")
-		cfg.rarity1Loca.y = cfg.rarity1Loca.y + 1
-
-		-- top right corner
-		cfg.rarity2Loca = util.AddVectorToLoc(cfg.rarity1Loca, "f", 1)
-		cfg.rarity2Loca.h = util.GetNewHeading(cfg.rarity2Loca.h, "r")
-
+		if cfg.turtleID == 1 or cfg.turtleID == 2 or cfg.turtleID == 3 or cfg.turtleID == 4 or cfg.turtleID == 5 then
+			cfg.destroyLoc = {x=688, z=2260, y=67, h="east"};
+		else
+			cfg.destroyLoc = {x=688, z=2260, y=67, h="east"} 
+		end		
+		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
-
-		-- bottom right corner
 		cfg.rarity2Locc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
-		cfg.rarity2Locc.h = util.GetNewHeading(cfg.rarity2Locc.h, "r")
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
+		cfg.rarity4Loc = {x=rarity3Loc.x, z=rarity3Loc.z, y=rarity3Loc.y, h=rarity3Loc.h};
+		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc, "f", 1)
 
-		cfg.rarity2Locd = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
-
-		-- bottom left corner
-		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locd, "f", 1)
-		cfg.rarity3Loc.h = util.GetNewHeading(cfg.rarity3Loc.h, "r")
-
-		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)
-
-		-- top left corner
-		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc,"f", 1)
-
-		cfg.flyCeiling = locBaseCenter.y + 2
+		cfg.flyCeiling = cfg.destroyLoc.y + 2
 		cfg.length = 50
 		cfg.width = 20
 		cfg.depth = 10
 
-		local t1_startloc = {x=684, z=2253, y=locBaseCenter.y, h="north"}
-		local t1_mineloc = {x=675, z=2250, y=locBaseCenter.y, h="north"}
-		local t6_mineloc = {x=754, z=2259, y=locBaseCenter.y, h="south"}
+		local t1_startloc = {x=800, z=2302, y=65, h="north"}
+		local t6_startloc = {x=800, z=2309, y=65, h="south"}
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = t1_startloc 
-			cfg.mineLoc = t1_mineloc
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 3)
 		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 2)
 		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 2, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
 		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width)
 		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=t1_startloc.x + 6, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_mineloc.x + ((cfg.turtleID - 1) * cfg.width), z=t1_mineloc.z, y=t1_mineloc.y, h=t1_mineloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width * 2)
 
 		-- side is flipped
 		elseif cfg.turtleID == 6 then
-			cfg.startLoc = {x=t1_startloc.x + 7, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = t6_mineloc
+			cfg.startLoc = t6_startloc 
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 3)
 		elseif cfg.turtleID == 7 then
-			cfg.startLoc = {x=t1_startloc.x + 9, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 6) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 1, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 2)
 		elseif cfg.turtleID == 8 then
-			cfg.startLoc = {x=t1_startloc.x + 10, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 6) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 2, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
 		elseif cfg.turtleID == 9 then
-			cfg.startLoc = {x=t1_startloc.x + 12, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 6) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 3, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width)
 		elseif cfg.turtleID == 10 then
-			cfg.startLoc = {x=t1_startloc.x + 13, z=t1_startloc.z + 1, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t6_mineloc.x - ((cfg.turtleID - 6) * cfg.width), z=t6_mineloc.z, y=t6_mineloc.y, h=t6_mineloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 4, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width * 2)
 		end
 	end
 end

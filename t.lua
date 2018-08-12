@@ -9,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.14"
+local version = "0.15"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -380,7 +380,7 @@ end
 			local action = table.remove(actions, 1)
 			if action == nil then
 				if aDigIfBlocked then 
-					table.insert(actions, {func=function() turtle.dig() end})
+					table.insert(actions, {func=function() Dig() end})
 				end
 				table.insert(actions, {func=function() turtle.attack() end})
 				action = table.remove(actions, 1)
