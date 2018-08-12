@@ -1,4 +1,4 @@
-local version = "0.17"
+local version = "0.18"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -216,7 +216,7 @@ function SetTurtleConfig(cfg)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
 		cfg.rarity2Locc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
 		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
-		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
+		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)
 		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc, "f", 1)
 
 		cfg.flyCeiling = cfg.destroyLoc.y + 2
