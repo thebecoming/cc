@@ -32,7 +32,7 @@ function AwaitModemMsg()
 	while true do
 		local event, modemSide, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")		
 		if senderChannel == port_turtleCmd or (senderChannel == port_log and isListenLogPort) then 
-			util.Print(message)
+			util.PrintToMonitor(message)
 		end
 	end
 end
