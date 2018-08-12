@@ -9,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.15"
+local version = "0.16"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -371,27 +371,20 @@ end
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- Lowest level process for each instruction, (checks instruction index)
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	function Forward(aDigIfBlocked)
+	function Forward()
 		CheckFuelOnMove()
-		local n = 0
-		local actions = {}		
+		local atkCount = 0
 		while not turtle.forward() do
-			-- This performs 1 action per cycle of failed moves
-			local action = table.remove(actions, 1)
-			if action == nil then
-				if aDigIfBlocked then 
-					table.insert(actions, {func=function() Dig() end})
+			-- only do attack loop if there is nothing in front blocking
+			local inspectSuccess, data = turtle.inspect()
+			if not inspectSuccess then
+				turtle.attack()
+				os.sleep(0.2)
+				atkCount = atkCount + 1
+				if atkCount == 20 then 
+					SendMessage(cfg.port_log, "I can't move forward!")
+					return false 
 				end
-				table.insert(actions, {func=function() turtle.attack() end})
-				action = table.remove(actions, 1)
-			end
-			action.func()
-
-			os.sleep(0.2)
-			n = n + 1
-			if n == 20 then 
-				SendMessage(cfg.port_log, "I can't move forward!")
-				return false 
 			end
 		end
 		if loc.h == "north" then
@@ -736,7 +729,7 @@ end
 		local n
 		for n=1,20 do
 			if not Dig() then return false end
-			if Forward(true) then
+			if Forward() then
 				success = true
 				break
 			else
@@ -1122,13 +1115,13 @@ end
                         --DispatchLocation()
 
                     elseif string.lower(command) == "forward" then
-                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward(true)))
+                        modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward: " .. tostring(Forward()))
                         DispatchLocation()
 
                     elseif string.lower(command) == "forward10" then
                         local moveCount = 0
                         for n=1, 10 do
-                            if Forward(true) then moveCount=moveCount+1 end
+                            if Forward() then moveCount=moveCount+1 end
                         end
                         modem.transmit(replyChannel, cfg.port_turtleCmd, os.getComputerLabel() .. " forward " .. tostring(moveCount) .. " spaces")
                         --DispatchLocation()

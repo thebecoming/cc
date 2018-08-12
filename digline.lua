@@ -1,4 +1,4 @@
-local version = "0.16"
+local version = "0.17"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -208,9 +208,9 @@ function SetTurtleConfig(cfg)
 	-- Main shafts
 	if cfg.regionCode == "s" then
 		if cfg.turtleID == 1 or cfg.turtleID == 2 or cfg.turtleID == 3 or cfg.turtleID == 4 or cfg.turtleID == 5 then
-			cfg.destroyLoc = {x=799, z=2305, y=65, h="east"};
+			cfg.destroyLoc = {x=799, z=2305, y=66, h="east"};
 		else
-			cfg.destroyLoc = {x=799, z=2306, y=65, h="east"} 
+			cfg.destroyLoc = {x=799, z=2306, y=66, h="east"} 
 		end		
 		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
