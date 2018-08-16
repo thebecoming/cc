@@ -1,4 +1,4 @@
-local version = "0.17"
+local version = "0.18"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -96,12 +96,12 @@ function MainLoop_SandPattern()
 		local invStepsPerSide = 5
 
 		if not t.GoHome() then isStuck = true end
-		-- Get burn item
+
+		-- Get burn item from reserve container
 		if not t.TurnRight() then isStuck = true end
 		PutItems("", "right", currentLoc.h)
 		GetItems(burnItem, "right", currentLoc.h)
 		if not t.TurnLeft() then isStuck = true end
-
 
 		-- Get burn item
 		for n=1, stepsPerSide, 1 do
@@ -120,6 +120,12 @@ function MainLoop_SandPattern()
 			end
 			PutItems(burnItem, "bottom", currentLoc.h, 1)
 		end
+
+		-- Store leftover burn item in reserve container
+		if not t.TurnRight() then isStuck = true end
+		PutItems("", "right", currentLoc.h)
+		GetItems("minecraft:coal", "right", currentLoc.h)
+		if not t.TurnLeft() then isStuck = true end
 		
 		-- Get coal
 		for n=1, stepsPerSide, 1 do
@@ -144,6 +150,15 @@ function MainLoop_SandPattern()
 			end
 			PutItems("minecraft:coal", "right", currentLoc.h, 2)
 		end
+		
+		-- Store leftover coal item in reserve container
+		if not t.TurnRight() then isStuck = true end
+		if not t.Up() then isStuck = true end
+		if not t.Forward() then isStuck = true end
+		PutItems("", "right", currentLoc.h)
+		if not t.Backward() then isStuck = true end
+		if not t.Down() then isStuck = true end
+		if not t.TurnLeft() then isStuck = true end
 
 		-- Gather result
 		for n=1, stepsPerSide, 1 do
@@ -156,7 +171,7 @@ function MainLoop_SandPattern()
 		-- Come back
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
-				if not t.Back() then isStuck = true end
+				if not t.Backward() then isStuck = true end
 			end
 		end
 
