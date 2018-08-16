@@ -1,4 +1,4 @@
-local version = "0.14"
+local version = "0.15"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -78,7 +78,7 @@ function RunProgram()
 			isStuck = true 
 			util.Print("Stuck from MainLoop_CirclePattern()")
 		end
-	else if cfg.regionCode == "z" then
+	elseif cfg.regionCode == "z" then
 		if not MainLoop_SandPattern() then 
 			isStuck = true 
 			util.Print("Stuck from MainLoop_SandPattern()")
@@ -394,8 +394,10 @@ function SetTurtleConfig(cfg)
 		burnResult = "minecraft:glass"
 		if cfg.turtleID == 1 then
 			cfg.destroyLoc = {x=799, z=2305, y=66, h="east"};
+			cfg.startLoc = {x=800, z=2304, y=65, h="east"};
 		else
 			cfg.destroyLoc = {x=799, z=2306, y=66, h="east"} 
+			cfg.startLoc = {x=805, z=2307, y=65, h="west"};
 		end		
 		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
 		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
