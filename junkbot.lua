@@ -1,4 +1,4 @@
-local version = "0.15"
+local version = "0.16"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -92,7 +92,8 @@ end
 function MainLoop_SandPattern()
 	while true do
 		local isStuck, n
-		local stepsPerSide = 5
+		local stepsPerSide = 6
+		local invStepsPerSide = 5
 
 		if not t.GoHome() then isStuck = true end
 		-- Get burn item
@@ -107,13 +108,15 @@ function MainLoop_SandPattern()
 			if n > 1 then 
 				if not t.Forward() then isStuck = true end
 			end
-			GetItems(burnItem, "right", currentLoc.h)
+			if n <= invStepsPerSide then 
+				GetItems(burnItem, "right", currentLoc.h)
+			end
 		end
 
 		-- place burn item in furnace below
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
-				if not t.Back() then isStuck = true end
+				if not t.Backward() then isStuck = true end
 			end
 			PutItems(burnItem, "bottom", currentLoc.h, 1)
 		end
@@ -122,20 +125,22 @@ function MainLoop_SandPattern()
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
 				if not t.Forward() then isStuck = true end
+			end			
+			if n <= invStepsPerSide then 
+				GetItems("minecraft:coal", "right", currentLoc.h)
 			end
-			GetItems("minecraft:coal", "right", currentLoc.h)
 		end
 		
 		-- manuever		
 		if not t.TurnRight() then isStuck = true end
-		if not t.Back() then isStuck = true end
+		if not t.Backward() then isStuck = true end
 		if not t.TurnLeft() then isStuck = true end	
 		if not t.Down() then isStuck = true end
 
 		-- Place coal
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
-				if not t.Back() then isStuck = true end
+				if not t.Backward() then isStuck = true end
 			end
 			PutItems("minecraft:coal", "right", currentLoc.h, 2)
 		end
@@ -143,7 +148,7 @@ function MainLoop_SandPattern()
 		-- Gather result
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
-				if not t.Back() then isStuck = true end
+				if not t.Backward() then isStuck = true end
 			end
 			GetItems(burnResult, "right", currentLoc.h)
 		end
