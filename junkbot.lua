@@ -1,4 +1,4 @@
-local version = "0.16"
+local version = "0.17"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -148,9 +148,16 @@ function MainLoop_SandPattern()
 		-- Gather result
 		for n=1, stepsPerSide, 1 do
 			if n > 1 then 
-				if not t.Backward() then isStuck = true end
+				if not t.Forward() then isStuck = true end
 			end
 			GetItems(burnResult, "right", currentLoc.h)
+		end
+
+		-- Come back
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Back() then isStuck = true end
+			end
 		end
 
 		-- Store result
