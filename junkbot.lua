@@ -6,10 +6,8 @@ local stopReason = ""
 local currentLoc -- This gets updated as t changes it (by reference)
 local modem
 local loopSeconds = 300
--- local burnItem = "minecraft:clay_ball"
-local burnItem = "minecraft:sand"
---local burnResult = "minecraft:brick"
-local burnResult = "minecraft:glass"
+local burnItem
+local burnResult
 
 local cfg = {
     -- turtle base.. don't change
@@ -75,16 +73,98 @@ function RunProgram()
 	if not t.GoHome() then isStuck = true end
 	if isStuck then util.Print("fuckin-a, i'm stuck!") return false end
 	
-	if not MainLoop() then 
-		isStuck = true 
-		util.Print("Stuck from MainLoop()")
+	if cfg.regionCode == "c" then
+		if not MainLoop_CirclePattern() then 
+			isStuck = true 
+			util.Print("Stuck from MainLoop_CirclePattern()")
+		end
+	else if cfg.regionCode == "z" then
+		if not MainLoop_SandPattern() then 
+			isStuck = true 
+			util.Print("Stuck from MainLoop_SandPattern()")
+		end
 	end
 
 	util.Print("RunProgram ending")
 	t.AddCommand({func=GoHome, args={"Gohome from RunProgram: " .. stopReason}}, false)
 end
 
-function MainLoop()
+function MainLoop_SandPattern()
+	while true do
+		local isStuck, n
+		local stepsPerSide = 5
+
+		if not t.GoHome() then isStuck = true end
+		-- Get burn item
+		if not t.TurnRight() then isStuck = true end
+		PutItems("", "right", currentLoc.h)
+		GetItems(burnItem, "right", currentLoc.h)
+		if not t.TurnLeft() then isStuck = true end
+
+
+		-- Get burn item
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Forward() then isStuck = true end
+			end
+			GetItems(burnItem, "right", currentLoc.h)
+		end
+
+		-- place burn item in furnace below
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Back() then isStuck = true end
+			end
+			PutItems(burnItem, "bottom", currentLoc.h, 1)
+		end
+		
+		-- Get coal
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Forward() then isStuck = true end
+			end
+			GetItems("minecraft:coal", "right", currentLoc.h)
+		end
+		
+		-- manuever		
+		if not t.TurnRight() then isStuck = true end
+		if not t.Back() then isStuck = true end
+		if not t.TurnLeft() then isStuck = true end	
+		if not t.Down() then isStuck = true end
+
+		-- Place coal
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Back() then isStuck = true end
+			end
+			PutItems("minecraft:coal", "right", currentLoc.h, 2)
+		end
+
+		-- Gather result
+		for n=1, stepsPerSide, 1 do
+			if n > 1 then 
+				if not t.Back() then isStuck = true end
+			end
+			GetItems(burnResult, "right", currentLoc.h)
+		end
+
+		-- Store result
+		if not t.TurnRight() then isStuck = true end
+		PutItems(burnResult, "right", currentLoc.h)
+		if not t.TurnLeft() then isStuck = true end	
+
+		-- maneuver back to start pos
+		if not t.Up() then isStuck = true end	
+		if not t.TurnRight() then isStuck = true end
+		if not t.Forward() then isStuck = true end
+		if not t.TurnLeft() then isStuck = true end
+
+		os.sleep(loopSeconds)
+	end
+	return true
+end
+
+function MainLoop_CirclePattern()
 	while true do
 		local isStuck
 		local pathQueue = {}
@@ -295,6 +375,8 @@ function SetTurtleConfig(cfg)
 
 	-- Home3 (need to change this convention...)
 	if cfg.regionCode == "c" then	
+		burnItem = "minecraft:clay_ball"
+		burnResult = "minecraft:brick"
 		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
 		cfg.flyCeiling = locBaseCenter.y + 3
 		cfg.fuelLoc = {x=211, z=1927, y=83, h="north"}		
@@ -308,16 +390,20 @@ function SetTurtleConfig(cfg)
 
 	-- Sand location
 	elseif cfg.regionCode == "z" then	
-		local locBaseCenter = {x=688, z=2260, y=66, h="north"} -- the space above the center block
-		cfg.flyCeiling = locBaseCenter.y + 3
-		cfg.fuelLoc = {x=267, z=2259, y=66, h="north"}		
-
+		burnItem = "minecraft:sand"
+		burnResult = "minecraft:glass"
 		if cfg.turtleID == 1 then
-			cfg.startLoc = util.AddVectorToLoc(locBaseCenter, "f", 2)
-			cfg.startLoc.h = util.GetNewHeading(cfg.startLoc.h, "r")
-		elseif cfg.turtleID == 2 then
-			error "not implemented"
-		end
+			cfg.destroyLoc = {x=799, z=2305, y=66, h="east"};
+		else
+			cfg.destroyLoc = {x=799, z=2306, y=66, h="east"} 
+		end		
+		cfg.rarity2Loca = util.AddVectorToLoc(cfg.destroyLoc, "f", 1)
+		cfg.rarity2Locb = util.AddVectorToLoc(cfg.rarity2Loca, "f", 1)
+		cfg.rarity2Locc = util.AddVectorToLoc(cfg.rarity2Locb, "f", 1)
+		cfg.rarity3Loc = util.AddVectorToLoc(cfg.rarity2Locc, "f", 1)
+		cfg.rarity4Loc = util.AddVectorToLoc(cfg.rarity3Loc, "f", 1)
+		cfg.fuelLoc = util.AddVectorToLoc(cfg.rarity4Loc, "f", 1)
+		cfg.flyCeiling = cfg.destroyLoc.y + 2
 	end
 end
 
