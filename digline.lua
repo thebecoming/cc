@@ -8,7 +8,7 @@ local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
 local isStepDown = true
 local modem
-local isResumeDepth
+local isResumeDepth = true
 
 
 local cfg = {
