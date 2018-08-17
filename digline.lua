@@ -1,4 +1,4 @@
-local version = "0.19"
+local version = "0.21"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -8,6 +8,7 @@ local currentLoc -- This gets updated as t changes it (by reference)
 local curLength, curWidth, curdepth
 local isStepDown = true
 local modem
+local isResumeDepth
 
 
 local cfg = {
@@ -139,6 +140,18 @@ function BeginMining()
 	curLength = 0
 	curDepth = 1
 	curWidth = 1
+
+	-- isResumeDepth=true drops down until it hits a block and resumes from there
+	if isResumeDepth then 
+		local atBottom = false
+		while not atBottom do 
+			if turtle.detect() then 
+				atBottom = true
+			else
+				t.Down();
+			end
+		end
+	end
 	
 	while not isMiningCompleted do
 		-- cfg.length = 21
@@ -222,7 +235,7 @@ function SetTurtleConfig(cfg)
 		cfg.flyCeiling = cfg.destroyLoc.y + 2
 		cfg.length = 50
 		cfg.width = 20
-		cfg.depth = 10
+		cfg.depth = 255
 
 		local t1_startloc = {x=800, z=2302, y=65, h="north"}
 		local t6_startloc = {x=800, z=2309, y=65, h="south"}
