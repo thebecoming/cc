@@ -1,4 +1,4 @@
-local version = "0.18"
+local version = "0.19"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -229,26 +229,25 @@ function SetTurtleConfig(cfg)
 
 		if cfg.turtleID == 1 then
 			cfg.startLoc = t1_startloc 
-			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 3)
-		elseif cfg.turtleID == 2 then
-			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
-			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y + 2, h=t1_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 2)
-		elseif cfg.turtleID == 3 then
-			cfg.startLoc = {x=t1_startloc.x + 2, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+		elseif cfg.turtleID == 2 then
+			cfg.startLoc = {x=t1_startloc.x + 1, z=t1_startloc.z, y=t1_startloc.y + 2, h=t1_startloc.h}
 			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
+		elseif cfg.turtleID == 3 then
+			cfg.startLoc = {x=t1_startloc.x + 2, z=t1_startloc.z, y=t1_startloc.y + 2, h=t1_startloc.h}
+			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 		elseif cfg.turtleID == 4 then
-			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 3, z=t1_startloc.z, y=t1_startloc.y + 2, h=t1_startloc.h}
 			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width)
 		elseif cfg.turtleID == 5 then
-			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
+			cfg.startLoc = {x=t1_startloc.x + 4, z=t1_startloc.z, y=t1_startloc.y + 2, h=t1_startloc.h}
 			cfg.mineLoc = {x=t1_startloc.x, z=t1_startloc.z, y=t1_startloc.y, h=t1_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width * 2)
@@ -256,26 +255,25 @@ function SetTurtleConfig(cfg)
 		-- side is flipped
 		elseif cfg.turtleID == 6 then
 			cfg.startLoc = t6_startloc 
-			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 3)
-		elseif cfg.turtleID == 7 then
-			cfg.startLoc = {x=t6_startloc.x + 1, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
-			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y + 2, h=t6_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width * 2)
+		elseif cfg.turtleID == 7 then
+			cfg.startLoc = {x=t6_startloc.x + 1, z=t6_startloc.z, y=t6_startloc.y + 2, h=t6_startloc.h}
+			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
+			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
 		elseif cfg.turtleID == 8 then
-			cfg.startLoc = {x=t6_startloc.x + 2, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 2, z=t6_startloc.z, y=t6_startloc.y + 2, h=t6_startloc.h}
 			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 2) -- i_dr_delicios portal evasion..
-			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "l", cfg.width)
 		elseif cfg.turtleID == 9 then
-			cfg.startLoc = {x=t6_startloc.x + 3, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 3, z=t6_startloc.z, y=t6_startloc.y + 2, h=t6_startloc.h}
 			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 2) -- i_dr_delicios portal evasion..
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width)
 		elseif cfg.turtleID == 10 then
-			cfg.startLoc = {x=t6_startloc.x + 4, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
+			cfg.startLoc = {x=t6_startloc.x + 4, z=t6_startloc.z, y=t6_startloc.y + 2, h=t6_startloc.h}
 			cfg.mineLoc = {x=t6_startloc.x, z=t6_startloc.z, y=t6_startloc.y, h=t6_startloc.h}
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "f", 1)
 			cfg.mineLoc = util.AddVectorToLoc(cfg.mineLoc, "r", cfg.width * 2)
