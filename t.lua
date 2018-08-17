@@ -9,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.16"
+local version = "0.17"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -728,12 +728,14 @@ end
 		local success = false
 		local n
 		for n=1,20 do
-			if not Dig() then return false end
+			Dig()
 			if Forward() then
 				success = true
 				break
 			else
 				-- There may be a mob in front..
+				-- Hopefully this will fix sand stacks so i can re-hit
+				os.sleep(0.5);
 			end
 		end
 		return success
