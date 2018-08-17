@@ -1,4 +1,4 @@
-local version = "0.21"
+local version = "0.22"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -145,7 +145,7 @@ function BeginMining()
 	if isResumeDepth then 
 		local atBottom = false
 		while not atBottom do 
-			if turtle.detect() then 
+			if turtle.detectDown() then 
 				atBottom = true
 			else
 				t.Down();
