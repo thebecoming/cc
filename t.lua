@@ -9,7 +9,7 @@
 -- make sure turtles who get behind others in line don't lose their position etc..
 
 
-local version = "0.17"
+local version = "0.18"
 local modem, util, cfg
 local undiggableBlockData = nil
 local stopReason = ""
@@ -377,11 +377,14 @@ end
 		while not turtle.forward() do
 			-- only do attack loop if there is nothing in front blocking
 			local inspectSuccess, data = turtle.inspect()
-			if not inspectSuccess then
+			if inspectSuccess then
+				-- Block is in front, can't move forward
+				return false
+			else
 				turtle.attack()
-				os.sleep(0.2)
+				os.sleep(0.1)
 				atkCount = atkCount + 1
-				if atkCount == 20 then 
+				if atkCount == 10 then 
 					SendMessage(cfg.port_log, "I can't move forward!")
 					return false 
 				end
