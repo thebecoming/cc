@@ -1,4 +1,4 @@
-local version = "2.11"
+local version = "2.12"
 os.loadAPI("util")
 os.loadAPI("t")
 
@@ -95,7 +95,7 @@ function InitProgram()
         return false
     end
 
-	t.StartTurtleRun();
+	t.StartTurtleRun()
 	t.SendMessage(cfg.port_log, "program END")
 end
 
@@ -260,7 +260,8 @@ function SetTurtleConfig(cfg)
 	
 	-- Main shafts
 	if cfg.regionCode == "a" or cfg.regionCode == "b" then
-		local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
+		--local locBaseCenter = {x=364, z=2104, y=75, h="west"} -- the space above the center block
+		local locBaseCenter = {x=262, z=2104, y=78, h="west"} -- (offset + 22 + 2 + 22 + 1 = 51) * 2
 		local baseCenterOffset = 4
 
 		cfg.destroyLoc = {x=locBaseCenter.x, z=locBaseCenter.z, y=locBaseCenter.y + 1, h=locBaseCenter.h};
@@ -295,7 +296,7 @@ function SetTurtleConfig(cfg)
 		cfg.maxRadius = 10 -- this is 22 inner ((rad*2) + 2). Add 2 more for stairs
 		cfg.nextdepth = 1
 		cfg.maxdepth = 255
-        cfg.isResumeMiningdepth = true
+		cfg.isResumeMiningdepth = true
 
 		local outerRingOffset = baseCenterOffset + (cfg.maxRadius * 2) + 4;
         local newMineLoc = {x=locBaseCenter.x,y=locBaseCenter.y,z=locBaseCenter.z,h=locBaseCenter.h}
